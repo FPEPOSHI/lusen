@@ -1,0 +1,27 @@
+{
+    "name": "Acme Commerce API",
+    "version": "2.4.1",
+    "description": "Everything you need to sell: customers, orders, refunds, the product catalogue and webhooks. REST over HTTPS, JSON in and out, bearer-token authenticated.",
+    "documentation": "/lusen/index.html",
+    "api_versions": [
+        {
+            "name": "v2",
+            "current": true
+        },
+        {
+            "name": "v1",
+            "deprecated": true,
+            "sunset": "2026-09-01"
+        }
+    ],
+    "surfaces": {
+        "openapi": "/lusen/openapi.json",
+        "llms_txt": "/lusen/llms.txt",
+        "llms_full": "/lusen/llms-full.txt",
+        "search_index": "/lusen/search-index.json",
+        "postman": "/lusen/postman.json",
+        "sitemap": "/lusen/sitemap.xml"
+    },
+    "endpoints": 24,
+    "generator": "lusen"
+}

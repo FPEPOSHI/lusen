@@ -1,0 +1,13 @@
+{
+    "name": "lusen",
+    "private": true,
+    "description": "Tailwind build for the Lusen docs UI. Maintainers only - dist/lusen.css is committed.",
+    "scripts": {
+        "build": "tailwindcss -i resources/css/lusen.css -o dist/lusen.css --minify",
+        "dev": "tailwindcss -i resources/css/lusen.css -o dist/lusen.css --watch"
+    },
+    "devDependencies": {
+        "@tailwindcss/cli": "^4.0.0",
+        "tailwindcss": "^4.0.0"
+    }
+}

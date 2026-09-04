@@ -1,0 +1,2064 @@
+{
+    "info": {
+        "_postman_id": "4ff1bfa3-ad6d-50a7-7924-43cbe3e3000e",
+        "name": "Acme Commerce API",
+        "description": "Everything you need to sell: customers, orders, refunds, the product catalogue and webhooks. REST over HTTPS, JSON in and out, bearer-token authenticated.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "https://api.acme.example",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Authentication (v2)",
+            "description": "Exchange an API key pair for a bearer token, and revoke it when you are done.",
+            "item": [
+                {
+                    "name": "Issue an access token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/auth/tokens",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "auth",
+                                "tokens"
+                            ]
+                        },
+                        "description": "Exchanges an API key pair for a short-lived bearer token. Tokens expire after one hour; request a new one rather than caching indefinitely.\n\n| Field | Type | Required |\n| --- | --- | --- |\n| `key_id` | string | yes |\n| `key_secret` | string | yes |\n| `scopes` | array | no |",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"key_id\": \"key id\",\n    \"key_secret\": \"key secret\",\n    \"scopes\": [\n        \"orders:read\"\n    ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/auth/tokens",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "auth",
+                                        "tokens"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"access_token\": \"act_7f3a9c2e5b1d8406\",\n    \"token_type\": \"Bearer\",\n    \"expires_in\": 3600,\n    \"scopes\": [\n        \"orders:read\",\n        \"orders:write\"\n    ]\n}"
+                        },
+                        {
+                            "name": "422 Unprocessable Entity",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/auth/tokens",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "auth",
+                                        "tokens"
+                                    ]
+                                }
+                            },
+                            "status": "Unprocessable Entity",
+                            "code": 422,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"message\": \"These credentials do not match our records.\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Revoke the current token",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/auth/tokens/current",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "auth",
+                                "tokens",
+                                "current"
+                            ]
+                        },
+                        "description": "Invalidates the token used to make this call. Idempotent — revoking an already-revoked token still returns 204.\n\nRate limit: 60 requests per minute."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Customers (v2)",
+            "description": "Create and manage the people who place orders.",
+            "item": [
+                {
+                    "name": "List customers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/customers",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "customers"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "25",
+                                    "description": "Results per page, 1–100. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number, 1-indexed. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "active",
+                                    "description": "Only customers in this state. (string, one of active, invited, archived)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "q",
+                                    "value": "q",
+                                    "description": "Free-text search over name and email. (string, maxLength 120)",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Returns a paginated list of customers, newest first. Use `status` to narrow the list, and `q` to search across name and email.\n\nRate limit: 60 requests per minute."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/customers",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "customers"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "25",
+                                            "description": "Results per page, 1–100. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Page number, 1-indexed. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "status",
+                                            "value": "active",
+                                            "description": "Only customers in this state. (string, one of active, invited, archived)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "q",
+                                            "value": "q",
+                                            "description": "Free-text search over name and email. (string, maxLength 120)",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"data\": [\n        {\n            \"id\": 1,\n            \"email\": \"jane@example.com\",\n            \"name\": \"Jane Doe\",\n            \"status\": \"active\",\n            \"created_at\": \"2026-01-15T09:30:00Z\"\n        },\n        {\n            \"id\": 2,\n            \"email\": \"sam@example.com\",\n            \"name\": \"Sam Reyes\",\n            \"status\": \"invited\",\n            \"created_at\": \"2026-01-14T16:02:11Z\"\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"per_page\": 25,\n        \"total\": 2\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Create a customer",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/customers",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "customers"
+                            ]
+                        },
+                        "description": "Creates a customer and, unless `send_invite` is false, emails them an invitation.\n\n| Field | Type | Required |\n| --- | --- | --- |\n| `email` | string<email> | yes |\n| `name` | string, maxLength 255 | yes |\n| `send_invite` | boolean | no |\n| `metadata` | object | no |",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"jane@example.com\",\n    \"name\": \"Jane Doe\",\n    \"send_invite\": true,\n    \"metadata\": {\n        \"plan\": \"pro\"\n    }\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/customers",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "customers"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"id\": 42,\n    \"email\": \"jane@example.com\",\n    \"name\": \"Jane Doe\",\n    \"status\": \"invited\",\n    \"created_at\": \"2026-02-01T11:00:00Z\"\n}"
+                        },
+                        {
+                            "name": "422 Unprocessable Entity",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/customers",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "customers"
+                                    ]
+                                }
+                            },
+                            "status": "Unprocessable Entity",
+                            "code": 422,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"message\": \"The email has already been taken.\",\n    \"errors\": {\n        \"email\": [\n            \"The email has already been taken.\"\n        ]\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Retrieve a customer",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/customers/:customer",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "customers",
+                                ":customer"
+                            ],
+                            "query": [
+                                {
+                                    "key": "include",
+                                    "value": "orders",
+                                    "description": "Embed a related collection in the response. (string, one of orders, addresses)",
+                                    "disabled": true
+                                }
+                            ],
+                            "variable": [
+                                {
+                                    "key": "customer",
+                                    "value": "1",
+                                    "description": "The customer id. (integer)"
+                                }
+                            ]
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/customers/:customer",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "customers",
+                                        ":customer"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "include",
+                                            "value": "orders",
+                                            "description": "Embed a related collection in the response. (string, one of orders, addresses)",
+                                            "disabled": true
+                                        }
+                                    ],
+                                    "variable": [
+                                        {
+                                            "key": "customer",
+                                            "value": "1",
+                                            "description": "The customer id. (integer)"
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"id\": 1,\n    \"email\": \"jane@example.com\",\n    \"name\": \"Jane Doe\",\n    \"status\": \"active\",\n    \"created_at\": \"2026-01-15T09:30:00Z\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Update a customer",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/customers/:customer",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "customers",
+                                ":customer"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "customer",
+                                    "value": "1",
+                                    "description": "The customer id. (integer)"
+                                }
+                            ]
+                        },
+                        "description": "Partial update — omitted fields are left untouched.\n\n| Field | Type | Required |\n| --- | --- | --- |\n| `name` | string, maxLength 255 | no |\n| `status` | string, one of active, archived | no |",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Jane Doe\",\n    \"status\": \"active\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "originalRequest": {
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/customers/:customer",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "customers",
+                                        ":customer"
+                                    ],
+                                    "variable": [
+                                        {
+                                            "key": "customer",
+                                            "value": "1",
+                                            "description": "The customer id. (integer)"
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"id\": 1,\n    \"email\": \"jane@example.com\",\n    \"name\": \"Jane Doe\",\n    \"status\": \"active\",\n    \"created_at\": \"2026-01-15T09:30:00Z\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete a customer",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/customers/:customer",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "customers",
+                                ":customer"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "customer",
+                                    "value": "1",
+                                    "description": "The customer id. (integer)"
+                                }
+                            ]
+                        },
+                        "description": "Permanently removes the customer and anonymises their orders. Prefer archiving via the update endpoint."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Orders (v2)",
+            "description": "Place, read and refund orders.",
+            "item": [
+                {
+                    "name": "List orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/orders",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "orders"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "25",
+                                    "description": "Results per page, 1–100. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number, 1-indexed. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "pending",
+                                    "description": "Only orders in this state. (string, one of pending, paid, shipped, refunded)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "customer_id",
+                                    "value": "1",
+                                    "description": "Only orders belonging to this customer. (integer)",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/orders",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "orders"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "25",
+                                            "description": "Results per page, 1–100. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Page number, 1-indexed. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "status",
+                                            "value": "pending",
+                                            "description": "Only orders in this state. (string, one of pending, paid, shipped, refunded)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "customer_id",
+                                            "value": "1",
+                                            "description": "Only orders belonging to this customer. (integer)",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"data\": [\n        {\n            \"id\": 8801,\n            \"customer_id\": 1,\n            \"status\": \"paid\",\n            \"total\": 4200,\n            \"currency\": \"USD\",\n            \"placed_at\": \"2026-02-03T14:20:00Z\"\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"per_page\": 25,\n        \"total\": 1\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Create an order",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Idempotency-Key",
+                                "value": "9f8c7b6a-5d4e-3f2a-1b0c-9d8e7f6a5b4c",
+                                "description": "A unique key per logical order. Replays return the original order."
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/orders",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "orders"
+                            ]
+                        },
+                        "description": "Creates an order in `pending` state. Send the `Idempotency-Key` header so a retried request cannot double-charge.\n\nRate limit: 10 requests per minute.\n\n| Field | Type | Required |\n| --- | --- | --- |\n| `customer_id` | integer | yes |\n| `currency` | string, one of USD, EUR, GBP | yes |\n| `items` | array | yes |",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"customer_id\": 1,\n    \"currency\": \"USD\",\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"quantity\": 2\n        }\n    ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Idempotency-Key",
+                                        "value": "9f8c7b6a-5d4e-3f2a-1b0c-9d8e7f6a5b4c",
+                                        "description": "A unique key per logical order. Replays return the original order."
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/orders",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "orders"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"id\": 8802,\n    \"status\": \"pending\",\n    \"total\": 3998,\n    \"currency\": \"USD\",\n    \"items\": [\n        {\n            \"product_id\": 12,\n            \"quantity\": 2,\n            \"unit_price\": 1999\n        }\n    ]\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Retrieve an order",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/orders/:order",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "orders",
+                                ":order"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "order",
+                                    "value": "1",
+                                    "description": "The order id. (integer)"
+                                }
+                            ]
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/orders/:order",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "orders",
+                                        ":order"
+                                    ],
+                                    "variable": [
+                                        {
+                                            "key": "order",
+                                            "value": "1",
+                                            "description": "The order id. (integer)"
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"data\": {\n        \"id\": 1,\n        \"customer_id\": 1,\n        \"status\": \"pending\",\n        \"total\": 4200,\n        \"currency\": \"USD\",\n        \"items\": [\n            {\n                \"product_id\": 1,\n                \"quantity\": 2,\n                \"unit_price\": 1999\n            }\n        ],\n        \"placed_at\": \"2026-01-15T09:30:00Z\",\n        \"refunded_at\": \"2026-01-15T09:30:00Z\"\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Refund an order",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/orders/:order/refunds",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "orders",
+                                ":order",
+                                "refunds"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "order",
+                                    "value": "1",
+                                    "description": "The order id. (integer)"
+                                }
+                            ]
+                        },
+                        "description": "Refunds all or part of a paid order. Partial refunds may be issued repeatedly up to the order total.\n\n| Field | Type | Required |\n| --- | --- | --- |\n| `amount` | integer | no |\n| `reason` | string, one of requested_by_customer, duplicate, fraudulent | no |",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": 4200,\n    \"reason\": \"requested_by_customer\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/orders/:order/refunds",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "orders",
+                                        ":order",
+                                        "refunds"
+                                    ],
+                                    "variable": [
+                                        {
+                                            "key": "order",
+                                            "value": "1",
+                                            "description": "The order id. (integer)"
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"id\": \"rfnd_91a\",\n    \"order_id\": 8801,\n    \"amount\": 4200,\n    \"status\": \"succeeded\"\n}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Products (v2)",
+            "description": "The public product catalogue.",
+            "item": [
+                {
+                    "name": "List products",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/products",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "products"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "25",
+                                    "description": "Results per page, 1–100. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number, 1-indexed. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "currency",
+                                    "value": "USD",
+                                    "description": "Prices are converted to this currency. (string, one of USD, EUR, GBP)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "q",
+                                    "value": "q",
+                                    "description": "Free-text search over name and description. Replaces the v1 search endpoint. (string, maxLength 120)",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Public catalogue. No credentials required, so this endpoint is safe to call from a browser.\n\nRate limit: 300 requests per minute.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/products",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "products"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "25",
+                                            "description": "Results per page, 1–100. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Page number, 1-indexed. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "currency",
+                                            "value": "USD",
+                                            "description": "Prices are converted to this currency. (string, one of USD, EUR, GBP)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "q",
+                                            "value": "q",
+                                            "description": "Free-text search over name and description. Replaces the v1 search endpoint. (string, maxLength 120)",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"data\": [\n        {\n            \"id\": 12,\n            \"name\": \"Field Notebook\",\n            \"price\": 1999,\n            \"currency\": \"USD\",\n            \"in_stock\": true\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"per_page\": 25,\n        \"total\": 1\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Retrieve a product",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/products/:product",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "products",
+                                ":product"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "product",
+                                    "value": "1",
+                                    "description": "The product id. (integer)"
+                                }
+                            ]
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Webhooks (v2)",
+            "description": "Receive signed callbacks when things happen in your account.",
+            "item": [
+                {
+                    "name": "List webhook endpoints",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/webhooks",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "webhooks"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Register a webhook endpoint",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v2/webhooks",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v2",
+                                "webhooks"
+                            ]
+                        },
+                        "description": "We POST a signed JSON payload to your URL for each subscribed event. Verify the `X-Acme-Signature` header before trusting a delivery.\n\n| Field | Type | Required |\n| --- | --- | --- |\n| `url` | string<uri> | yes |\n| `events` | array | yes |",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"url\": \"https://example.com\",\n    \"events\": [\n        \"order.paid\"\n    ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v2/webhooks",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v2",
+                                        "webhooks"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"id\": \"whk_3f9\",\n    \"url\": \"https://example.com/hooks/acme\",\n    \"events\": [\n        \"order.paid\"\n    ],\n    \"signing_secret\": \"whsec_5d4c3b2a1908\"\n}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Authentication (v1)",
+            "description": "Unchanged in v2 apart from the path.",
+            "item": [
+                {
+                    "name": "Issue an access token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/auth/tokens",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "tokens"
+                            ]
+                        },
+                        "description": "Exchanges an API key pair for a short-lived bearer token. Tokens expire after one hour; request a new one rather than caching indefinitely.\n\n**Deprecated.**\n\n| Field | Type | Required |\n| --- | --- | --- |\n| `key_id` | string | yes |\n| `key_secret` | string | yes |\n| `scopes` | array | no |",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"key_id\": \"key id\",\n    \"key_secret\": \"key secret\",\n    \"scopes\": [\n        \"orders:read\"\n    ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/auth/tokens",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "auth",
+                                        "tokens"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"access_token\": \"act_7f3a9c2e5b1d8406\",\n    \"token_type\": \"Bearer\",\n    \"expires_in\": 3600,\n    \"scopes\": [\n        \"orders:read\",\n        \"orders:write\"\n    ]\n}"
+                        },
+                        {
+                            "name": "422 Unprocessable Entity",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/auth/tokens",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "auth",
+                                        "tokens"
+                                    ]
+                                }
+                            },
+                            "status": "Unprocessable Entity",
+                            "code": 422,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"message\": \"These credentials do not match our records.\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Revoke the current token",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/auth/tokens/current",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "tokens",
+                                "current"
+                            ]
+                        },
+                        "description": "Invalidates the token used to make this call. Idempotent — revoking an already-revoked token still returns 204.\n\n**Deprecated.**\n\nRate limit: 60 requests per minute."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Customers (v1)",
+            "description": "Reading and creating customers. Updating and deleting them arrived in v2.",
+            "item": [
+                {
+                    "name": "List customers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/customers",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "customers"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "25",
+                                    "description": "Results per page, 1–100. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number, 1-indexed. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "active",
+                                    "description": "Only customers in this state. (string, one of active, invited, archived)",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Returns a paginated list of customers, newest first. Use `status` to narrow the list, and `q` to search across name and email.\n\n**Deprecated.**\n\nRate limit: 60 requests per minute."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/customers",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "customers"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "25",
+                                            "description": "Results per page, 1–100. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Page number, 1-indexed. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "status",
+                                            "value": "active",
+                                            "description": "Only customers in this state. (string, one of active, invited, archived)",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"data\": [\n        {\n            \"id\": 1,\n            \"email\": \"jane@example.com\",\n            \"name\": \"Jane Doe\",\n            \"status\": \"active\",\n            \"created_at\": \"2026-01-15T09:30:00Z\"\n        },\n        {\n            \"id\": 2,\n            \"email\": \"sam@example.com\",\n            \"name\": \"Sam Reyes\",\n            \"status\": \"invited\",\n            \"created_at\": \"2026-01-14T16:02:11Z\"\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"per_page\": 25,\n        \"total\": 2\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Create a customer",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/customers",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "customers"
+                            ]
+                        },
+                        "description": "Creates a customer and, unless `send_invite` is false, emails them an invitation.\n\n**Deprecated.**\n\n| Field | Type | Required |\n| --- | --- | --- |\n| `email` | string<email> | yes |\n| `name` | string, maxLength 255 | yes |\n| `send_invite` | boolean | no |\n| `metadata` | object | no |",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"jane@example.com\",\n    \"name\": \"Jane Doe\",\n    \"send_invite\": true,\n    \"metadata\": {\n        \"plan\": \"pro\"\n    }\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/customers",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "customers"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"id\": 42,\n    \"email\": \"jane@example.com\",\n    \"name\": \"Jane Doe\",\n    \"status\": \"invited\",\n    \"created_at\": \"2026-02-01T11:00:00Z\"\n}"
+                        },
+                        {
+                            "name": "422 Unprocessable Entity",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/customers",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "customers"
+                                    ]
+                                }
+                            },
+                            "status": "Unprocessable Entity",
+                            "code": 422,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"message\": \"The email has already been taken.\",\n    \"errors\": {\n        \"email\": [\n            \"The email has already been taken.\"\n        ]\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Retrieve a customer",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/customers/:customer",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "customers",
+                                ":customer"
+                            ],
+                            "query": [
+                                {
+                                    "key": "include",
+                                    "value": "orders",
+                                    "description": "Embed a related collection in the response. (string, one of orders, addresses)",
+                                    "disabled": true
+                                }
+                            ],
+                            "variable": [
+                                {
+                                    "key": "customer",
+                                    "value": "1",
+                                    "description": "The customer id. (integer)"
+                                }
+                            ]
+                        },
+                        "description": "**Deprecated.**"
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/customers/:customer",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "customers",
+                                        ":customer"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "include",
+                                            "value": "orders",
+                                            "description": "Embed a related collection in the response. (string, one of orders, addresses)",
+                                            "disabled": true
+                                        }
+                                    ],
+                                    "variable": [
+                                        {
+                                            "key": "customer",
+                                            "value": "1",
+                                            "description": "The customer id. (integer)"
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"id\": 1,\n    \"email\": \"jane@example.com\",\n    \"name\": \"Jane Doe\",\n    \"status\": \"active\",\n    \"created_at\": \"2026-01-15T09:30:00Z\"\n}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Orders (v1)",
+            "description": "Placing and reading orders. Refunds arrived in v2.",
+            "item": [
+                {
+                    "name": "List orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/orders",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "orders"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "25",
+                                    "description": "Results per page, 1–100. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number, 1-indexed. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "pending",
+                                    "description": "Only orders in this state. (string, one of pending, paid, shipped, refunded)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "customer_id",
+                                    "value": "1",
+                                    "description": "Only orders belonging to this customer. (integer)",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "**Deprecated.**"
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/orders",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "orders"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "25",
+                                            "description": "Results per page, 1–100. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Page number, 1-indexed. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "status",
+                                            "value": "pending",
+                                            "description": "Only orders in this state. (string, one of pending, paid, shipped, refunded)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "customer_id",
+                                            "value": "1",
+                                            "description": "Only orders belonging to this customer. (integer)",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"data\": [\n        {\n            \"id\": 8801,\n            \"customer_id\": 1,\n            \"status\": \"paid\",\n            \"total\": 4200,\n            \"currency\": \"USD\",\n            \"placed_at\": \"2026-02-03T14:20:00Z\"\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"per_page\": 25,\n        \"total\": 1\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Create an order",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/orders",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "orders"
+                            ]
+                        },
+                        "description": "Creates an order in `pending` state. A retried request creates a second order; v2 accepts an `Idempotency-Key` header that makes the retry safe.\n\n**Deprecated.**\n\nRate limit: 10 requests per minute.\n\n| Field | Type | Required |\n| --- | --- | --- |\n| `customer_id` | integer | yes |\n| `currency` | string, one of USD, EUR, GBP | yes |\n| `items` | array | yes |",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"customer_id\": 1,\n    \"currency\": \"USD\",\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"quantity\": 2\n        }\n    ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/orders",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "orders"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"id\": 8802,\n    \"status\": \"pending\",\n    \"total\": 3998,\n    \"currency\": \"USD\",\n    \"items\": [\n        {\n            \"product_id\": 12,\n            \"quantity\": 2,\n            \"unit_price\": 1999\n        }\n    ]\n}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Products (v1)",
+            "description": "The public product catalogue, with the search route v2 replaced.",
+            "item": [
+                {
+                    "name": "List products",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/products",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "products"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "25",
+                                    "description": "Results per page, 1–100. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number, 1-indexed. (integer)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "currency",
+                                    "value": "USD",
+                                    "description": "Prices are converted to this currency. (string, one of USD, EUR, GBP)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "q",
+                                    "value": "q",
+                                    "description": "Free-text search over name and description. Replaces the v1 search endpoint. (string, maxLength 120)",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Public catalogue. No credentials required, so this endpoint is safe to call from a browser.\n\n**Deprecated.**\n\nRate limit: 300 requests per minute.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/products",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "products"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "25",
+                                            "description": "Results per page, 1–100. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Page number, 1-indexed. (integer)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "currency",
+                                            "value": "USD",
+                                            "description": "Prices are converted to this currency. (string, one of USD, EUR, GBP)",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "q",
+                                            "value": "q",
+                                            "description": "Free-text search over name and description. Replaces the v1 search endpoint. (string, maxLength 120)",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n    \"data\": [\n        {\n            \"id\": 12,\n            \"name\": \"Field Notebook\",\n            \"price\": 1999,\n            \"currency\": \"USD\",\n            \"in_stock\": true\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"per_page\": 25,\n        \"total\": 1\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Search products",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/products/search?term=term",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "products",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "term",
+                                    "value": "term",
+                                    "description": "The search term. (string)"
+                                }
+                            ]
+                        },
+                        "description": "Removed in v2, where the list endpoint takes a `q` parameter instead. Kept here for integrations that have not moved yet.\n\n**Deprecated.**",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+            }
+        ]
+    }
+}

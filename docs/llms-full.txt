@@ -1,0 +1,1521 @@
+# Acme Commerce API
+
+Version 2.4.1.
+Base URL: `https://api.acme.example`
+
+Everything you need to sell: customers, orders, refunds, the product catalogue and webhooks. REST over HTTPS, JSON in and out, bearer-token authenticated.
+
+## API versions
+
+| Version | Status | Endpoints |
+| --- | --- | --- |
+| `v2` | current | 15 |
+| `v1` | deprecated — retires 2026-09-01 | 9 |
+
+Write new integrations against `v2`. Every endpoint below states the version it belongs to, and any endpoint with a newer edition links to it.
+
+## Getting started
+
+### Introduction
+
+Everything you need to sell: customers, orders, refunds, the product catalogue and webhooks. REST over HTTPS, JSON in and out, bearer-token authenticated.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Version | `2.4.1` |
+| API versions | `v2` (current), `v1` (deprecated) |
+| Base URL | `https://api.acme.example` |
+| Sandbox | `https://sandbox.acme.example` |
+| Endpoints | 24 across 9 groups |
+| Format | JSON request and response bodies |
+
+## What you can do
+
+- **Authentication (v2)** — Exchange an API key pair for a bearer token, and revoke it when you are done. (2 endpoints)
+- **Customers (v2)** — Create and manage the people who place orders. (5 endpoints)
+- **Orders (v2)** — Place, read and refund orders. (4 endpoints)
+- **Products (v2)** — The public product catalogue. (2 endpoints)
+- **Webhooks (v2)** — Receive signed callbacks when things happen in your account. (2 endpoints)
+- **Authentication (v1)** — Unchanged in v2 apart from the path. (2 endpoints)
+- **Customers (v1)** — Reading and creating customers. Updating and deleting them arrived in v2. (3 endpoints)
+- **Orders (v1)** — Placing and reading orders. Refunds arrived in v2. (2 endpoints)
+- **Products (v1)** — The public product catalogue, with the search route v2 replaced. (2 endpoints)
+
+## Making a request
+
+Every endpoint speaks JSON. This one needs no credentials, so you can run it right now:
+
+```bash
+curl -X GET 'https://api.acme.example/api/v2/products' \
+  -H 'Accept: application/json'
+```
+
+## Reading this documentation
+
+Each endpoint has its own page listing every parameter, every response status and a request you can copy and run. 
+Pages are also published as Markdown — swap `.html` for `.md` on any endpoint URL — and the whole API is available as an OpenAPI 3.1 document.
+
+
+### Use cases
+
+Three things teams build with the Acme Commerce API, in the order people
+usually build them.
+
+## Syncing customers from your CRM
+
+Keep an external system in step with Acme without polling everything. Pull the
+customers that changed, reconcile them locally, and write back only what moved.
+
+```bash
+curl 'https://api.acme.example/api/v2/customers?status=active&per_page=100' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+Page through with `page` until `meta.total` is exhausted. Customers are
+returned newest first, so a run that starts mid-import will not skip records
+already seen.
+
+## Taking an order and refunding it
+
+The order lifecycle is three calls. Create the order with an `Idempotency-Key`
+so a network retry cannot double-charge, read it back to confirm payment, and
+refund all or part of it if the customer changes their mind.
+
+1. `POST /api/v2/orders` — creates the order in `pending`.
+2. `GET /api/v2/orders/{order}` — poll until `status` is `paid`.
+3. `POST /api/v2/orders/{order}/refunds` — full or partial, repeatable up to the
+   order total.
+
+Prefer a webhook over polling step 2 in production.
+
+## Reacting to events instead of polling
+
+Register a webhook endpoint once and Acme posts to it whenever something
+happens. Every delivery carries an `X-Acme-Signature` header — verify it
+before you trust the body.
+
+```bash
+curl -X POST 'https://api.acme.example/api/v2/webhooks' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{"url":"https://example.com/hooks/acme","events":["order.paid"]}'
+```
+
+The response includes a signing secret. Store it; it is shown once.
+
+
+### Versioning
+
+This API serves 2 versions at once. The version is part of the path, so a request names the version it wants.
+
+## Versions
+
+| Version | Status | Endpoints |
+| --- | --- | --- |
+| `v2` | current | 15 |
+| `v1` | deprecated — retires 2026-09-01 | 9 |
+
+New integrations should use `v2`.
+
+## `v2` compared with `v1`
+
+New in `v2`:
+
+- `PATCH /api/v2/customers/{customer}` — Update a customer
+- `DELETE /api/v2/customers/{customer}` — Delete a customer
+- `GET /api/v2/orders/{order}` — Retrieve an order
+- `POST /api/v2/orders/{order}/refunds` — Refund an order
+- `GET /api/v2/products/{product}` — Retrieve a product
+- `GET /api/v2/webhooks` — List webhook endpoints
+- `POST /api/v2/webhooks` — Register a webhook endpoint
+
+In `v1` but not in `v2`:
+
+- `GET /api/v1/products/search` — Search products
+
+The other 8 operations exist in both versions at the same path. Each one's page links to its newer edition.
+
+
+### Authentication
+
+Authenticated endpoints expect a bearer token.
+
+```bash
+Authorization: Bearer YOUR_TOKEN
+```
+
+## Which endpoints need it
+
+18 of 24 endpoints require authentication.
+
+These endpoints are public and need no credentials:
+
+- `POST /api/v2/auth/tokens`
+- `GET /api/v2/products`
+- `GET /api/v2/products/{product}`
+- `POST /api/v1/auth/tokens`
+- `GET /api/v1/products`
+- `GET /api/v1/products/search`
+
+## A complete request
+
+```bash
+curl -X DELETE 'https://api.acme.example/api/v2/auth/tokens/current' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+A request with a missing, malformed or expired token is rejected with `401`. 
+A valid token that lacks permission for the operation is rejected with `403`.
+
+
+### Errors
+
+Errors are returned with a conventional HTTP status and a JSON body.
+
+## Status codes used by this API
+
+| Status | Meaning |
+| --- | --- |
+| `401` | Unauthenticated |
+| `404` | Not Found |
+| `409` | Conflict |
+| `422` | Unprocessable Entity |
+| `429` | Too Many Requests |
+
+## Error body
+
+```json
+{
+    "message": "These credentials do not match our records."
+}
+```
+
+A `429` means you have exceeded a rate limit. See [Rate limiting](rate-limiting) for the specific limits.
+
+
+### Rate limiting
+
+Requests are rate limited per client. Exceeding a limit returns `429 Too Many Requests`.
+
+## Limits
+
+| Limit | Endpoints |
+| --- | --- |
+| 60 requests per minute | Authentication, Customers |
+| 10 requests per minute | Orders |
+| 300 requests per minute | Products |
+
+The remaining 16 endpoints declare no limit of their own.
+
+## Staying within the limit
+
+A `429` response carries a `Retry-After` header giving the number of seconds to wait. Honour it rather than retrying immediately — a tight retry loop will keep you locked out.
+
+Two habits keep you well clear of the limit:
+
+- Request larger pages instead of more pages. One call for 100 records costs a quarter of four calls for 25.
+- Cache anything that does not change often, and prefer webhooks over polling where they exist.
+
+
+## Guides
+
+### Pagination
+
+Every list endpoint pages the same way, so this is documented once here rather
+than repeated on each one.
+
+## Requesting a page
+
+| Parameter | Description |
+| --- | --- |
+| `page` | Page number, 1-indexed. Defaults to `1`. |
+| `per_page` | Results per page, 1–100. Defaults to `25`. |
+
+## Reading the response
+
+List responses wrap results in `data` and report position in `meta`.
+
+```json
+{
+  "data": [],
+  "meta": { "page": 1, "per_page": 25, "total": 0 }
+}
+```
+
+You have reached the end when `page * per_page >= meta.total`.
+
+## Iterating safely
+
+Records are returned newest first, so inserting during a long iteration shifts
+later pages. For a full export, filter to a fixed window rather than walking
+the whole collection.
+
+
+## Authentication (v2)
+
+Exchange an API key pair for a bearer token, and revoke it when you are done.
+
+### POST /api/v2/auth/tokens
+
+Issue an access token
+
+Exchanges an API key pair for a short-lived bearer token. Tokens expire after one hour; request a new one rather than caching indefinitely.
+
+Full URL: `https://api.acme.example/api/v2/auth/tokens`
+
+API version: `v2`.
+
+Authentication: not required.
+
+#### Body parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key_id` | string | yes | The public half of your API key pair. |
+| `key_secret` | string | yes | The secret half. Never send this from a browser. |
+| `scopes` | array | no | Defaults to every scope the key is entitled to. |
+
+#### Example request
+
+```bash
+curl -X POST 'https://api.acme.example/api/v2/auth/tokens' \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "key_id": "key id",
+    "key_secret": "key secret",
+    "scopes": [
+        "orders:read"
+    ]
+}'
+```
+
+#### Responses
+
+**201** — A token you can use as a bearer credential.
+
+```json
+{
+    "access_token": "act_7f3a9c2e5b1d8406",
+    "token_type": "Bearer",
+    "expires_in": 3600,
+    "scopes": [
+        "orders:read",
+        "orders:write"
+    ]
+}
+```
+
+**422** — The key pair was rejected.
+
+```json
+{
+    "message": "These credentials do not match our records."
+}
+```
+
+### DELETE /api/v2/auth/tokens/current
+
+Revoke the current token
+
+Invalidates the token used to make this call. Idempotent — revoking an already-revoked token still returns 204.
+
+Full URL: `https://api.acme.example/api/v2/auth/tokens/current`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Example request
+
+```bash
+curl -X DELETE 'https://api.acme.example/api/v2/auth/tokens/current' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**204** — Revoked. No body is returned.
+
+## Customers (v2)
+
+Create and manage the people who place orders.
+
+### GET /api/v2/customers
+
+List customers
+
+Returns a paginated list of customers, newest first. Use `status` to narrow the list, and `q` to search across name and email.
+
+Full URL: `https://api.acme.example/api/v2/customers`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Query parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `per_page` | integer | no | Results per page, 1–100. |
+| `page` | integer | no | Page number, 1-indexed. |
+| `status` | string, one of active, invited, archived | no | Only customers in this state. |
+| `q` | string, maxLength 120 | no | Free-text search over name and email. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v2/customers' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — A page of customers.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `data` | array |  |
+| `data[].id` | integer |  |
+| `data[].email` | string<email> |  |
+| `data[].name` | string |  |
+| `data[].status` | string, one of active, invited, archived |  |
+| `data[].created_at` | string<date-time> |  |
+
+```json
+{
+    "data": [
+        {
+            "id": 1,
+            "email": "jane@example.com",
+            "name": "Jane Doe",
+            "status": "active",
+            "created_at": "2026-01-15T09:30:00Z"
+        },
+        {
+            "id": 2,
+            "email": "sam@example.com",
+            "name": "Sam Reyes",
+            "status": "invited",
+            "created_at": "2026-01-14T16:02:11Z"
+        }
+    ],
+    "meta": {
+        "page": 1,
+        "per_page": 25,
+        "total": 2
+    }
+}
+```
+
+**401** — Missing or expired bearer token.
+
+### POST /api/v2/customers
+
+Create a customer
+
+Creates a customer and, unless `send_invite` is false, emails them an invitation.
+
+Full URL: `https://api.acme.example/api/v2/customers`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Body parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `email` | string<email> | yes | Must be unique across your account. |
+| `name` | string, maxLength 255 | yes | Display name. |
+| `send_invite` | boolean | no | Defaults to true. |
+| `metadata` | object | no | Arbitrary key/value pairs echoed back on reads. |
+| `metadata.plan` | string | no |  |
+
+#### Example request
+
+```bash
+curl -X POST 'https://api.acme.example/api/v2/customers' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "email": "jane@example.com",
+    "name": "Jane Doe",
+    "send_invite": true,
+    "metadata": {
+        "plan": "pro"
+    }
+}'
+```
+
+#### Responses
+
+**201** — The created customer.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | integer |  |
+| `email` | string<email> |  |
+| `name` | string |  |
+| `status` | string, one of active, invited, archived |  |
+| `created_at` | string<date-time> |  |
+
+```json
+{
+    "id": 42,
+    "email": "jane@example.com",
+    "name": "Jane Doe",
+    "status": "invited",
+    "created_at": "2026-02-01T11:00:00Z"
+}
+```
+
+**422** — Validation failed.
+
+```json
+{
+    "message": "The email has already been taken.",
+    "errors": {
+        "email": [
+            "The email has already been taken."
+        ]
+    }
+}
+```
+
+### GET /api/v2/customers/{customer}
+
+Retrieve a customer
+
+Full URL: `https://api.acme.example/api/v2/customers/{customer}`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Path parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customer` | integer | yes | The customer id. |
+
+#### Query parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `include` | string, one of orders, addresses | no | Embed a related collection in the response. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v2/customers/1' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — The customer.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | integer |  |
+| `email` | string<email> |  |
+| `name` | string |  |
+| `status` | string, one of active, invited, archived |  |
+| `created_at` | string<date-time> |  |
+
+**404** — No customer with that id.
+
+### PATCH /api/v2/customers/{customer}
+
+Update a customer
+
+Partial update — omitted fields are left untouched.
+
+Full URL: `https://api.acme.example/api/v2/customers/{customer}`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Path parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customer` | integer | yes | The customer id. |
+
+#### Body parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string, maxLength 255 | no |  |
+| `status` | string, one of active, archived | no | Archiving hides the customer from list endpoints. |
+
+#### Example request
+
+```bash
+curl -X PATCH 'https://api.acme.example/api/v2/customers/1' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "Jane Doe",
+    "status": "active"
+}'
+```
+
+#### Responses
+
+**200** — The updated customer.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | integer |  |
+| `email` | string<email> |  |
+| `name` | string |  |
+| `status` | string, one of active, invited, archived |  |
+| `created_at` | string<date-time> |  |
+
+**422** — Validation failed.
+
+### DELETE /api/v2/customers/{customer}
+
+Delete a customer
+
+Permanently removes the customer and anonymises their orders. Prefer archiving via the update endpoint.
+
+Full URL: `https://api.acme.example/api/v2/customers/{customer}`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Path parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customer` | integer | yes | The customer id. |
+
+#### Example request
+
+```bash
+curl -X DELETE 'https://api.acme.example/api/v2/customers/1' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**204** — Deleted.
+
+**409** — The customer has an open order and cannot be deleted.
+
+## Orders (v2)
+
+Place, read and refund orders.
+
+### GET /api/v2/orders
+
+List orders
+
+Full URL: `https://api.acme.example/api/v2/orders`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Query parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `per_page` | integer | no | Results per page, 1–100. |
+| `page` | integer | no | Page number, 1-indexed. |
+| `status` | string, one of pending, paid, shipped, refunded | no | Only orders in this state. |
+| `customer_id` | integer | no | Only orders belonging to this customer. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v2/orders' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — A page of orders.
+
+```json
+{
+    "data": [
+        {
+            "id": 8801,
+            "customer_id": 1,
+            "status": "paid",
+            "total": 4200,
+            "currency": "USD",
+            "placed_at": "2026-02-03T14:20:00Z"
+        }
+    ],
+    "meta": {
+        "page": 1,
+        "per_page": 25,
+        "total": 1
+    }
+}
+```
+
+### POST /api/v2/orders
+
+Create an order
+
+Creates an order in `pending` state. Send the `Idempotency-Key` header so a retried request cannot double-charge.
+
+Full URL: `https://api.acme.example/api/v2/orders`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Header parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `Idempotency-Key` | string<uuid> | yes | A unique key per logical order. Replays return the original order. |
+
+#### Body parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customer_id` | integer | yes | Who the order is for. |
+| `currency` | string, one of USD, EUR, GBP | yes |  |
+| `items` | array | yes | At least one line item. |
+| `items[].product_id` | integer | no |  |
+| `items[].quantity` | integer | no |  |
+
+#### Example request
+
+```bash
+curl -X POST 'https://api.acme.example/api/v2/orders' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H 'Idempotency-Key: 9f8c7b6a-5d4e-3f2a-1b0c-9d8e7f6a5b4c' \
+  -d '{
+    "customer_id": 1,
+    "currency": "USD",
+    "items": [
+        {
+            "product_id": 1,
+            "quantity": 2
+        }
+    ]
+}'
+```
+
+#### Responses
+
+**201** — The created order.
+
+```json
+{
+    "id": 8802,
+    "status": "pending",
+    "total": 3998,
+    "currency": "USD",
+    "items": [
+        {
+            "product_id": 12,
+            "quantity": 2,
+            "unit_price": 1999
+        }
+    ]
+}
+```
+
+**422** — Validation failed.
+
+**429** — Too many orders created. Back off and retry after the interval in the Retry-After header.
+
+### GET /api/v2/orders/{order}
+
+Retrieve an order
+
+Full URL: `https://api.acme.example/api/v2/orders/{order}`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Path parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `order` | integer | yes | The order id. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v2/orders/1' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — The order.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `data` | object |  |
+| `data.id` | integer |  |
+| `data.customer_id` | integer |  |
+| `data.status` | string, one of pending, paid, shipped, refunded |  |
+| `data.total` | integer |  |
+| `data.currency` | string |  |
+| `data.items` | array |  |
+| `data.items[].product_id` | integer |  |
+| `data.items[].quantity` | integer |  |
+| `data.items[].unit_price` | integer |  |
+| `data.placed_at` | string<date-time> |  |
+| `data.refunded_at` | string<date-time>, nullable |  |
+
+**404** — No order with that id.
+
+### POST /api/v2/orders/{order}/refunds
+
+Refund an order
+
+Refunds all or part of a paid order. Partial refunds may be issued repeatedly up to the order total.
+
+Full URL: `https://api.acme.example/api/v2/orders/{order}/refunds`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Path parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `order` | integer | yes | The order id. |
+
+#### Body parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `amount` | integer | no | Minor units. Omit to refund the full remaining balance. |
+| `reason` | string, one of requested_by_customer, duplicate, fraudulent | no |  |
+
+#### Example request
+
+```bash
+curl -X POST 'https://api.acme.example/api/v2/orders/1/refunds' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "amount": 4200,
+    "reason": "requested_by_customer"
+}'
+```
+
+#### Responses
+
+**201** — The refund.
+
+```json
+{
+    "id": "rfnd_91a",
+    "order_id": 8801,
+    "amount": 4200,
+    "status": "succeeded"
+}
+```
+
+**409** — The order is not in a refundable state.
+
+## Products (v2)
+
+The public product catalogue.
+
+### GET /api/v2/products
+
+List products
+
+Public catalogue. No credentials required, so this endpoint is safe to call from a browser.
+
+Full URL: `https://api.acme.example/api/v2/products`
+
+API version: `v2`.
+
+Authentication: not required.
+
+#### Query parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `per_page` | integer | no | Results per page, 1–100. |
+| `page` | integer | no | Page number, 1-indexed. |
+| `currency` | string, one of USD, EUR, GBP | no | Prices are converted to this currency. |
+| `q` | string, maxLength 120 | no | Free-text search over name and description. Replaces the v1 search endpoint. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v2/products' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — A page of products.
+
+```json
+{
+    "data": [
+        {
+            "id": 12,
+            "name": "Field Notebook",
+            "price": 1999,
+            "currency": "USD",
+            "in_stock": true
+        }
+    ],
+    "meta": {
+        "page": 1,
+        "per_page": 25,
+        "total": 1
+    }
+}
+```
+
+### GET /api/v2/products/{product}
+
+Retrieve a product
+
+Full URL: `https://api.acme.example/api/v2/products/{product}`
+
+API version: `v2`.
+
+Authentication: not required.
+
+#### Path parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `product` | integer | yes | The product id. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v2/products/1' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — The product.
+
+**404** — No product with that id.
+
+## Webhooks (v2)
+
+Receive signed callbacks when things happen in your account.
+
+### GET /api/v2/webhooks
+
+List webhook endpoints
+
+Full URL: `https://api.acme.example/api/v2/webhooks`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v2/webhooks' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — Your configured webhook endpoints.
+
+### POST /api/v2/webhooks
+
+Register a webhook endpoint
+
+We POST a signed JSON payload to your URL for each subscribed event. Verify the `X-Acme-Signature` header before trusting a delivery.
+
+Full URL: `https://api.acme.example/api/v2/webhooks`
+
+API version: `v2`.
+
+Authentication: required (bearer token).
+
+#### Body parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `url` | string<uri> | yes | Must be HTTPS. |
+| `events` | array | yes | At least one event. |
+
+#### Example request
+
+```bash
+curl -X POST 'https://api.acme.example/api/v2/webhooks' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "url": "https://example.com",
+    "events": [
+        "order.paid"
+    ]
+}'
+```
+
+#### Responses
+
+**201** — The registered endpoint, including the signing secret.
+
+```json
+{
+    "id": "whk_3f9",
+    "url": "https://example.com/hooks/acme",
+    "events": [
+        "order.paid"
+    ],
+    "signing_secret": "whsec_5d4c3b2a1908"
+}
+```
+
+**422** — Validation failed.
+
+## Authentication (v1)
+
+Unchanged in v2 apart from the path.
+
+### POST /api/v1/auth/tokens
+
+Issue an access token
+
+Exchanges an API key pair for a short-lived bearer token. Tokens expire after one hour; request a new one rather than caching indefinitely.
+
+**Deprecated.**
+
+**A newer version of this operation exists**: [`POST /api/v2/auth/tokens`](/lusen/endpoints/v2-auth-tokens-store.md).
+
+Full URL: `https://api.acme.example/api/v1/auth/tokens`
+
+API version: `v1`.
+
+Authentication: not required.
+
+#### Body parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key_id` | string | yes | The public half of your API key pair. |
+| `key_secret` | string | yes | The secret half. Never send this from a browser. |
+| `scopes` | array | no | Defaults to every scope the key is entitled to. |
+
+#### Example request
+
+```bash
+curl -X POST 'https://api.acme.example/api/v1/auth/tokens' \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "key_id": "key id",
+    "key_secret": "key secret",
+    "scopes": [
+        "orders:read"
+    ]
+}'
+```
+
+#### Responses
+
+**201** — A token you can use as a bearer credential.
+
+```json
+{
+    "access_token": "act_7f3a9c2e5b1d8406",
+    "token_type": "Bearer",
+    "expires_in": 3600,
+    "scopes": [
+        "orders:read",
+        "orders:write"
+    ]
+}
+```
+
+**422** — The key pair was rejected.
+
+```json
+{
+    "message": "These credentials do not match our records."
+}
+```
+
+### DELETE /api/v1/auth/tokens/current
+
+Revoke the current token
+
+Invalidates the token used to make this call. Idempotent — revoking an already-revoked token still returns 204.
+
+**Deprecated.**
+
+**A newer version of this operation exists**: [`DELETE /api/v2/auth/tokens/current`](/lusen/endpoints/v2-auth-tokens-destroy.md).
+
+Full URL: `https://api.acme.example/api/v1/auth/tokens/current`
+
+API version: `v1`.
+
+Authentication: required (bearer token).
+
+#### Example request
+
+```bash
+curl -X DELETE 'https://api.acme.example/api/v1/auth/tokens/current' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**204** — Revoked. No body is returned.
+
+## Customers (v1)
+
+Reading and creating customers. Updating and deleting them arrived in v2.
+
+### GET /api/v1/customers
+
+List customers
+
+Returns a paginated list of customers, newest first. Use `status` to narrow the list, and `q` to search across name and email.
+
+**Deprecated.**
+
+**A newer version of this operation exists**: [`GET /api/v2/customers`](/lusen/endpoints/v2-customers-index.md).
+
+Full URL: `https://api.acme.example/api/v1/customers`
+
+API version: `v1`.
+
+Authentication: required (bearer token).
+
+#### Query parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `per_page` | integer | no | Results per page, 1–100. |
+| `page` | integer | no | Page number, 1-indexed. |
+| `status` | string, one of active, invited, archived | no | Only customers in this state. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v1/customers' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — A page of customers.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `data` | array |  |
+| `data[].id` | integer |  |
+| `data[].email` | string<email> |  |
+| `data[].name` | string |  |
+| `data[].status` | string, one of active, invited, archived |  |
+| `data[].created_at` | string<date-time> |  |
+
+```json
+{
+    "data": [
+        {
+            "id": 1,
+            "email": "jane@example.com",
+            "name": "Jane Doe",
+            "status": "active",
+            "created_at": "2026-01-15T09:30:00Z"
+        },
+        {
+            "id": 2,
+            "email": "sam@example.com",
+            "name": "Sam Reyes",
+            "status": "invited",
+            "created_at": "2026-01-14T16:02:11Z"
+        }
+    ],
+    "meta": {
+        "page": 1,
+        "per_page": 25,
+        "total": 2
+    }
+}
+```
+
+**401** — Missing or expired bearer token.
+
+### POST /api/v1/customers
+
+Create a customer
+
+Creates a customer and, unless `send_invite` is false, emails them an invitation.
+
+**Deprecated.**
+
+**A newer version of this operation exists**: [`POST /api/v2/customers`](/lusen/endpoints/v2-customers-store.md).
+
+Full URL: `https://api.acme.example/api/v1/customers`
+
+API version: `v1`.
+
+Authentication: required (bearer token).
+
+#### Body parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `email` | string<email> | yes | Must be unique across your account. |
+| `name` | string, maxLength 255 | yes | Display name. |
+| `send_invite` | boolean | no | Defaults to true. |
+| `metadata` | object | no | Arbitrary key/value pairs echoed back on reads. |
+| `metadata.plan` | string | no |  |
+
+#### Example request
+
+```bash
+curl -X POST 'https://api.acme.example/api/v1/customers' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "email": "jane@example.com",
+    "name": "Jane Doe",
+    "send_invite": true,
+    "metadata": {
+        "plan": "pro"
+    }
+}'
+```
+
+#### Responses
+
+**201** — The created customer.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | integer |  |
+| `email` | string<email> |  |
+| `name` | string |  |
+| `status` | string, one of active, invited, archived |  |
+| `created_at` | string<date-time> |  |
+
+```json
+{
+    "id": 42,
+    "email": "jane@example.com",
+    "name": "Jane Doe",
+    "status": "invited",
+    "created_at": "2026-02-01T11:00:00Z"
+}
+```
+
+**422** — Validation failed.
+
+```json
+{
+    "message": "The email has already been taken.",
+    "errors": {
+        "email": [
+            "The email has already been taken."
+        ]
+    }
+}
+```
+
+### GET /api/v1/customers/{customer}
+
+Retrieve a customer
+
+**Deprecated.**
+
+**A newer version of this operation exists**: [`GET /api/v2/customers/{customer}`](/lusen/endpoints/v2-customers-show.md).
+
+Full URL: `https://api.acme.example/api/v1/customers/{customer}`
+
+API version: `v1`.
+
+Authentication: required (bearer token).
+
+#### Path parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customer` | integer | yes | The customer id. |
+
+#### Query parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `include` | string, one of orders, addresses | no | Embed a related collection in the response. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v1/customers/1' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — The customer.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | integer |  |
+| `email` | string<email> |  |
+| `name` | string |  |
+| `status` | string, one of active, invited, archived |  |
+| `created_at` | string<date-time> |  |
+
+**404** — No customer with that id.
+
+## Orders (v1)
+
+Placing and reading orders. Refunds arrived in v2.
+
+### GET /api/v1/orders
+
+List orders
+
+**Deprecated.**
+
+**A newer version of this operation exists**: [`GET /api/v2/orders`](/lusen/endpoints/v2-orders-index.md).
+
+Full URL: `https://api.acme.example/api/v1/orders`
+
+API version: `v1`.
+
+Authentication: required (bearer token).
+
+#### Query parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `per_page` | integer | no | Results per page, 1–100. |
+| `page` | integer | no | Page number, 1-indexed. |
+| `status` | string, one of pending, paid, shipped, refunded | no | Only orders in this state. |
+| `customer_id` | integer | no | Only orders belonging to this customer. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v1/orders' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — A page of orders.
+
+```json
+{
+    "data": [
+        {
+            "id": 8801,
+            "customer_id": 1,
+            "status": "paid",
+            "total": 4200,
+            "currency": "USD",
+            "placed_at": "2026-02-03T14:20:00Z"
+        }
+    ],
+    "meta": {
+        "page": 1,
+        "per_page": 25,
+        "total": 1
+    }
+}
+```
+
+### POST /api/v1/orders
+
+Create an order
+
+Creates an order in `pending` state. A retried request creates a second order; v2 accepts an `Idempotency-Key` header that makes the retry safe.
+
+**Deprecated.**
+
+**A newer version of this operation exists**: [`POST /api/v2/orders`](/lusen/endpoints/v2-orders-store.md).
+
+Full URL: `https://api.acme.example/api/v1/orders`
+
+API version: `v1`.
+
+Authentication: required (bearer token).
+
+#### Body parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customer_id` | integer | yes | Who the order is for. |
+| `currency` | string, one of USD, EUR, GBP | yes |  |
+| `items` | array | yes | At least one line item. |
+| `items[].product_id` | integer | no |  |
+| `items[].quantity` | integer | no |  |
+
+#### Example request
+
+```bash
+curl -X POST 'https://api.acme.example/api/v1/orders' \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "customer_id": 1,
+    "currency": "USD",
+    "items": [
+        {
+            "product_id": 1,
+            "quantity": 2
+        }
+    ]
+}'
+```
+
+#### Responses
+
+**201** — The created order.
+
+```json
+{
+    "id": 8802,
+    "status": "pending",
+    "total": 3998,
+    "currency": "USD",
+    "items": [
+        {
+            "product_id": 12,
+            "quantity": 2,
+            "unit_price": 1999
+        }
+    ]
+}
+```
+
+**422** — Validation failed.
+
+**429** — Too many orders created. Back off and retry after the interval in the Retry-After header.
+
+## Products (v1)
+
+The public product catalogue, with the search route v2 replaced.
+
+### GET /api/v1/products
+
+List products
+
+Public catalogue. No credentials required, so this endpoint is safe to call from a browser.
+
+**Deprecated.**
+
+**A newer version of this operation exists**: [`GET /api/v2/products`](/lusen/endpoints/v2-products-index.md).
+
+Full URL: `https://api.acme.example/api/v1/products`
+
+API version: `v1`.
+
+Authentication: not required.
+
+#### Query parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `per_page` | integer | no | Results per page, 1–100. |
+| `page` | integer | no | Page number, 1-indexed. |
+| `currency` | string, one of USD, EUR, GBP | no | Prices are converted to this currency. |
+| `q` | string, maxLength 120 | no | Free-text search over name and description. Replaces the v1 search endpoint. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v1/products' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — A page of products.
+
+```json
+{
+    "data": [
+        {
+            "id": 12,
+            "name": "Field Notebook",
+            "price": 1999,
+            "currency": "USD",
+            "in_stock": true
+        }
+    ],
+    "meta": {
+        "page": 1,
+        "per_page": 25,
+        "total": 1
+    }
+}
+```
+
+### GET /api/v1/products/search
+
+Search products
+
+Removed in v2, where the list endpoint takes a `q` parameter instead. Kept here for integrations that have not moved yet.
+
+**Deprecated.**
+
+Full URL: `https://api.acme.example/api/v1/products/search`
+
+API version: `v1`.
+
+Authentication: not required.
+
+#### Query parameters
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `term` | string | yes | The search term. |
+
+#### Example request
+
+```bash
+curl -X GET 'https://api.acme.example/api/v1/products/search?term=term' \
+  -H 'Accept: application/json'
+```
+
+#### Responses
+
+**200** — Matching products.

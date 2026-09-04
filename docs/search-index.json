@@ -1,0 +1,270 @@
+{
+    "version": "2.4.1",
+    "items": [
+        {
+            "title": "Introduction",
+            "url": "/lusen/pages/introduction.html",
+            "kind": "page",
+            "context": "Getting started",
+            "text": "Everything you need to sell: customers, orders, refunds, the product catalogue and webhooks. REST over HTTPS, JSON in and out, bearer-token authenticated. At a glance What you can do Making a request Reading this documentation"
+        },
+        {
+            "title": "Use cases",
+            "url": "/lusen/pages/use-cases.html",
+            "kind": "page",
+            "context": "Getting started",
+            "text": "Three things teams build with the Acme Commerce API, in the order people usually build them. Syncing customers from your CRM Taking an order and refunding it Reacting to events instead of polling"
+        },
+        {
+            "title": "Versioning",
+            "url": "/lusen/pages/versioning.html",
+            "kind": "page",
+            "context": "Getting started",
+            "text": "This API serves 2 versions at once. The version is part of the path, so a request names the version it wants. Versions v2 compared with v1"
+        },
+        {
+            "title": "Authentication",
+            "url": "/lusen/pages/authentication.html",
+            "kind": "page",
+            "context": "Getting started",
+            "text": "Authenticated endpoints expect a bearer token. Which endpoints need it A complete request"
+        },
+        {
+            "title": "Errors",
+            "url": "/lusen/pages/errors.html",
+            "kind": "page",
+            "context": "Getting started",
+            "text": "Errors are returned with a conventional HTTP status and a JSON body. Status codes used by this API Error body"
+        },
+        {
+            "title": "Rate limiting",
+            "url": "/lusen/pages/rate-limiting.html",
+            "kind": "page",
+            "context": "Getting started",
+            "text": "Requests are rate limited per client. Exceeding a limit returns `429 Too Many Requests`. Limits Staying within the limit"
+        },
+        {
+            "title": "Pagination",
+            "url": "/lusen/pages/pagination.html",
+            "kind": "page",
+            "context": "Guides",
+            "text": "Every list endpoint pages the same way, so this is documented once here rather than repeated on each one. Requesting a page Reading the response Iterating safely"
+        },
+        {
+            "title": "Issue an access token",
+            "url": "/lusen/endpoints/v2-auth-tokens-store.html",
+            "kind": "endpoint",
+            "method": "POST",
+            "path": "/api/v2/auth/tokens",
+            "context": "Authentication · v2",
+            "text": "Issue an access token Exchanges an API key pair for a short-lived bearer token. Tokens expire after one hour; request a new one rather than caching indefinitely. v2 key_id key_secret scopes"
+        },
+        {
+            "title": "Revoke the current token",
+            "url": "/lusen/endpoints/v2-auth-tokens-destroy.html",
+            "kind": "endpoint",
+            "method": "DELETE",
+            "path": "/api/v2/auth/tokens/current",
+            "context": "Authentication · v2",
+            "text": "Revoke the current token Invalidates the token used to make this call. Idempotent — revoking an already-revoked token still returns 204. v2"
+        },
+        {
+            "title": "List customers",
+            "url": "/lusen/endpoints/v2-customers-index.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v2/customers",
+            "context": "Customers · v2",
+            "text": "List customers Returns a paginated list of customers, newest first. Use `status` to narrow the list, and `q` to search across name and email. v2 per_page page status q"
+        },
+        {
+            "title": "Create a customer",
+            "url": "/lusen/endpoints/v2-customers-store.html",
+            "kind": "endpoint",
+            "method": "POST",
+            "path": "/api/v2/customers",
+            "context": "Customers · v2",
+            "text": "Create a customer Creates a customer and, unless `send_invite` is false, emails them an invitation. v2 email name send_invite metadata"
+        },
+        {
+            "title": "Retrieve a customer",
+            "url": "/lusen/endpoints/v2-customers-show.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v2/customers/{customer}",
+            "context": "Customers · v2",
+            "text": "Retrieve a customer v2 customer include"
+        },
+        {
+            "title": "Update a customer",
+            "url": "/lusen/endpoints/v2-customers-update.html",
+            "kind": "endpoint",
+            "method": "PATCH",
+            "path": "/api/v2/customers/{customer}",
+            "context": "Customers · v2",
+            "text": "Update a customer Partial update — omitted fields are left untouched. v2 customer name status"
+        },
+        {
+            "title": "Delete a customer",
+            "url": "/lusen/endpoints/v2-customers-destroy.html",
+            "kind": "endpoint",
+            "method": "DELETE",
+            "path": "/api/v2/customers/{customer}",
+            "context": "Customers · v2",
+            "text": "Delete a customer Permanently removes the customer and anonymises their orders. Prefer archiving via the update endpoint. v2 customer"
+        },
+        {
+            "title": "List orders",
+            "url": "/lusen/endpoints/v2-orders-index.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v2/orders",
+            "context": "Orders · v2",
+            "text": "List orders v2 per_page page status customer_id"
+        },
+        {
+            "title": "Create an order",
+            "url": "/lusen/endpoints/v2-orders-store.html",
+            "kind": "endpoint",
+            "method": "POST",
+            "path": "/api/v2/orders",
+            "context": "Orders · v2",
+            "text": "Create an order Creates an order in `pending` state. Send the `Idempotency-Key` header so a retried request cannot double-charge. v2 Idempotency-Key customer_id currency items"
+        },
+        {
+            "title": "Retrieve an order",
+            "url": "/lusen/endpoints/v2-orders-show.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v2/orders/{order}",
+            "context": "Orders · v2",
+            "text": "Retrieve an order v2 order"
+        },
+        {
+            "title": "Refund an order",
+            "url": "/lusen/endpoints/v2-orders-refunds-store.html",
+            "kind": "endpoint",
+            "method": "POST",
+            "path": "/api/v2/orders/{order}/refunds",
+            "context": "Orders · v2",
+            "text": "Refund an order Refunds all or part of a paid order. Partial refunds may be issued repeatedly up to the order total. v2 order amount reason"
+        },
+        {
+            "title": "List products",
+            "url": "/lusen/endpoints/v2-products-index.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v2/products",
+            "context": "Products · v2",
+            "text": "List products Public catalogue. No credentials required, so this endpoint is safe to call from a browser. v2 per_page page currency q"
+        },
+        {
+            "title": "Retrieve a product",
+            "url": "/lusen/endpoints/v2-products-show.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v2/products/{product}",
+            "context": "Products · v2",
+            "text": "Retrieve a product v2 product"
+        },
+        {
+            "title": "List webhook endpoints",
+            "url": "/lusen/endpoints/v2-webhooks-index.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v2/webhooks",
+            "context": "Webhooks · v2",
+            "text": "List webhook endpoints v2"
+        },
+        {
+            "title": "Register a webhook endpoint",
+            "url": "/lusen/endpoints/v2-webhooks-store.html",
+            "kind": "endpoint",
+            "method": "POST",
+            "path": "/api/v2/webhooks",
+            "context": "Webhooks · v2",
+            "text": "Register a webhook endpoint We POST a signed JSON payload to your URL for each subscribed event. Verify the `X-Acme-Signature` header before trusting a delivery. v2 url events"
+        },
+        {
+            "title": "Issue an access token",
+            "url": "/lusen/endpoints/v1-auth-tokens-store.html",
+            "kind": "endpoint",
+            "method": "POST",
+            "path": "/api/v1/auth/tokens",
+            "context": "Authentication · v1",
+            "text": "Issue an access token Exchanges an API key pair for a short-lived bearer token. Tokens expire after one hour; request a new one rather than caching indefinitely. v1 key_id key_secret scopes"
+        },
+        {
+            "title": "Revoke the current token",
+            "url": "/lusen/endpoints/v1-auth-tokens-destroy.html",
+            "kind": "endpoint",
+            "method": "DELETE",
+            "path": "/api/v1/auth/tokens/current",
+            "context": "Authentication · v1",
+            "text": "Revoke the current token Invalidates the token used to make this call. Idempotent — revoking an already-revoked token still returns 204. v1"
+        },
+        {
+            "title": "List customers",
+            "url": "/lusen/endpoints/v1-customers-index.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v1/customers",
+            "context": "Customers · v1",
+            "text": "List customers Returns a paginated list of customers, newest first. Use `status` to narrow the list, and `q` to search across name and email. v1 per_page page status"
+        },
+        {
+            "title": "Create a customer",
+            "url": "/lusen/endpoints/v1-customers-store.html",
+            "kind": "endpoint",
+            "method": "POST",
+            "path": "/api/v1/customers",
+            "context": "Customers · v1",
+            "text": "Create a customer Creates a customer and, unless `send_invite` is false, emails them an invitation. v1 email name send_invite metadata"
+        },
+        {
+            "title": "Retrieve a customer",
+            "url": "/lusen/endpoints/v1-customers-show.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v1/customers/{customer}",
+            "context": "Customers · v1",
+            "text": "Retrieve a customer v1 customer include"
+        },
+        {
+            "title": "List orders",
+            "url": "/lusen/endpoints/v1-orders-index.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v1/orders",
+            "context": "Orders · v1",
+            "text": "List orders v1 per_page page status customer_id"
+        },
+        {
+            "title": "Create an order",
+            "url": "/lusen/endpoints/v1-orders-store.html",
+            "kind": "endpoint",
+            "method": "POST",
+            "path": "/api/v1/orders",
+            "context": "Orders · v1",
+            "text": "Create an order Creates an order in `pending` state. A retried request creates a second order; v2 accepts an `Idempotency-Key` header that makes the retry safe. v1 customer_id currency items"
+        },
+        {
+            "title": "List products",
+            "url": "/lusen/endpoints/v1-products-index.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v1/products",
+            "context": "Products · v1",
+            "text": "List products Public catalogue. No credentials required, so this endpoint is safe to call from a browser. v1 per_page page currency q"
+        },
+        {
+            "title": "Search products",
+            "url": "/lusen/endpoints/v1-products-search.html",
+            "kind": "endpoint",
+            "method": "GET",
+            "path": "/api/v1/products/search",
+            "context": "Products · v1",
+            "text": "Search products Removed in v2, where the list endpoint takes a `q` parameter instead. Kept here for integrations that have not moved yet. v1 term"
+        }
+    ]
+}

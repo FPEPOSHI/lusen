@@ -1,0 +1,1891 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Acme Commerce API",
+        "version": "2.4.1",
+        "description": "Everything you need to sell: customers, orders, refunds, the product catalogue and webhooks. REST over HTTPS, JSON in and out, bearer-token authenticated."
+    },
+    "servers": [
+        {
+            "url": "https://api.acme.example"
+        },
+        {
+            "url": "https://sandbox.acme.example",
+            "description": "Sandbox"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Authentication (v2)",
+            "description": "Exchange an API key pair for a bearer token, and revoke it when you are done."
+        },
+        {
+            "name": "Customers (v2)",
+            "description": "Create and manage the people who place orders."
+        },
+        {
+            "name": "Orders (v2)",
+            "description": "Place, read and refund orders."
+        },
+        {
+            "name": "Products (v2)",
+            "description": "The public product catalogue."
+        },
+        {
+            "name": "Webhooks (v2)",
+            "description": "Receive signed callbacks when things happen in your account."
+        },
+        {
+            "name": "Authentication (v1)",
+            "description": "Unchanged in v2 apart from the path."
+        },
+        {
+            "name": "Customers (v1)",
+            "description": "Reading and creating customers. Updating and deleting them arrived in v2."
+        },
+        {
+            "name": "Orders (v1)",
+            "description": "Placing and reading orders. Refunds arrived in v2."
+        },
+        {
+            "name": "Products (v1)",
+            "description": "The public product catalogue, with the search route v2 replaced."
+        }
+    ],
+    "paths": {
+        "/api/v1/auth/tokens": {
+            "post": {
+                "operationId": "v1.auth.tokens.store",
+                "summary": "Issue an access token",
+                "description": "Exchanges an API key pair for a short-lived bearer token. Tokens expire after one hour; request a new one rather than caching indefinitely.",
+                "tags": [
+                    "Authentication (v1)"
+                ],
+                "deprecated": true,
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "key_id": {
+                                        "type": "string",
+                                        "description": "The public half of your API key pair."
+                                    },
+                                    "key_secret": {
+                                        "type": "string",
+                                        "description": "The secret half. Never send this from a browser."
+                                    },
+                                    "scopes": {
+                                        "type": "array",
+                                        "description": "Defaults to every scope the key is entitled to.",
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "orders:read",
+                                                "orders:write",
+                                                "customers:read"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "key_id",
+                                    "key_secret"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "A token you can use as a bearer credential.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "issued": {
+                                        "summary": "Issued",
+                                        "value": {
+                                            "access_token": "act_7f3a9c2e5b1d8406",
+                                            "token_type": "Bearer",
+                                            "expires_in": 3600,
+                                            "scopes": [
+                                                "orders:read",
+                                                "orders:write"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "The key pair was rejected.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "rejected": {
+                                        "summary": "Rejected",
+                                        "value": {
+                                            "message": "These credentials do not match our records."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/tokens/current": {
+            "delete": {
+                "operationId": "v1.auth.tokens.destroy",
+                "summary": "Revoke the current token",
+                "description": "Invalidates the token used to make this call. Idempotent — revoking an already-revoked token still returns 204.",
+                "tags": [
+                    "Authentication (v1)"
+                ],
+                "deprecated": true,
+                "responses": {
+                    "204": {
+                        "description": "Revoked. No body is returned."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/customers": {
+            "get": {
+                "operationId": "v1.customers.index",
+                "summary": "List customers",
+                "description": "Returns a paginated list of customers, newest first. Use `status` to narrow the list, and `q` to search across name and email.",
+                "tags": [
+                    "Customers (v1)"
+                ],
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Results per page, 1–100.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 25
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number, 1-indexed.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Only customers in this state.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "invited",
+                                "archived"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A page of customers.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "format": "email"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "active",
+                                                            "invited",
+                                                            "archived"
+                                                        ]
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "first-page": {
+                                        "summary": "First page",
+                                        "value": {
+                                            "data": [
+                                                {
+                                                    "id": 1,
+                                                    "email": "jane@example.com",
+                                                    "name": "Jane Doe",
+                                                    "status": "active",
+                                                    "created_at": "2026-01-15T09:30:00Z"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "email": "sam@example.com",
+                                                    "name": "Sam Reyes",
+                                                    "status": "invited",
+                                                    "created_at": "2026-01-14T16:02:11Z"
+                                                }
+                                            ],
+                                            "meta": {
+                                                "page": 1,
+                                                "per_page": 25,
+                                                "total": 2
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or expired bearer token."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "v1.customers.store",
+                "summary": "Create a customer",
+                "description": "Creates a customer and, unless `send_invite` is false, emails them an invitation.",
+                "tags": [
+                    "Customers (v1)"
+                ],
+                "deprecated": true,
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "description": "Must be unique across your account."
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Display name.",
+                                        "maxLength": 255
+                                    },
+                                    "send_invite": {
+                                        "type": "boolean",
+                                        "description": "Defaults to true."
+                                    },
+                                    "metadata": {
+                                        "type": "object",
+                                        "description": "Arbitrary key/value pairs echoed back on reads.",
+                                        "properties": {
+                                            "plan": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "email",
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The created customer.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "active",
+                                                "invited",
+                                                "archived"
+                                            ]
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "created": {
+                                        "summary": "Created",
+                                        "value": {
+                                            "id": 42,
+                                            "email": "jane@example.com",
+                                            "name": "Jane Doe",
+                                            "status": "invited",
+                                            "created_at": "2026-02-01T11:00:00Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "duplicate-email": {
+                                        "summary": "Duplicate email",
+                                        "value": {
+                                            "message": "The email has already been taken.",
+                                            "errors": {
+                                                "email": [
+                                                    "The email has already been taken."
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/customers/{customer}": {
+            "get": {
+                "operationId": "v1.customers.show",
+                "summary": "Retrieve a customer",
+                "tags": [
+                    "Customers (v1)"
+                ],
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "name": "customer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The customer id.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Embed a related collection in the response.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "orders",
+                                "addresses"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The customer.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "active",
+                                                "invited",
+                                                "archived"
+                                            ]
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No customer with that id."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/orders": {
+            "get": {
+                "operationId": "v1.orders.index",
+                "summary": "List orders",
+                "tags": [
+                    "Orders (v1)"
+                ],
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Results per page, 1–100.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 25
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number, 1-indexed.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Only orders in this state.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "paid",
+                                "shipped",
+                                "refunded"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "customer_id",
+                        "in": "query",
+                        "description": "Only orders belonging to this customer.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A page of orders.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "first-page": {
+                                        "summary": "First page",
+                                        "value": {
+                                            "data": [
+                                                {
+                                                    "id": 8801,
+                                                    "customer_id": 1,
+                                                    "status": "paid",
+                                                    "total": 4200,
+                                                    "currency": "USD",
+                                                    "placed_at": "2026-02-03T14:20:00Z"
+                                                }
+                                            ],
+                                            "meta": {
+                                                "page": 1,
+                                                "per_page": 25,
+                                                "total": 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "v1.orders.store",
+                "summary": "Create an order",
+                "description": "Creates an order in `pending` state. A retried request creates a second order; v2 accepts an `Idempotency-Key` header that makes the retry safe.",
+                "tags": [
+                    "Orders (v1)"
+                ],
+                "deprecated": true,
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "customer_id": {
+                                        "type": "integer",
+                                        "description": "Who the order is for."
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "enum": [
+                                            "USD",
+                                            "EUR",
+                                            "GBP"
+                                        ]
+                                    },
+                                    "items": {
+                                        "type": "array",
+                                        "description": "At least one line item.",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "product_id": {
+                                                    "type": "integer"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "customer_id",
+                                    "currency",
+                                    "items"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The created order.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "created": {
+                                        "summary": "Created",
+                                        "value": {
+                                            "id": 8802,
+                                            "status": "pending",
+                                            "total": 3998,
+                                            "currency": "USD",
+                                            "items": [
+                                                {
+                                                    "product_id": 12,
+                                                    "quantity": 2,
+                                                    "unit_price": 1999
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed."
+                    },
+                    "429": {
+                        "description": "Too many orders created. Back off and retry after the interval in the Retry-After header."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/products": {
+            "get": {
+                "operationId": "v1.products.index",
+                "summary": "List products",
+                "description": "Public catalogue. No credentials required, so this endpoint is safe to call from a browser.",
+                "tags": [
+                    "Products (v1)"
+                ],
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Results per page, 1–100.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 25
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number, 1-indexed.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "currency",
+                        "in": "query",
+                        "description": "Prices are converted to this currency.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "USD",
+                                "EUR",
+                                "GBP"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Free-text search over name and description. Replaces the v1 search endpoint.",
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 120
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A page of products.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "first-page": {
+                                        "summary": "First page",
+                                        "value": {
+                                            "data": [
+                                                {
+                                                    "id": 12,
+                                                    "name": "Field Notebook",
+                                                    "price": 1999,
+                                                    "currency": "USD",
+                                                    "in_stock": true
+                                                }
+                                            ],
+                                            "meta": {
+                                                "page": 1,
+                                                "per_page": 25,
+                                                "total": 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/products/search": {
+            "get": {
+                "operationId": "v1.products.search",
+                "summary": "Search products",
+                "description": "Removed in v2, where the list endpoint takes a `q` parameter instead. Kept here for integrations that have not moved yet.",
+                "tags": [
+                    "Products (v1)"
+                ],
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "name": "term",
+                        "in": "query",
+                        "required": true,
+                        "description": "The search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Matching products."
+                    }
+                }
+            }
+        },
+        "/api/v2/auth/tokens": {
+            "post": {
+                "operationId": "v2.auth.tokens.store",
+                "summary": "Issue an access token",
+                "description": "Exchanges an API key pair for a short-lived bearer token. Tokens expire after one hour; request a new one rather than caching indefinitely.",
+                "tags": [
+                    "Authentication (v2)"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "key_id": {
+                                        "type": "string",
+                                        "description": "The public half of your API key pair."
+                                    },
+                                    "key_secret": {
+                                        "type": "string",
+                                        "description": "The secret half. Never send this from a browser."
+                                    },
+                                    "scopes": {
+                                        "type": "array",
+                                        "description": "Defaults to every scope the key is entitled to.",
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "orders:read",
+                                                "orders:write",
+                                                "customers:read"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "key_id",
+                                    "key_secret"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "A token you can use as a bearer credential.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "issued": {
+                                        "summary": "Issued",
+                                        "value": {
+                                            "access_token": "act_7f3a9c2e5b1d8406",
+                                            "token_type": "Bearer",
+                                            "expires_in": 3600,
+                                            "scopes": [
+                                                "orders:read",
+                                                "orders:write"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "The key pair was rejected.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "rejected": {
+                                        "summary": "Rejected",
+                                        "value": {
+                                            "message": "These credentials do not match our records."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/auth/tokens/current": {
+            "delete": {
+                "operationId": "v2.auth.tokens.destroy",
+                "summary": "Revoke the current token",
+                "description": "Invalidates the token used to make this call. Idempotent — revoking an already-revoked token still returns 204.",
+                "tags": [
+                    "Authentication (v2)"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Revoked. No body is returned."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v2/customers": {
+            "get": {
+                "operationId": "v2.customers.index",
+                "summary": "List customers",
+                "description": "Returns a paginated list of customers, newest first. Use `status` to narrow the list, and `q` to search across name and email.",
+                "tags": [
+                    "Customers (v2)"
+                ],
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Results per page, 1–100.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 25
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number, 1-indexed.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Only customers in this state.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "invited",
+                                "archived"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Free-text search over name and email.",
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 120
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A page of customers.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "format": "email"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "active",
+                                                            "invited",
+                                                            "archived"
+                                                        ]
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "first-page": {
+                                        "summary": "First page",
+                                        "value": {
+                                            "data": [
+                                                {
+                                                    "id": 1,
+                                                    "email": "jane@example.com",
+                                                    "name": "Jane Doe",
+                                                    "status": "active",
+                                                    "created_at": "2026-01-15T09:30:00Z"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "email": "sam@example.com",
+                                                    "name": "Sam Reyes",
+                                                    "status": "invited",
+                                                    "created_at": "2026-01-14T16:02:11Z"
+                                                }
+                                            ],
+                                            "meta": {
+                                                "page": 1,
+                                                "per_page": 25,
+                                                "total": 2
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or expired bearer token."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "v2.customers.store",
+                "summary": "Create a customer",
+                "description": "Creates a customer and, unless `send_invite` is false, emails them an invitation.",
+                "tags": [
+                    "Customers (v2)"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "description": "Must be unique across your account."
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Display name.",
+                                        "maxLength": 255
+                                    },
+                                    "send_invite": {
+                                        "type": "boolean",
+                                        "description": "Defaults to true."
+                                    },
+                                    "metadata": {
+                                        "type": "object",
+                                        "description": "Arbitrary key/value pairs echoed back on reads.",
+                                        "properties": {
+                                            "plan": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "email",
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The created customer.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "active",
+                                                "invited",
+                                                "archived"
+                                            ]
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "created": {
+                                        "summary": "Created",
+                                        "value": {
+                                            "id": 42,
+                                            "email": "jane@example.com",
+                                            "name": "Jane Doe",
+                                            "status": "invited",
+                                            "created_at": "2026-02-01T11:00:00Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "duplicate-email": {
+                                        "summary": "Duplicate email",
+                                        "value": {
+                                            "message": "The email has already been taken.",
+                                            "errors": {
+                                                "email": [
+                                                    "The email has already been taken."
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v2/customers/{customer}": {
+            "get": {
+                "operationId": "v2.customers.show",
+                "summary": "Retrieve a customer",
+                "tags": [
+                    "Customers (v2)"
+                ],
+                "parameters": [
+                    {
+                        "name": "customer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The customer id.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Embed a related collection in the response.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "orders",
+                                "addresses"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The customer.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "active",
+                                                "invited",
+                                                "archived"
+                                            ]
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No customer with that id."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "operationId": "v2.customers.update",
+                "summary": "Update a customer",
+                "description": "Partial update — omitted fields are left untouched.",
+                "tags": [
+                    "Customers (v2)"
+                ],
+                "parameters": [
+                    {
+                        "name": "customer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The customer id.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Archiving hides the customer from list endpoints.",
+                                        "enum": [
+                                            "active",
+                                            "archived"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The updated customer.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "active",
+                                                "invited",
+                                                "archived"
+                                            ]
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "v2.customers.destroy",
+                "summary": "Delete a customer",
+                "description": "Permanently removes the customer and anonymises their orders. Prefer archiving via the update endpoint.",
+                "tags": [
+                    "Customers (v2)"
+                ],
+                "parameters": [
+                    {
+                        "name": "customer",
+                        "in": "path",
+                        "required": true,
+                        "description": "The customer id.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted."
+                    },
+                    "409": {
+                        "description": "The customer has an open order and cannot be deleted."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v2/orders": {
+            "get": {
+                "operationId": "v2.orders.index",
+                "summary": "List orders",
+                "tags": [
+                    "Orders (v2)"
+                ],
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Results per page, 1–100.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 25
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number, 1-indexed.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Only orders in this state.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "paid",
+                                "shipped",
+                                "refunded"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "customer_id",
+                        "in": "query",
+                        "description": "Only orders belonging to this customer.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A page of orders.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "first-page": {
+                                        "summary": "First page",
+                                        "value": {
+                                            "data": [
+                                                {
+                                                    "id": 8801,
+                                                    "customer_id": 1,
+                                                    "status": "paid",
+                                                    "total": 4200,
+                                                    "currency": "USD",
+                                                    "placed_at": "2026-02-03T14:20:00Z"
+                                                }
+                                            ],
+                                            "meta": {
+                                                "page": 1,
+                                                "per_page": 25,
+                                                "total": 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "v2.orders.store",
+                "summary": "Create an order",
+                "description": "Creates an order in `pending` state. Send the `Idempotency-Key` header so a retried request cannot double-charge.",
+                "tags": [
+                    "Orders (v2)"
+                ],
+                "parameters": [
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true,
+                        "description": "A unique key per logical order. Replays return the original order.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "customer_id": {
+                                        "type": "integer",
+                                        "description": "Who the order is for."
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "enum": [
+                                            "USD",
+                                            "EUR",
+                                            "GBP"
+                                        ]
+                                    },
+                                    "items": {
+                                        "type": "array",
+                                        "description": "At least one line item.",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "product_id": {
+                                                    "type": "integer"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "customer_id",
+                                    "currency",
+                                    "items"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The created order.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "created": {
+                                        "summary": "Created",
+                                        "value": {
+                                            "id": 8802,
+                                            "status": "pending",
+                                            "total": 3998,
+                                            "currency": "USD",
+                                            "items": [
+                                                {
+                                                    "product_id": 12,
+                                                    "quantity": 2,
+                                                    "unit_price": 1999
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed."
+                    },
+                    "429": {
+                        "description": "Too many orders created. Back off and retry after the interval in the Retry-After header."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v2/orders/{order}": {
+            "get": {
+                "operationId": "v2.orders.show",
+                "summary": "Retrieve an order",
+                "tags": [
+                    "Orders (v2)"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order id.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The order.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "customer_id": {
+                                                    "type": "integer"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "pending",
+                                                        "paid",
+                                                        "shipped",
+                                                        "refunded"
+                                                    ]
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "currency": {
+                                                    "type": "string"
+                                                },
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "product_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "quantity": {
+                                                                "type": "integer"
+                                                            },
+                                                            "unit_price": {
+                                                                "type": "integer"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "placed_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "refunded_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "date-time"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No order with that id."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v2/orders/{order}/refunds": {
+            "post": {
+                "operationId": "v2.orders.refunds.store",
+                "summary": "Refund an order",
+                "description": "Refunds all or part of a paid order. Partial refunds may be issued repeatedly up to the order total.",
+                "tags": [
+                    "Orders (v2)"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "required": true,
+                        "description": "The order id.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "amount": {
+                                        "type": "integer",
+                                        "description": "Minor units. Omit to refund the full remaining balance."
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "enum": [
+                                            "requested_by_customer",
+                                            "duplicate",
+                                            "fraudulent"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The refund.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "full-refund": {
+                                        "summary": "Full refund",
+                                        "value": {
+                                            "id": "rfnd_91a",
+                                            "order_id": 8801,
+                                            "amount": 4200,
+                                            "status": "succeeded"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "The order is not in a refundable state."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v2/products": {
+            "get": {
+                "operationId": "v2.products.index",
+                "summary": "List products",
+                "description": "Public catalogue. No credentials required, so this endpoint is safe to call from a browser.",
+                "tags": [
+                    "Products (v2)"
+                ],
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Results per page, 1–100.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 25
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number, 1-indexed.",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "currency",
+                        "in": "query",
+                        "description": "Prices are converted to this currency.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "USD",
+                                "EUR",
+                                "GBP"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Free-text search over name and description. Replaces the v1 search endpoint.",
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 120
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A page of products.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "first-page": {
+                                        "summary": "First page",
+                                        "value": {
+                                            "data": [
+                                                {
+                                                    "id": 12,
+                                                    "name": "Field Notebook",
+                                                    "price": 1999,
+                                                    "currency": "USD",
+                                                    "in_stock": true
+                                                }
+                                            ],
+                                            "meta": {
+                                                "page": 1,
+                                                "per_page": 25,
+                                                "total": 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/products/{product}": {
+            "get": {
+                "operationId": "v2.products.show",
+                "summary": "Retrieve a product",
+                "tags": [
+                    "Products (v2)"
+                ],
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "required": true,
+                        "description": "The product id.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The product."
+                    },
+                    "404": {
+                        "description": "No product with that id."
+                    }
+                }
+            }
+        },
+        "/api/v2/webhooks": {
+            "get": {
+                "operationId": "v2.webhooks.index",
+                "summary": "List webhook endpoints",
+                "tags": [
+                    "Webhooks (v2)"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Your configured webhook endpoints."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "v2.webhooks.store",
+                "summary": "Register a webhook endpoint",
+                "description": "We POST a signed JSON payload to your URL for each subscribed event. Verify the `X-Acme-Signature` header before trusting a delivery.",
+                "tags": [
+                    "Webhooks (v2)"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "description": "Must be HTTPS."
+                                    },
+                                    "events": {
+                                        "type": "array",
+                                        "description": "At least one event.",
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "order.paid",
+                                                "order.refunded",
+                                                "customer.created"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "url",
+                                    "events"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The registered endpoint, including the signing secret.",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "registered": {
+                                        "summary": "Registered",
+                                        "value": {
+                                            "id": "whk_3f9",
+                                            "url": "https://example.com/hooks/acme",
+                                            "events": [
+                                                "order.paid"
+                                            ],
+                                            "signing_secret": "whsec_5d4c3b2a1908"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    }
+}

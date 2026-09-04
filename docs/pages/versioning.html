@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Versioning — Acme Commerce API</title>
+    <meta name="description" content="This API serves 2 versions at once. The version is part of the path, so a request names the version it wants.">
+
+            <link rel="canonical" href="https://fpeposhi.github.io/lusen/pages/versioning.html">
+    
+            <meta name="robots" content="index, follow">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Versioning — Acme Commerce API">
+    <meta property="og:description" content="This API serves 2 versions at once. The version is part of the path, so a request names the version it wants.">
+        <meta name="twitter:card" content="summary_large_image">
+
+    
+    
+    <link rel="alternate" type="application/json" href="/lusen/openapi.json" title="OpenAPI 3.1">
+    <link rel="alternate" type="text/markdown" href="/lusen/pages/versioning.md" title="Markdown">
+    <link rel="alternate" type="application/json" href="/lusen/.well-known/api-docs" title="Discovery">
+
+            <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Versioning","description":"This API serves 2 versions at once. The version is part of the path, so a request names the version it wants.","url":"/lusen/pages/versioning","isPartOf":{"@type":"WebSite","name":"Acme Commerce API","url":"/lusen"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Acme Commerce API","item":"/lusen"},{"@type":"ListItem","position":2,"name":"Getting started","item":"/lusen"},{"@type":"ListItem","position":3,"name":"Versioning","item":"/lusen/pages/versioning"}]}}</script>
+    
+            
+        <script>try{var t=localStorage.getItem('lusen-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    
+            <link rel="stylesheet" href="/lusen/assets/lusen.css">
+    </head>
+<body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-200">
+
+<a href="#content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-indigo-600 focus:px-3 focus:py-2 focus:text-white">
+    Skip to content
+</a>
+
+<div class="mx-auto flex max-w-7xl gap-8 px-4 sm:px-6 lg:px-8">
+
+    <aside class="hidden w-64 shrink-0 border-r border-slate-200 lg:block dark:border-slate-800">
+        
+        <div class="sticky top-0 max-h-screen overflow-y-auto py-10 pr-4">
+        <nav aria-label="Documentation">
+            <form class="lusen-search" role="search" hidden data-lusen-search>
+    <label class="sr-only" for="lusen-search-input">Search the documentation</label>
+    <input id="lusen-search-input"
+           type="search"
+           autocomplete="off"
+           placeholder="Search…"
+           class="w-full rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white">
+    <ul class="lusen-search-results" role="listbox" aria-label="Search results" hidden></ul>
+    <p class="lusen-search-empty" hidden>No matches.</p>
+</form>
+
+                            
+                <button type="button" data-lusen-theme hidden
+                        class="mb-4 w-full rounded-md border border-slate-200 px-3 py-1.5 text-left text-sm text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
+                    <span data-lusen-theme-label>Theme</span>
+                </button>
+            
+            <a href="/lusen/index.html" class="block text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
+                                Acme Commerce API
+            </a>
+            <p class="mt-1 font-mono text-xs text-slate-500">v2.4.1</p>
+
+            <ul class="mt-8 space-y-6">
+                                    <li>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Getting started</span>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/pages/introduction.html"
+                                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        Introduction
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/pages/use-cases.html"
+                                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        Use cases
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/pages/versioning.html"
+                                        aria-current="page"                                        class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-indigo-500 font-medium text-slate-900 dark:text-white">
+                                        Versioning
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/pages/authentication.html"
+                                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        Authentication
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/pages/errors.html"
+                                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        Errors
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/pages/rate-limiting.html"
+                                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        Rate limiting
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                                    <li>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Guides</span>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/pages/pagination.html"
+                                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        Pagination
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                
+                
+                
+                                                                                    <li class="border-t border-slate-200 pt-4 dark:border-slate-800">
+                            <span class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                                v2
+                            </span>
+                        </li>
+                    
+                    <li>
+                        <a href="/lusen/index.html#v2-authentication" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                            Authentication
+                        </a>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-auth-tokens-store.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                        <span class="truncate">Issue an access token</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-auth-tokens-destroy.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/20 px-1 py-0.5 text-[10px]">
+    DELETE
+</span>
+                                        <span class="truncate">Revoke the current token</span>
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                                    
+                    <li>
+                        <a href="/lusen/index.html#v2-customers" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                            Customers
+                        </a>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-customers-index.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">List customers</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-customers-store.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                        <span class="truncate">Create a customer</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-customers-show.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">Retrieve a customer</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-customers-update.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20 px-1 py-0.5 text-[10px]">
+    PATCH
+</span>
+                                        <span class="truncate">Update a customer</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-customers-destroy.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/20 px-1 py-0.5 text-[10px]">
+    DELETE
+</span>
+                                        <span class="truncate">Delete a customer</span>
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                                    
+                    <li>
+                        <a href="/lusen/index.html#v2-orders" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                            Orders
+                        </a>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-orders-index.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">List orders</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-orders-store.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                        <span class="truncate">Create an order</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-orders-show.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">Retrieve an order</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-orders-refunds-store.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                        <span class="truncate">Refund an order</span>
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                                    
+                    <li>
+                        <a href="/lusen/index.html#v2-products" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                            Products
+                        </a>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-products-index.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">List products</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-products-show.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">Retrieve a product</span>
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                                    
+                    <li>
+                        <a href="/lusen/index.html#v2-webhooks" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                            Webhooks
+                        </a>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-webhooks-index.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">List webhook endpoints</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v2-webhooks-store.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                        <span class="truncate">Register a webhook endpoint</span>
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                                                                                    <li class="border-t border-slate-200 pt-4 dark:border-slate-800">
+                            <span class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                                v1 (deprecated)
+                            </span>
+                        </li>
+                    
+                    <li>
+                        <a href="/lusen/index.html#v1-authentication" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                            Authentication
+                        </a>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/endpoints/v1-auth-tokens-store.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                        <span class="truncate">Issue an access token</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v1-auth-tokens-destroy.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/20 px-1 py-0.5 text-[10px]">
+    DELETE
+</span>
+                                        <span class="truncate">Revoke the current token</span>
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                                    
+                    <li>
+                        <a href="/lusen/index.html#v1-customers" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                            Customers
+                        </a>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/endpoints/v1-customers-index.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">List customers</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v1-customers-store.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                        <span class="truncate">Create a customer</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v1-customers-show.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">Retrieve a customer</span>
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                                    
+                    <li>
+                        <a href="/lusen/index.html#v1-orders" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                            Orders
+                        </a>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/endpoints/v1-orders-index.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">List orders</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v1-orders-store.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                        <span class="truncate">Create an order</span>
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                                    
+                    <li>
+                        <a href="/lusen/index.html#v1-products" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                            Products
+                        </a>
+                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                                            <li>
+                                    <a href="/lusen/endpoints/v1-products-index.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">List products</span>
+                                    </a>
+                                </li>
+                                                            <li>
+                                    <a href="/lusen/endpoints/v1-products-search.html"
+                                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                        <span class="truncate">Search products</span>
+                                    </a>
+                                </li>
+                                                    </ul>
+                    </li>
+                            </ul>
+        </nav>
+        </div>
+    </aside>
+
+    <main id="content" class="min-w-0 flex-1 py-10">
+        
+        
+    <nav aria-label="Breadcrumb" class="text-sm">
+        <ol class="flex flex-wrap items-center gap-2 text-slate-500">
+            <li><a href="/lusen/index.html" class="hover:text-slate-900 dark:hover:text-white">Acme Commerce API</a></li>
+                            <li aria-hidden="true">/</li>
+                <li>Getting started</li>
+                        <li aria-hidden="true">/</li>
+            <li aria-current="page" class="text-slate-900 dark:text-white">Versioning</li>
+        </ol>
+    </nav>
+
+    <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Versioning</h1>
+
+    <nav aria-labelledby="toc-heading" class="mb-8 rounded-lg border border-slate-200 p-4 dark:border-slate-800">
+        <h2 id="toc-heading" class="text-xs font-semibold uppercase tracking-wider text-slate-500">On this page</h2>
+        <ul class="mt-2 space-y-1">
+                            <li class="">
+                    <a href="#versions" class="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                        Versions
+                    </a>
+                </li>
+                            <li class="">
+                    <a href="#v2-compared-with-v1" class="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                        v2 compared with v1
+                    </a>
+                </li>
+                    </ul>
+    </nav>
+
+    
+    <div class="lusen-prose"><p>This API serves 2 versions at once. The version is part of the path, so a request names the version it wants.</p>
+<h2 id="versions" class="group scroll-mt-8">Versions<a href="#versions" class="ml-2 text-slate-300 opacity-0 group-hover:opacity-100 dark:text-slate-600" aria-label="Link to this section">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Status</th>
+<th>Endpoints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v2</code></td>
+<td>current</td>
+<td>15</td>
+</tr>
+<tr>
+<td><code>v1</code></td>
+<td>deprecated — retires 2026-09-01</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+<p>New integrations should use <code>v2</code>.</p>
+<h2 id="v2-compared-with-v1" class="group scroll-mt-8"><code>v2</code> compared with <code>v1</code><a href="#v2-compared-with-v1" class="ml-2 text-slate-300 opacity-0 group-hover:opacity-100 dark:text-slate-600" aria-label="Link to this section">#</a></h2>
+<p>New in <code>v2</code>:</p>
+<ul>
+<li><code>PATCH /api/v2/customers/{customer}</code> — Update a customer</li>
+<li><code>DELETE /api/v2/customers/{customer}</code> — Delete a customer</li>
+<li><code>GET /api/v2/orders/{order}</code> — Retrieve an order</li>
+<li><code>POST /api/v2/orders/{order}/refunds</code> — Refund an order</li>
+<li><code>GET /api/v2/products/{product}</code> — Retrieve a product</li>
+<li><code>GET /api/v2/webhooks</code> — List webhook endpoints</li>
+<li><code>POST /api/v2/webhooks</code> — Register a webhook endpoint</li>
+</ul>
+<p>In <code>v1</code> but not in <code>v2</code>:</p>
+<ul>
+<li><code>GET /api/v1/products/search</code> — Search products</li>
+</ul>
+<p>The other 8 operations exist in both versions at the same path. Each one's page links to its newer edition.</p>
+</div>
+
+    <nav aria-label="Pagination" class="mt-12 flex flex-wrap gap-4 border-t border-slate-200 pt-6 dark:border-slate-800">
+                    <a href="/lusen/pages/use-cases.html" rel="prev" class="group flex-1 rounded-lg border border-slate-200 p-4 hover:border-indigo-500 dark:border-slate-800">
+                <span class="text-xs uppercase tracking-wider text-slate-500">Previous</span>
+                <span class="mt-1 block text-sm font-medium text-slate-900 dark:text-white">Use cases</span>
+            </a>
+        
+                    <a href="/lusen/pages/authentication.html" rel="next" class="group flex-1 rounded-lg border border-slate-200 p-4 text-right hover:border-indigo-500 dark:border-slate-800">
+                <span class="text-xs uppercase tracking-wider text-slate-500">Next</span>
+                <span class="mt-1 block text-sm font-medium text-slate-900 dark:text-white">Authentication</span>
+            </a>
+            </nav>
+
+    </main>
+
+</div>
+
+<footer class="mx-auto max-w-7xl px-4 py-10 text-xs text-slate-500 sm:px-6 lg:px-8">
+    <p>
+        Generated by <a href="https://github.com/fpeposhi/lusen" class="underline hover:text-slate-900 dark:hover:text-white">Lusen</a>.
+        Machine-readable:
+        <a href="/lusen/openapi.json" class="underline hover:text-slate-900 dark:hover:text-white">OpenAPI</a>,
+        <a href="/lusen/llms.txt" class="underline hover:text-slate-900 dark:hover:text-white">llms.txt</a>.
+    </p>
+</footer>
+
+<script>/*
+ | Progressive enhancement only.
+ |
+ | Every control this file touches starts hidden and is revealed here, so a
+ | reader without JavaScript sees a complete, navigable page rather than dead
+ | buttons. Nothing here is required to read the documentation.
+ |
+ | No framework and no build step: this ships as-is inside the page.
+ */
+(function () {
+    'use strict';
+
+    /* ---------------------------------------------------------------- copy */
+
+    function initCopy() {
+        if (!navigator.clipboard) return;
+
+        document.querySelectorAll('[data-lusen-copy]').forEach(function (button) {
+            button.hidden = false;
+
+            button.addEventListener('click', function () {
+                var block = button.closest('.lusen-code');
+                var code = block && block.querySelector('code');
+
+                if (!code) return;
+
+                navigator.clipboard.writeText(code.innerText).then(function () {
+                    var previous = button.textContent;
+                    button.textContent = 'Copied';
+                    button.classList.add('is-copied');
+
+                    setTimeout(function () {
+                        button.textContent = previous;
+                        button.classList.remove('is-copied');
+                    }, 1600);
+                });
+            });
+        });
+    }
+
+    /* -------------------------------------------------------------- search */
+
+    var index = null;
+    var loading = null;
+
+    function loadIndex(url) {
+        if (index) return Promise.resolve(index);
+        if (loading) return loading;
+
+        loading = fetch(url)
+            .then(function (response) {
+                if (!response.ok) throw new Error('unavailable');
+                return response.json();
+            })
+            .then(function (data) {
+                index = (data && data.items) || [];
+                return index;
+            });
+
+        return loading;
+    }
+
+    function score(item, terms) {
+        var title = item.title.toLowerCase();
+        var path = (item.path || '').toLowerCase();
+        var text = (item.text || '').toLowerCase();
+        var total = 0;
+
+        for (var i = 0; i < terms.length; i++) {
+            var term = terms[i];
+
+            if (title.indexOf(term) === 0) total += 10;
+            else if (title.indexOf(term) !== -1) total += 6;
+            else if (path.indexOf(term) !== -1) total += 4;
+            else if (text.indexOf(term) !== -1) total += 1;
+            else return 0; // every term must match somewhere
+        }
+
+        return total;
+    }
+
+    function search(terms) {
+        return index
+            .map(function (item) { return { item: item, score: score(item, terms) }; })
+            .filter(function (hit) { return hit.score > 0; })
+            .sort(function (a, b) { return b.score - a.score; })
+            .slice(0, 10)
+            .map(function (hit) { return hit.item; });
+    }
+
+    function render(list, empty, results) {
+        list.textContent = '';
+
+        results.forEach(function (item) {
+            var li = document.createElement('li');
+            var a = document.createElement('a');
+
+            a.href = item.url;
+            a.className = 'lusen-search-hit';
+
+            if (item.method) {
+                var badge = document.createElement('span');
+                badge.className = 'lusen-search-method';
+                badge.textContent = item.method;
+                a.appendChild(badge);
+            }
+
+            var label = document.createElement('span');
+            label.className = 'lusen-search-title';
+            label.textContent = item.title;
+            a.appendChild(label);
+
+            if (item.context) {
+                var context = document.createElement('span');
+                context.className = 'lusen-search-context';
+                context.textContent = item.context;
+                a.appendChild(context);
+            }
+
+            li.appendChild(a);
+            list.appendChild(li);
+        });
+
+        list.hidden = results.length === 0;
+        empty.hidden = results.length !== 0;
+    }
+
+    function initSearch() {
+        var form = document.querySelector('[data-lusen-search]');
+        var url = window.lusenSearchIndex;
+
+        if (!form || !url || !window.fetch) return;
+
+        var input = form.querySelector('input');
+        var list = form.querySelector('.lusen-search-results');
+        var empty = form.querySelector('.lusen-search-empty');
+
+        form.addEventListener('submit', function (event) { event.preventDefault(); });
+
+        input.addEventListener('input', function () {
+            var query = input.value.trim().toLowerCase();
+
+            if (query.length < 2) {
+                list.hidden = true;
+                empty.hidden = true;
+                return;
+            }
+
+            loadIndex(url).then(function () {
+                render(list, empty, search(query.split(/\s+/)));
+            }).catch(function () { form.hidden = true; });
+        });
+
+        input.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                input.value = '';
+                list.hidden = true;
+                empty.hidden = true;
+                input.blur();
+            }
+        });
+
+        // Only reveal the box once an index is known to be reachable: a search
+        // field that cannot search is worse than none at all.
+        loadIndex(url)
+            .then(function () { form.hidden = false; })
+            .catch(function () { form.hidden = true; });
+    }
+
+    /* --------------------------------------------------------------- theme */
+
+    function initTheme() {
+        var button = document.querySelector('[data-lusen-theme]');
+
+        if (!button) return;
+
+        var label = button.querySelector('[data-lusen-theme-label]');
+        var root = document.documentElement;
+
+        function stored() {
+            try { return localStorage.getItem('lusen-theme'); } catch (e) { return null; }
+        }
+
+        function systemDark() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        function current() {
+            return root.getAttribute('data-theme') || (systemDark() ? 'dark' : 'light');
+        }
+
+        function paint() {
+            var choice = stored();
+            label.textContent = choice === null
+                ? 'Theme: system'
+                : (choice === 'dark' ? 'Theme: dark' : 'Theme: light');
+        }
+
+        button.addEventListener('click', function () {
+            // Cycles through the three real states, so a reader can get back
+            // to following the operating system.
+            var next = stored() === null
+                ? (current() === 'dark' ? 'light' : 'dark')
+                : (stored() === 'dark' ? null : 'dark');
+
+            try {
+                if (next === null) {
+                    localStorage.removeItem('lusen-theme');
+                    root.removeAttribute('data-theme');
+                } else {
+                    localStorage.setItem('lusen-theme', next);
+                    root.setAttribute('data-theme', next);
+                }
+            } catch (e) {}
+
+            paint();
+        });
+
+        paint();
+        button.hidden = false;
+    }
+
+    function init() {
+        initCopy();
+        initSearch();
+        initTheme();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
+<script>window.lusenSearchIndex = "\/lusen\/search-index.json";</script>
+
+</body>
+</html>
