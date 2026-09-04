@@ -230,6 +230,22 @@ final class UserController extends Controller
 }
 ```
 
+## Responses, with or without API resources
+
+Lusen documents response bodies from the API resource an action returns. When
+there is no resource — an API answering with plain arrays through a
+base-controller helper — it reads the shape you wrote instead:
+
+```php
+/**
+ * @response array{status: true, data: array{orders: list<OrderShape>, total: int}}
+ */
+```
+
+That is the PHPStan grammar, and any class it names is read too: public typed
+properties become fields, their docblocks become descriptions. See
+[AUTHORING.md](AUTHORING.md#responses-without-an-api-resource).
+
 ## Two versions at once
 
 An API that has lived long enough serves `/api/v1/orders` next to

@@ -6,8 +6,14 @@ namespace Lusen\Extract;
 
 use Lusen\Collect\RouteCandidate;
 use Lusen\Extract\Contracts\Extractor;
+use Lusen\Extract\Types\TypeNames;
+use Lusen\Extract\Types\TypeReader;
 use Lusen\Ir\Endpoint;
+use Lusen\Ir\Enums\HttpMethod;
+use Lusen\Ir\Example;
+use Lusen\Ir\Response;
 use Lusen\Support\DocBlock;
+use Lusen\Support\Examples;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -21,6 +27,12 @@ use ReflectionMethod;
  *
  * Runs after RouteExtractor so it overrides the derived summary, and before
  * AttributeExtractor so an explicit #[ApiDoc] still wins.
+ *
+ * It also reads `@response`, which is how an API that answers with plain
+ * arrays says what it returns. Reading it here rather than in
+ * ResourceExtractor gets the precedence right for free: this runs first, and
+ * ResourceExtractor only fills gaps, so a shape somebody wrote by hand beats
+ * one inferred from `toArray()`.
  */
 final readonly class ControllerExtractor implements Extractor
 {
@@ -46,6 +58,8 @@ final readonly class ControllerExtractor implements Extractor
         'create a new controller instance',
     ];
 
+    public function __construct(private TypeReader $types = new TypeReader) {}
+
     public function extract(Endpoint $endpoint, RouteCandidate $candidate): ?Endpoint
     {
         $action = $this->reflectAction($candidate);
@@ -63,13 +77,97 @@ final readonly class ControllerExtractor implements Extractor
 
         $group = $method->tag('group') ?? $class->tag('group');
 
-        return $endpoint->with(
+        $endpoint = $endpoint->with(
             summary: $this->summary($method),
             description: $this->description($method),
             group: $group === '' ? null : $group,
             authenticated: $this->authenticated($method, $class),
             deprecated: $method->hasTag('deprecated') ? true : null,
         );
+
+        return $this->describeResponses($endpoint, $method, $action);
+    }
+
+    /**
+     * `@response array{status: bool, data: Invoice}`, optionally with a status
+     * code in front of it.
+     *
+     * This is the only response an application with no API resources can
+     * offer, and it is a better one: a shape written by hand states what the
+     * endpoint promises, where a parsed `toArray()` only reports what today's
+     * code happens to build.
+     */
+    private function describeResponses(Endpoint $endpoint, DocBlock $method, ReflectionMethod $action): Endpoint
+    {
+        $written = $method->tagValues('response');
+
+        if ($written === []) {
+            return $endpoint;
+        }
+
+        $names = TypeNames::forClass($action->getDeclaringClass()->getName());
+        $responses = $endpoint->responses;
+        $added = false;
+
+        foreach ($written as $value) {
+            [$status, $expression] = $this->statusAndType($value, $endpoint);
+
+            if ($expression === '' || $this->hasStatus($responses, $status)) {
+                continue;
+            }
+
+            $schema = $this->types->read($expression, $names);
+
+            if ($schema === null) {
+                continue;
+            }
+
+            $responses[] = new Response(
+                status: $status,
+                schema: $schema,
+                examples: [new Example('Example', Examples::forSchema($schema))],
+            );
+
+            $added = true;
+        }
+
+        if (! $added) {
+            return $endpoint;
+        }
+
+        usort($responses, static fn (Response $a, Response $b): int => $a->status <=> $b->status);
+
+        return $endpoint->withResponses($responses);
+    }
+
+    /**
+     * @return array{int, string}
+     */
+    private function statusAndType(string $value, Endpoint $endpoint): array
+    {
+        $value = trim($value);
+
+        if (preg_match('/^(\d{3})\s+(.*)$/s', $value, $match) === 1) {
+            return [(int) $match[1], trim($match[2])];
+        }
+
+        // Never 204 for a documented body: a shape says there is one, whatever
+        // the verb would otherwise imply.
+        return [$endpoint->method === HttpMethod::Post ? 201 : 200, $value];
+    }
+
+    /**
+     * @param  list<Response>  $responses
+     */
+    private function hasStatus(array $responses, int $status): bool
+    {
+        foreach ($responses as $response) {
+            if ($response->status === $status) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function summary(DocBlock $doc): ?string

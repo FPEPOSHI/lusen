@@ -231,6 +231,57 @@ is also what the generated **Errors** page will show.
 
 ---
 
+## Responses without an API resource
+
+Lusen reads response bodies from the API resource an action returns. Plenty of
+codebases have none — they answer with plain arrays through a base-controller
+helper — so it also reads the shape when you write it down.
+
+```php
+/**
+ * List orders
+ *
+ * @response array{status: true, data: array{orders: list<OrderShape>, total: int}}
+ * @response 422 array{status: false, message: string}
+ */
+public function index(): JsonResponse { /* ... */ }
+```
+
+The grammar is the PHPStan one you already use in static analysis:
+`array{key: T, optional?: T}`, `list<T>`, `array<T>`, `T[]`, `?T`, `A|B`, and
+literals. A union of string literals (`'paid'|'pending'`) becomes an enum. A
+union of real types documents the first member, which is why
+`array{...}|ApiError` reads as the success shape. Without a status code in
+front, a `POST` is `201` and everything else is `200` — never `204`, since a
+written shape says there is a body.
+
+Any class named in a shape is read too:
+
+```php
+/** Documentation-only shape of an order's money amounts. */
+class MoneyShape
+{
+    /** ISO 4217 currency code. */
+    public string $currency;
+    public ?float $exchange_rate;
+    /** @var list<LineShape> */
+    public array $lines;
+}
+```
+
+Public typed properties become fields, their docblock summaries become
+descriptions, and `@var` beats a bare `array` because it says more. Nothing is
+marked required: a class has no way to say which of its fields are always
+present, and claiming otherwise would be a promise it never made. Static and
+non-public properties are skipped, and a class that refers to itself stops
+rather than recursing.
+
+Anything unreadable becomes `any`, never a guess. A hand-written `@response`
+always beats a shape inferred from `toArray()`, and an `#[ApiResponse]`
+attribute beats both.
+
+---
+
 ## Attributes
 
 Import from `Lusen\Attributes`. Use these when inference cannot see something,

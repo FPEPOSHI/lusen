@@ -116,6 +116,46 @@ final readonly class Schema
         );
     }
 
+    public function asNullable(): self
+    {
+        return $this->nullable ? $this : new self(
+            type: $this->type,
+            format: $this->format,
+            nullable: true,
+            enum: $this->enum,
+            items: $this->items,
+            properties: $this->properties,
+            required: $this->required,
+            constraints: $this->constraints,
+            example: $this->example,
+            description: $this->description,
+        );
+    }
+
+    /**
+     * Keeps an existing description: the field's own docblock is more specific
+     * than anything a caller could add around it.
+     */
+    public function describedAs(?string $description): self
+    {
+        if ($description === null || $description === '' || $this->description !== null) {
+            return $this;
+        }
+
+        return new self(
+            type: $this->type,
+            format: $this->format,
+            nullable: $this->nullable,
+            enum: $this->enum,
+            items: $this->items,
+            properties: $this->properties,
+            required: $this->required,
+            constraints: $this->constraints,
+            example: $this->example,
+            description: $description,
+        );
+    }
+
     /**
      * Human-readable one-liner for the docs UI parameter table, e.g.
      * "string, max 255" or "integer, 1-100".

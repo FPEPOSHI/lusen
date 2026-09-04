@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lusen;
 
+use Composer\InstalledVersions;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\View\Factory as ViewFactory;
@@ -26,6 +27,7 @@ use Lusen\Extract\Models\ModelSchema;
 use Lusen\Extract\Resources\ResourceReader;
 use Lusen\Extract\RouteExtractor;
 use Lusen\Support\Data;
+use OutOfBoundsException;
 
 final class LusenServiceProvider extends ServiceProvider
 {
@@ -259,13 +261,42 @@ final class LusenServiceProvider extends ServiceProvider
      * invalidate the whole cache, since the stored endpoints were produced by
      * rules that no longer apply.
      */
+    /**
+     * Invalidates every cached endpoint when anything that shaped it changes:
+     * the configuration, and the package itself.
+     *
+     * The package half is not optional. An upgrade that teaches an extractor
+     * to read something new - a response shape it used to miss - would
+     * otherwise hand back the endpoints analysed by the old version, and the
+     * feature somebody upgraded for would appear not to work.
+     */
     private function cacheKey(): string
     {
         $config = $this->section('lusen');
 
         unset($config['cache'], $config['output'], $config['ui'], $config['seo']);
 
-        return hash('xxh128', json_encode($config) ?: '');
+        return hash('xxh128', (json_encode($config) ?: '').'|'.$this->packageVersion());
+    }
+
+    /**
+     * The installed commit of this package, falling back to its version, then
+     * to nothing at all when Composer's runtime API cannot answer - which is
+     * the case while running the package's own test suite.
+     */
+    private function packageVersion(): string
+    {
+        if (! class_exists(InstalledVersions::class)) {
+            return '';
+        }
+
+        try {
+            return InstalledVersions::getReference('fpeposhi/lusen')
+                ?? InstalledVersions::getPrettyVersion('fpeposhi/lusen')
+                ?? '';
+        } catch (OutOfBoundsException) {
+            return '';
+        }
     }
 
     private function cacheEnabled(): bool

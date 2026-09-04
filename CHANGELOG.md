@@ -13,6 +13,31 @@ identifiers are stable enough to build on, but the configuration shape and the
 IR are still moving, and whether the MCP server stays in this package is an
 open question. Pin with `^0.1`.
 
+### Added
+
+- **Responses from written types.** `@response array{status: true, data: Order}`
+  is now read into a response schema, with the PHPStan grammar most codebases
+  already use: nested shapes, `list<T>`, `array<T>`, `T[]`, `?T`, optional
+  `key?:`, literals, and a union of string literals as an enum. An API that
+  answers with plain arrays through a base-controller envelope — which has no
+  resource for Lusen to parse — can now document its responses without
+  adopting anything new.
+- **Classes named in those shapes are read as schemas**: public typed
+  properties become fields and their docblock summaries become descriptions.
+  Documentation-only DTOs are a common way to keep response shapes beside the
+  code, and they are better evidence than inference. Nothing is marked
+  required, because a class cannot say which fields are always present.
+- Precedence is unchanged and now spans three sources: an `#[ApiResponse]`
+  attribute beats a `@response` docblock, which beats a shape inferred from a
+  resource's `toArray()`.
+
+### Fixed
+
+- The build cache did not invalidate when the package itself changed, despite
+  its own documentation saying it did. Upgrading Lusen kept serving endpoints
+  analysed by the previous version, so a release that taught an extractor to
+  read something new appeared not to work until someone ran `--fresh`.
+
 ### Changed
 
 - Laravel 11 is no longer supported. Every 11.x release is now covered by a
