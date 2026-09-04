@@ -7,6 +7,7 @@ use Lusen\Extract\ControllerExtractor;
 use Lusen\Extract\FormRequestExtractor;
 use Lusen\Extract\ResourceExtractor;
 use Lusen\Extract\RouteExtractor;
+use Lusen\Extract\ScrambleExtractor;
 
 return [
 
@@ -132,6 +133,14 @@ return [
         ControllerExtractor::class,
         FormRequestExtractor::class,
         ResourceExtractor::class,
+
+        /*
+         | Reads Scramble's attributes, so a codebase documented with it keeps
+         | what it wrote. Harmless if you have never used it, and safe to
+         | remove if you would rather Lusen ignored them.
+         */
+        ScrambleExtractor::class,
+
         AttributeExtractor::class,
     ],
 

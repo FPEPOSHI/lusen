@@ -231,6 +231,35 @@ is also what the generated **Errors** page will show.
 
 ---
 
+## Coming from Scramble
+
+A codebase documented once should not have to be documented again to change
+tools, so Lusen reads Scramble's attributes where it finds them:
+
+| Attribute | What Lusen takes |
+| --- | --- |
+| `#[Group(name:)]` | the endpoint's group |
+| `#[Response(status:, description:, type:)]` | a response per status, with `type` read as a schema |
+| `#[QueryParameter]`, `#[PathParameter]`, `#[BodyParameter]`, `#[HeaderParameter]` | the parameter, with its description, type, example and default |
+
+`type` goes through the same reader as `@response`, so `'ApiError'` becomes
+that class's shape rather than a bare label. A `default:` is appended to the
+description, since the schema has nowhere to keep one and a caller needs it.
+
+Scramble does not have to be installed. The attributes are matched by name and
+read without being instantiated, so this keeps working in a codebase that has
+already removed the dependency.
+
+Lusen's own attributes still win — `#[ApiDoc(group: '...')]` beats
+`#[Group(name: '...')]` — and you can drop `ScrambleExtractor::class` from
+`extractors` if you would rather it ignored them.
+
+> **If you published `config/lusen.php` before this release**, its `extractors`
+> list replaces the package's, so the new extractor will not run until you add
+> `Lusen\Extract\ScrambleExtractor::class` to it, before `AttributeExtractor`.
+
+---
+
 ## Describing a parameter
 
 A FormRequest says what is valid; a docblock above the rule says what the field

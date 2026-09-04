@@ -30,6 +30,18 @@ open question. Pin with `^0.1`.
 - Precedence is unchanged and now spans three sources: an `#[ApiResponse]`
   attribute beats a `@response` docblock, which beats a shape inferred from a
   resource's `toArray()`.
+- **Scramble's attributes are read.** `#[Group]`, `#[Response]` and the
+  `#[QueryParameter]` family become groups, responses and parameters, with
+  `type:` resolved through the same reader that handles `@response`. A
+  codebase documented once should not have to be documented again to change
+  tools. Scramble does not need to be installed: the attributes are matched by
+  name and read without being instantiated, so this still works after the
+  dependency is gone. Lusen's own attributes continue to win, and
+  `ScrambleExtractor::class` can be dropped from `extractors`.
+
+  **Upgrading with a published config:** your `extractors` list replaces the
+  package's, so add `Lusen\Extract\ScrambleExtractor::class` to it (before
+  `AttributeExtractor`) or the extractor will not run.
 - **Parameter descriptions and examples from the rules.** A docblock above an
   entry in `rules()` becomes the parameter's description, and its `@example`
   becomes the example — typed as written, so `3` is a number and the generated
