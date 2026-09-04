@@ -84,3 +84,20 @@ it('describes a path parameter and keeps it required whatever the attribute says
 it('lets Lusen own attributes overrule the foreign ones', function (): void {
     expect(scrambledSpec()->endpoint('clients.ours')?->group)->toBe('Lusen has the last word');
 });
+
+it('gives Lusen own attribute the same reach, through the same reader', function (): void {
+    // #[ApiResponse(type:)] is not a Scramble concept - it is ours, taking the
+    // grammar `@response` already uses, so nobody has to keep a foreign
+    // attribute around just to describe a body.
+    $responses = scrambledSpec()->endpoint('clients.ours')?->responses ?? [];
+
+    expect(array_map(fn ($r): int => $r->status, $responses))->toBe([200, 404])
+        ->and($responses[0]->schema?->properties['items']->items?->type)->toBe(SchemaType::String)
+        ->and($responses[1]->schema?->properties['currency']->type)->toBe(SchemaType::String);
+});
+
+it('generates an example from the declared type when none is written', function (): void {
+    $example = scrambledSpec()->endpoint('clients.ours')?->responses[0]->examples[0] ?? null;
+
+    expect($example?->value)->toHaveKey('ok')->toHaveKey('items');
+});

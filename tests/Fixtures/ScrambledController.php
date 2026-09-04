@@ -9,6 +9,7 @@ use Dedoc\Scramble\Attributes\PathParameter;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Dedoc\Scramble\Attributes\Response;
 use Lusen\Attributes\ApiDoc;
+use Lusen\Attributes\ApiResponse;
 
 /**
  * A controller documented with Scramble's attributes.
@@ -42,5 +43,7 @@ final class ScrambledController
      * Ours wins
      */
     #[ApiDoc(group: 'Lusen has the last word')]
+    #[ApiResponse(404, 'Gone.', type: '\Lusen\Tests\Fixtures\Schema\MoneyShape')]
+    #[ApiResponse(200, 'Ours.', type: 'array{ok: true, items: list<string>}')]
     public function ours(): void {}
 }

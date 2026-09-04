@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here.
 
+## 0.3.0 — 2026-09-04
+
+### Added
+
+- `#[ApiResponse(type:)]`, taking the same grammar as `@response`, so a
+  response body can be described with Lusen's own attribute rather than
+  another tool's. Without it the Scramble layer was the only way to attach a
+  schema to a status, which made a compatibility shim look like the
+  recommended path. An example is generated from the type when none is
+  written.
+
 ## 0.2.0 — 2026-09-04
 
 Everything in this release came from pointing 0.1.0 at a real application
@@ -11,6 +22,7 @@ above validation rules and in another tool's attributes — and Lusen read
 none of it. Endpoints missing documentation there went from 75 of 77 to 29.
 
 ### Added
+
 
 - **Responses from written types.** `@response array{status: true, data: Order}`
   is now read into a response schema, with the PHPStan grammar most codebases

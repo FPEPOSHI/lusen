@@ -19,10 +19,16 @@ use Attribute;
 #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 final readonly class ApiResponse
 {
+    /**
+     * @param  string|null  $type  the body's shape, in the same grammar as
+     *                             `@response`: `array{id: int}`, `list<Order>`,
+     *                             `?ApiError`, or the name of a class to read
+     */
     public function __construct(
         public int $status = 200,
         public ?string $description = null,
         public mixed $example = null,
         public string $contentType = 'application/json',
+        public ?string $type = null,
     ) {}
 }

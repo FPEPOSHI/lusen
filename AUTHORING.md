@@ -246,9 +246,21 @@ tools, so Lusen reads Scramble's attributes where it finds them:
 that class's shape rather than a bare label. A `default:` is appended to the
 description, since the schema has nowhere to keep one and a caller needs it.
 
-Scramble does not have to be installed. The attributes are matched by name and
-read without being instantiated, so this keeps working in a codebase that has
-already removed the dependency.
+Scramble does not have to be installed, and Lusen does not depend on it in any
+sense: it is not in `composer.json`, nothing in `src/` imports it, and the only
+trace of it is the namespace string the extractor matches against. The
+attributes are read through reflection without being instantiated, so this
+keeps working in a codebase that has already removed the dependency.
+
+**You do not need Scramble's attributes to say any of this.** `#[ApiResponse]`
+takes the same `type` grammar, so the compatibility layer is for codebases
+migrating rather than a feature to adopt:
+
+```php
+#[ApiResponse(200, 'The order.', type: 'array{status: true, data: OrderShape}')]
+#[ApiResponse(404, 'No order with that id.', type: 'ApiError')]
+public function show(): JsonResponse { /* ... */ }
+```
 
 Lusen's own attributes still win — `#[ApiDoc(group: '...')]` beats
 `#[Group(name: '...')]` — and you can drop `ScrambleExtractor::class` from
@@ -398,7 +410,7 @@ or is wrong.
 | `#[ApiDoc]` | class, method | `summary`, `description`, `group`, `authenticated`, `deprecated`, `tags`, `version`. Leave a property out to keep the inferred value |
 | `#[ApiGroup]` | class | Names the group and describes it — the description becomes the group's landing copy |
 | `#[ApiParam]` | method, repeatable | A parameter inference cannot reach: a query filter, a custom header, a body field validated outside a FormRequest |
-| `#[ApiResponse]` | method, repeatable | A response, per status. Prefer passing `example` |
+| `#[ApiResponse]` | method, repeatable | A response, per status. `type` takes the same grammar as `@response`, so `type: 'array{id: int}'` or `type: 'OrderShape'` documents the body; `example` overrides the generated one |
 | `#[Authenticated]` | class, method | Force the auth flag on, or `#[Authenticated(false)]` to force it off |
 | `#[Hidden]` | class, method | Exclude from the docs entirely |
 
