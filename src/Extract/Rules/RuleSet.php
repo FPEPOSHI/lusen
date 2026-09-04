@@ -32,7 +32,16 @@ final readonly class RuleSet
     /**
      * @param  list<string>  $rules  normalised rule strings, e.g. ['required', 'max:255']
      */
-    public function __construct(private array $rules) {}
+    /**
+     * @param  list<string>  $rules
+     * @param  string|null  $documentation  what the author wrote above this rule
+     * @param  mixed  $example  the author's own `@example`, which beats a generated one
+     */
+    public function __construct(
+        private array $rules,
+        public ?string $documentation = null,
+        public mixed $example = null,
+    ) {}
 
     /**
      * Splits Laravel's two accepted spellings - `'required|email'` and
@@ -114,7 +123,35 @@ final readonly class RuleSet
             nullable: $this->isNullable(),
             enum: $this->enum(),
             constraints: $this->constraints($type),
+            example: $this->example,
         );
+    }
+
+    /**
+     * What to show a reader in the description column.
+     *
+     * The author's own sentence first, then whatever the rules add that the
+     * schema could not express. Both, when there are both: "must be a JPEG"
+     * and "the customer's avatar" answer different questions.
+     */
+    public function description(): ?string
+    {
+        $parts = array_filter(
+            [$this->documentation, $this->note()],
+            static fn (?string $part): bool => $part !== null && $part !== '',
+        );
+
+        if ($parts === []) {
+            return null;
+        }
+
+        // Each part is a sentence, and DocBlock strips the full stop off a
+        // summary. Without putting it back the two run together in the
+        // description column: "Where to deliver the order Accepted types: ...".
+        return implode(' ', array_map(
+            static fn (string $part): string => preg_match('/[.!?:]$/', $part) === 1 ? $part : $part.'.',
+            $parts,
+        ));
     }
 
     /**

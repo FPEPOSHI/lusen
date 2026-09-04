@@ -25,6 +25,18 @@ final class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            /**
+             * Where to deliver the order.
+             *
+             * @example DEPOT-7
+             */
+            'depot' => 'required|string|max:32',
+            /**
+             * How many crates, at most twelve.
+             *
+             * @example 3
+             */
+            'crates' => 'required|integer|max:12',
             'email' => 'required|email|max:255',
             'reference' => ['nullable', 'string', 'size:8'],
             'quantity' => 'required|integer|between:1,99',

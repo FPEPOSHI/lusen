@@ -30,6 +30,13 @@ open question. Pin with `^0.1`.
 - Precedence is unchanged and now spans three sources: an `#[ApiResponse]`
   attribute beats a `@response` docblock, which beats a shape inferred from a
   resource's `toArray()`.
+- **Parameter descriptions and examples from the rules.** A docblock above an
+  entry in `rules()` becomes the parameter's description, and its `@example`
+  becomes the example — typed as written, so `3` is a number and the generated
+  request does not quote it. A rule-derived note is kept alongside the
+  sentence rather than replacing it. `attributes()` and `messages()` are not
+  used: they carry labels and error text, and are usually `__()` calls that a
+  reader which never boots the application cannot resolve.
 - **Response envelopes.** `return $this->sendResponse([...])` is followed into
   the helper it names, so an API that wraps every success in
   `{status: true, data: …}` documents the wrapper along with the payload, in

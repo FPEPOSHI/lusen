@@ -51,7 +51,7 @@ final class RuleTree
                 in: $in,
                 schema: self::schema($node),
                 required: $set?->isRequired() ?? false,
-                description: $set?->note(),
+                description: $set?->description(),
             );
         }
 

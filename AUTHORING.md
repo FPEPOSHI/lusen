@@ -231,6 +231,45 @@ is also what the generated **Errors** page will show.
 
 ---
 
+## Describing a parameter
+
+A FormRequest says what is valid; a docblock above the rule says what the field
+is *for*. Lusen reads it:
+
+```php
+public function rules(): array
+{
+    return [
+        /**
+         * Where to deliver the order.
+         *
+         * @example DEPOT-7
+         */
+        'depot' => 'required|string|max:32',
+
+        /**
+         * How many crates, at most twelve.
+         *
+         * @example 3
+         */
+        'crates' => 'required|integer|max:12',
+    ];
+}
+```
+
+`@example` is typed the way you wrote it — `3` stays a number, so the example
+request does not quote it — and it beats the value Lusen would have generated.
+
+Anything the rules add that the schema could not express is kept alongside your
+sentence rather than replacing it: "must be a JPEG" and "the customer's avatar"
+answer different questions.
+
+`attributes()` and `messages()` are deliberately not used. They hold labels and
+error text rather than descriptions, and in practice both are `__()` calls that
+a reader which never boots your application cannot resolve.
+
+---
+
 ## Responses without an API resource
 
 Lusen reads response bodies from the API resource an action returns. Plenty of

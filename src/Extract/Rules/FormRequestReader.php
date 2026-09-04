@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lusen\Extract\Rules;
 
 use BackedEnum;
+use Lusen\Support\DocBlock;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ClassConstFetch;
@@ -91,11 +92,51 @@ final class FormRequestReader
             $value = self::ruleStrings($item->value);
 
             if ($value !== []) {
-                $rules[$item->key->value] = new RuleSet($value);
+                // A docblock above the rule is the only place in a
+                // FormRequest where a field gets described in words. The
+                // alternatives - attributes() and messages() - are labels and
+                // error text, and in practice both are `__()` calls a static
+                // reader cannot resolve anyway.
+                $doc = DocBlock::parse($item->getDocComment()?->getText());
+
+                $rules[$item->key->value] = new RuleSet(
+                    $value,
+                    documentation: self::sentence($doc),
+                    example: self::example($doc),
+                );
             }
         }
 
         return $rules;
+    }
+
+    private static function sentence(DocBlock $doc): ?string
+    {
+        $written = trim($doc->summary.' '.$doc->description);
+
+        return $written === '' ? null : $written;
+    }
+
+    /**
+     * `@example 2026-01-01`, typed the way it was written: an author who wrote
+     * `25` meant a number, and quoting it in the example request would be
+     * wrong.
+     */
+    private static function example(DocBlock $doc): mixed
+    {
+        $written = $doc->tag('example');
+
+        if ($written === null || $written === '') {
+            return null;
+        }
+
+        return match (true) {
+            strtolower($written) === 'true' => true,
+            strtolower($written) === 'false' => false,
+            preg_match('/^-?\d+$/', $written) === 1 => (int) $written,
+            preg_match('/^-?\d*\.\d+$/', $written) === 1 => (float) $written,
+            default => trim($written, "'\""),
+        };
     }
 
     private static function findRulesMethod(string $file, string $class): ?ClassMethod

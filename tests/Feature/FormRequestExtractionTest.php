@@ -179,3 +179,24 @@ it('reads the same request only once across actions that share it', function ():
     // file is parsed once regardless.
     expect(bodyParam('orders.update', 'email'))->not->toBeNull();
 });
+
+it('describes a parameter from the docblock above its rule', function (): void {
+    expect(bodyParam('orders.store', 'depot')?->description)->toBe('Where to deliver the order.');
+});
+
+it('takes the author @example over a generated one, typed as written', function (): void {
+    expect(bodyParam('orders.store', 'depot')?->schema->example)->toBe('DEPOT-7')
+        // Written as a number, so the example request must not quote it.
+        ->and(bodyParam('orders.store', 'crates')?->schema->example)->toBe(3);
+});
+
+it('keeps a rule-derived note alongside the authored sentence', function (): void {
+    // "how many crates" and whatever the rules add answer different
+    // questions, so neither replaces the other.
+    expect(bodyParam('orders.store', 'crates')?->description)
+        ->toStartWith('How many crates, at most twelve.');
+});
+
+it('leaves an undocumented rule undescribed rather than inventing a sentence', function (): void {
+    expect(bodyParam('orders.store', 'email')?->description)->toBeNull();
+});
