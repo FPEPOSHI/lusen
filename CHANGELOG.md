@@ -6,6 +6,14 @@ All notable changes to this project are documented here.
 
 Initial scaffold.
 
+### Changed
+
+- Laravel 11 is no longer supported. Every 11.x release is now covered by a
+  security advisory, so Composer's default policy refuses to install one at
+  all — a package claiming to support it would be sending people at a
+  framework they cannot install and should not be running. The requirement is
+  `^12.0`, and CI tests Laravel 12 on PHP 8.2, 8.3 and 8.4.
+
 ### Fixed
 
 - The generated introduction listed one bullet per group by its plain name, so
