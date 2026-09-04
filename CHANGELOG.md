@@ -8,10 +8,24 @@ All notable changes to this project are documented here.
 
 - `#[ApiResponse(type:)]`, taking the same grammar as `@response`, so a
   response body can be described with Lusen's own attribute rather than
-  another tool's. Without it the Scramble layer was the only way to attach a
-  schema to a status, which made a compatibility shim look like the
-  recommended path. An example is generated from the type when none is
-  written.
+  another tool's. Without it the compatibility layer was the only way to
+  attach a schema to a status, which made a shim for people leaving another
+  tool look like the path for people arriving. An example is generated from
+  the type when none is written.
+
+### Changed
+
+- `ScrambleExtractor` is now `ExternalAttributeExtractor`, and the attribute
+  namespaces it reads are configuration (`attributes.external`) rather than a
+  constant in its source. Naming one tool in a class name made a general
+  mechanism look like a special case, and left no way to point it at a
+  different tool without changing the package. The default still reads what
+  0.2.0 read, so nothing stops working; a published config needs
+  `Lusen\Extract\ExternalAttributeExtractor::class` in its `extractors` list
+  in place of the old name.
+- Both response attributes are decoded by one `ResponseFactory`, so an
+  external `#[Response]` and Lusen's `#[ApiResponse]` cannot describe the same
+  declaration differently.
 
 ## 0.2.0 — 2026-09-04
 

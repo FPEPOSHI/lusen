@@ -231,10 +231,11 @@ is also what the generated **Errors** page will show.
 
 ---
 
-## Coming from Scramble
+## Attributes from another tool
 
 A codebase documented once should not have to be documented again to change
-tools, so Lusen reads Scramble's attributes where it finds them:
+tools, so Lusen reads documentation attributes it recognises from the
+namespaces listed in `attributes.external`:
 
 | Attribute | What Lusen takes |
 | --- | --- |
@@ -242,19 +243,25 @@ tools, so Lusen reads Scramble's attributes where it finds them:
 | `#[Response(status:, description:, type:)]` | a response per status, with `type` read as a schema |
 | `#[QueryParameter]`, `#[PathParameter]`, `#[BodyParameter]`, `#[HeaderParameter]` | the parameter, with its description, type, example and default |
 
-`type` goes through the same reader as `@response`, so `'ApiError'` becomes
-that class's shape rather than a bare label. A `default:` is appended to the
-description, since the schema has nowhere to keep one and a caller needs it.
+```php
+'attributes' => [
+    'external' => [
+        'Some\\Vendor\\Attributes\\',
+    ],
+],
+```
 
-Scramble does not have to be installed, and Lusen does not depend on it in any
-sense: it is not in `composer.json`, nothing in `src/` imports it, and the only
-trace of it is the namespace string the extractor matches against. The
-attributes are read through reflection without being instantiated, so this
-keeps working in a codebase that has already removed the dependency.
+Matching is on the full namespace, never the short name alone: an unrelated
+`#[Response]` would otherwise be silently misdocumented. Nothing needs to be
+installed — the attributes are read by name without being instantiated, so this
+keeps working after the package they came from is removed.
 
-**You do not need Scramble's attributes to say any of this.** `#[ApiResponse]`
-takes the same `type` grammar, so the compatibility layer is for codebases
-migrating rather than a feature to adopt:
+Responses go through the same decoder as `#[ApiResponse]`, so two ways of
+declaring the same response cannot document it differently.
+
+**You do not need any of this to describe a response.** Lusen's own attribute
+takes the same `type` grammar, and this exists for codebases migrating rather
+than as a feature to adopt:
 
 ```php
 #[ApiResponse(200, 'The order.', type: 'array{status: true, data: OrderShape}')]
@@ -262,13 +269,8 @@ migrating rather than a feature to adopt:
 public function show(): JsonResponse { /* ... */ }
 ```
 
-Lusen's own attributes still win — `#[ApiDoc(group: '...')]` beats
-`#[Group(name: '...')]` — and you can drop `ScrambleExtractor::class` from
-`extractors` if you would rather it ignored them.
-
-> **If you published `config/lusen.php` before this release**, its `extractors`
-> list replaces the package's, so the new extractor will not run until you add
-> `Lusen\Extract\ScrambleExtractor::class` to it, before `AttributeExtractor`.
+Lusen's own attributes win over external ones, and you can drop
+`ExternalAttributeExtractor::class` from `extractors` to ignore them entirely.
 
 ---
 

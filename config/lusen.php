@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use Lusen\Extract\AttributeExtractor;
 use Lusen\Extract\ControllerExtractor;
+use Lusen\Extract\ExternalAttributeExtractor;
 use Lusen\Extract\FormRequestExtractor;
 use Lusen\Extract\ResourceExtractor;
 use Lusen\Extract\RouteExtractor;
-use Lusen\Extract\ScrambleExtractor;
 
 return [
 
@@ -135,13 +135,35 @@ return [
         ResourceExtractor::class,
 
         /*
-         | Reads Scramble's attributes, so a codebase documented with it keeps
-         | what it wrote. Harmless if you have never used it, and safe to
-         | remove if you would rather Lusen ignored them.
+         | Reads documentation attributes left by another tool, listed under
+         | `attributes.external` below. Harmless if there are none, and safe
+         | to remove if you would rather Lusen ignored them.
          */
-        ScrambleExtractor::class,
+        ExternalAttributeExtractor::class,
 
         AttributeExtractor::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attributes from another documentation tool
+    |--------------------------------------------------------------------------
+    |
+    | Namespaces whose attributes Lusen should read, so a codebase that has
+    | been documented once keeps what it wrote when it changes tools. Groups,
+    | responses and parameters are recognised by their short names within
+    | these namespaces.
+    |
+    | Nothing needs to be installed: the attributes are read by name without
+    | being instantiated, so this keeps working after the package they came
+    | from is removed.
+    |
+    */
+
+    'attributes' => [
+        'external' => [
+            'Dedoc\\Scramble\\Attributes\\',
+        ],
     ],
 
     /*

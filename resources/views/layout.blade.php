@@ -79,6 +79,17 @@
              independently once it outgrows the viewport. --}}
         <div class="sticky top-0 max-h-screen overflow-y-auto py-10 pr-4">
         <nav aria-label="Documentation">
+            {{-- The API's name leads the sidebar. It is the one thing on the
+                 page that says which documentation this is, so it belongs
+                 above the controls rather than under them. --}}
+            <a href="{{ $links->index() }}" class="block text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
+                @if (config('lusen.ui.logo'))
+                    <img src="{{ config('lusen.ui.logo') }}" alt="{{ $spec->title }}" class="mb-2 h-8 w-auto">
+                @endif
+                {{ $spec->title }}
+            </a>
+            <p class="mt-1 mb-4 font-mono text-xs text-slate-500">v{{ $spec->version }}</p>
+
             @include('lusen::partials.search')
 
             @if (config('lusen.ui.dark_mode', true))
@@ -89,14 +100,6 @@
                     <span data-lusen-theme-label>Theme</span>
                 </button>
             @endif
-
-            <a href="{{ $links->index() }}" class="block text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
-                @if (config('lusen.ui.logo'))
-                    <img src="{{ config('lusen.ui.logo') }}" alt="{{ $spec->title }}" class="mb-2 h-8 w-auto">
-                @endif
-                {{ $spec->title }}
-            </a>
-            <p class="mt-1 font-mono text-xs text-slate-500">v{{ $spec->version }}</p>
 
             <ul class="mt-8 space-y-6">
                 @foreach ($spec->sections as $section)

@@ -6,49 +6,52 @@ namespace Lusen\Extract;
 
 use Lusen\Collect\RouteCandidate;
 use Lusen\Extract\Contracts\Extractor;
+use Lusen\Extract\Types\ResponseFactory;
 use Lusen\Extract\Types\TypeNames;
 use Lusen\Extract\Types\TypeReader;
 use Lusen\Ir\Endpoint;
 use Lusen\Ir\Enums\ParameterLocation;
-use Lusen\Ir\Example;
 use Lusen\Ir\Parameter;
 use Lusen\Ir\Response;
 use Lusen\Ir\Schema;
-use Lusen\Support\Examples;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use Throwable;
 
 /**
- * Reads the annotations another documentation tool already put in the code.
+ * Reads documentation attributes that another tool put in the code.
  *
- * A codebase that has been documented once should not have to be documented
- * again to change tools. ControllerExtractor already honours `@ignore` and
- * `@hideFromApiDocs` for the same reason; this extends the courtesy to
- * Scramble's attributes, which are the richest thing many Laravel APIs have:
- * error responses by status, group names in the team's own language, and query
- * and path parameters with descriptions, types and examples.
+ * A codebase documented once should not have to be documented again to change
+ * tools. ControllerExtractor already honours `@ignore` and `@hideFromApiDocs`
+ * for the same reason; this extends the courtesy to attributes, which are
+ * often the richest thing an application has: responses by status, group names
+ * in the team's own language, and parameters with descriptions and examples.
  *
- * Nothing here depends on Scramble being installed. The attributes are matched
- * by name and read through `getArguments()`, which hands back the literal
- * arguments without instantiating anything - so this works whether the package
- * is present, absent, or has moved on to another major version.
+ * Which namespaces to read is configuration, not something baked in here, so a
+ * codebase can point this at whatever it used without waiting for Lusen to
+ * learn the name. Matching on the full namespace rather than the short name is
+ * deliberate: an unrelated `#[Response]` would otherwise be silently
+ * misdocumented.
  *
- * Runs late, because an annotation somebody wrote is better evidence than
- * anything inference produced, but before AttributeExtractor, because Lusen's
- * own attributes are still the last word.
+ * Nothing is instantiated. Attributes are read through `getArguments()`, which
+ * never loads the class - so this keeps working in a codebase that has already
+ * removed the package the attributes came from.
+ *
+ * Responses go through the same decoder as Lusen's own `#[ApiResponse]`, so
+ * identical declarations produce identical documentation. Runs before
+ * AttributeExtractor, because Lusen's own attributes are the last word.
  */
-final readonly class ScrambleExtractor implements Extractor
+final readonly class ExternalAttributeExtractor implements Extractor
 {
     /**
-     * Only attributes from this namespace are read. Matching on the short name
-     * alone would eventually collide with an unrelated `#[Response]` and
-     * silently document the wrong thing.
+     * @param  list<string>  $namespaces  attribute namespaces to read, each ending in a separator
      */
-    private const NAMESPACE = 'Dedoc\\Scramble\\Attributes\\';
-
-    public function __construct(private TypeReader $types = new TypeReader) {}
+    public function __construct(
+        private array $namespaces = [],
+        private ResponseFactory $responses = new ResponseFactory,
+        private TypeReader $types = new TypeReader,
+    ) {}
 
     public function extract(Endpoint $endpoint, RouteCandidate $candidate): Endpoint
     {
@@ -106,14 +109,12 @@ final readonly class ScrambleExtractor implements Extractor
                 continue;
             }
 
-            $type = $this->string($arguments, 'type', 2);
-            $schema = $type === null ? null : $this->types->read($type, $names);
-
-            $response = new Response(
+            $response = $this->responses->make(
                 status: $status,
                 description: $this->string($arguments, 'description', 1),
-                schema: $schema,
-                examples: $schema === null ? [] : [new Example('Example', Examples::forSchema($schema))],
+                type: $this->string($arguments, 'type', 2),
+                example: $arguments['example'] ?? null,
+                names: $names,
             );
 
             $responses = $this->replaceStatus($responses, $response);
@@ -267,12 +268,26 @@ final readonly class ScrambleExtractor implements Extractor
         $found = [];
 
         foreach ($target->getAttributes() as $attribute) {
-            if ($attribute->getName() === self::NAMESPACE.$short) {
+            if (in_array($attribute->getName(), $this->qualified($short), true)) {
                 $found[] = $this->arguments($attribute);
             }
         }
 
         return $found;
+    }
+
+    /**
+     * Every fully-qualified name this short name could have, across the
+     * configured namespaces.
+     *
+     * @return list<string>
+     */
+    private function qualified(string $short): array
+    {
+        return array_map(
+            static fn (string $namespace): string => rtrim($namespace, '\\').'\\'.$short,
+            $this->namespaces,
+        );
     }
 
     /**

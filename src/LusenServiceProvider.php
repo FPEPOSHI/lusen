@@ -20,6 +20,7 @@ use Lusen\Emit\BladeRenderer;
 use Lusen\Emit\Contracts\Renderer;
 use Lusen\Emit\EmitterRegistry;
 use Lusen\Extract\Contracts\Extractor;
+use Lusen\Extract\ExternalAttributeExtractor;
 use Lusen\Extract\ExtractionPipeline;
 use Lusen\Extract\Models\MigrationReader;
 use Lusen\Extract\Models\ModelLocator;
@@ -75,6 +76,10 @@ final class LusenServiceProvider extends ServiceProvider
         $this->app->bind(RouteExtractor::class, fn (): RouteExtractor => new RouteExtractor(
             Data::map($this->section('lusen'), 'auth'),
             Data::map($this->section('lusen'), 'versions'),
+        ));
+
+        $this->app->bind(ExternalAttributeExtractor::class, fn (): ExternalAttributeExtractor => new ExternalAttributeExtractor(
+            $this->externalAttributeNamespaces(),
         ));
 
         $this->app->bind(ModelSchema::class, fn (): ModelSchema => new ModelSchema(
@@ -270,6 +275,21 @@ final class LusenServiceProvider extends ServiceProvider
      * otherwise hand back the endpoints analysed by the old version, and the
      * feature somebody upgraded for would appear not to work.
      */
+    /**
+     * @return list<string>
+     */
+    private function externalAttributeNamespaces(): array
+    {
+        $attributes = Data::map($this->section('lusen'), 'attributes');
+        $external = $attributes['external'] ?? [];
+
+        if (! is_array($external)) {
+            return [];
+        }
+
+        return array_values(array_filter($external, static fn (mixed $v): bool => is_string($v) && $v !== ''));
+    }
+
     private function cacheKey(): string
     {
         $config = $this->section('lusen');

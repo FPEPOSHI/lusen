@@ -12,16 +12,14 @@ use Lusen\Attributes\Authenticated;
 use Lusen\Attributes\Hidden;
 use Lusen\Collect\RouteCandidate;
 use Lusen\Extract\Contracts\Extractor;
+use Lusen\Extract\Types\ResponseFactory;
 use Lusen\Extract\Types\TypeNames;
-use Lusen\Extract\Types\TypeReader;
 use Lusen\Ir\Endpoint;
 use Lusen\Ir\Enums\ParameterLocation;
 use Lusen\Ir\Enums\SchemaType;
-use Lusen\Ir\Example;
 use Lusen\Ir\Parameter;
 use Lusen\Ir\Response;
 use Lusen\Ir\Schema;
-use Lusen\Support\Examples;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
@@ -39,7 +37,7 @@ use ReflectionMethod;
  */
 final readonly class AttributeExtractor implements Extractor
 {
-    public function __construct(private TypeReader $types = new TypeReader) {}
+    public function __construct(private ResponseFactory $responses = new ResponseFactory) {}
 
     public function extract(Endpoint $endpoint, RouteCandidate $candidate): ?Endpoint
     {
@@ -224,30 +222,15 @@ final readonly class AttributeExtractor implements Extractor
                 static fn (Response $r): bool => $r->status !== $response->status,
             ));
 
-            $schema = $response->type === null
-                ? null
-                : $this->types->read($response->type, TypeNames::forClass($method->getDeclaringClass()->getName()));
-
-            // A written example is the author's own; otherwise the shape can
-            // produce one, which is better than an endpoint with a documented
-            // body and nothing to copy.
-            $example = match (true) {
-                $response->example !== null => $response->example,
-                $schema !== null => Examples::forSchema($schema),
-                default => null,
-            };
-
-            $responses[] = new Response(
+            // The same decoder the external attributes go through, so two
+            // ways of declaring the same response cannot document it
+            // differently.
+            $responses[] = $this->responses->make(
                 status: $response->status,
                 description: $response->description,
-                schema: $schema,
-                examples: $example === null
-                    ? []
-                    : [new Example(
-                        label: 'Example',
-                        value: $example,
-                        contentType: $response->contentType,
-                    )],
+                type: $response->type,
+                example: $response->example,
+                names: TypeNames::forClass($method->getDeclaringClass()->getName()),
                 contentType: $response->contentType,
             );
         }
