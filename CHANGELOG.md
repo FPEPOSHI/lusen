@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## 0.3.2 — 2026-09-04
+
+### Fixed
+
+- The on-page table of contents had a bottom margin and nothing on top, so it
+  sat hard against the heading above it on every prose page.
+
 ## 0.3.1 — 2026-09-04
 
 Two fixes, both found by pointing 0.3.0 at a real application and reading
