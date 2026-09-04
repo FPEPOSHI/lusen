@@ -34,7 +34,9 @@ it('takes the summary and description from the method docblock', function (): vo
     $endpoint = docsSpec()->endpoint('c.index');
 
     expect($endpoint?->summary)->toBe('List every customer')
-        ->and($endpoint?->description)->toBe('Returns a paginated list, newest first. Use the status filter to narrow it.');
+        // A soft break, kept as written. Markdown renders it as a space, so
+        // the page is unchanged while a list or a fence survives intact.
+        ->and($endpoint?->description)->toBe("Returns a paginated list, newest first.\nUse the status filter to narrow it.");
 });
 
 it('takes the group from the class docblock', function (): void {

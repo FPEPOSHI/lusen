@@ -24,7 +24,13 @@ it('splits the first paragraph from the rest', function (): void {
     $doc = DocBlock::parse("/**\n * List users.\n *\n * Paginated, newest first.\n * Filterable by status.\n */");
 
     expect($doc->summary)->toBe('List users')
-        ->and($doc->description)->toBe('Paginated, newest first. Filterable by status.');
+        ->and($doc->description)->toBe("Paginated, newest first.\nFilterable by status.");
+});
+
+it('keeps a list in a description instead of running it into one line', function (): void {
+    $doc = DocBlock::parse("/**\n * Rates\n *\n * Sources:\n *   - `BOA` first\n *   - `BKT` second\n */");
+
+    expect($doc->description)->toBe("Sources:\n  - `BOA` first\n  - `BKT` second");
 });
 
 it('preserves paragraph breaks in the description', function (): void {

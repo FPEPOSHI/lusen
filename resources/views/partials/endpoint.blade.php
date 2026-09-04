@@ -69,7 +69,10 @@
     @endunless
 
     @if ($endpoint->description)
-        <p class="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400">{{ $endpoint->description }}</p>
+        {{-- Rendered as Markdown, not printed as text: a description written
+             with a list or a code fence is written that way on purpose, and
+             authors reach for Markdown here as soon as they notice it works. --}}
+        <div class="lusen-prose mt-2 max-w-2xl text-sm">{!! \Lusen\Support\MarkdownDocument::render($endpoint->description)->html !!}</div>
     @endif
 
     <p class="mt-3 text-sm text-slate-500">

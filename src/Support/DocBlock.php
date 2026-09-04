@@ -128,31 +128,31 @@ final readonly class DocBlock
      */
     private static function split(array $body): array
     {
-        $paragraphs = [];
-        $current = [];
+        $summaryLines = [];
+        $rest = 0;
 
-        foreach ($body as $line) {
+        foreach ($body as $index => $line) {
             if (trim($line) === '') {
-                if ($current !== []) {
-                    $paragraphs[] = implode(' ', $current);
-                    $current = [];
+                if ($summaryLines !== []) {
+                    break;
                 }
+
+                $rest = $index + 1;
 
                 continue;
             }
 
-            $current[] = trim($line);
+            $summaryLines[] = trim($line);
+            $rest = $index + 1;
         }
 
-        if ($current !== []) {
-            $paragraphs[] = implode(' ', $current);
-        }
-
-        if ($paragraphs === []) {
+        if ($summaryLines === []) {
             return ['', ''];
         }
 
-        $summary = array_shift($paragraphs);
+        // The summary is a one-line heading wherever it is used, so wrapping
+        // it across several lines in the source is a detail of the source.
+        $summary = implode(' ', $summaryLines);
 
         // A heading does not carry a full stop, and the summary becomes one -
         // in the page title, the sidebar and the <title> tag.
@@ -160,6 +160,25 @@ final readonly class DocBlock
             $summary = substr($summary, 0, -1);
         }
 
-        return [$summary, implode("\n\n", $paragraphs)];
+        // The description keeps the shape it was written in. A list, an
+        // indented block or a fenced example is structure the author put there
+        // on purpose, and joining the lines destroys it - which is how a
+        // bulleted list of supported values arrived as one run-on sentence.
+        $lines = array_slice($body, $rest);
+
+        while ($lines !== [] && trim($lines[0]) === '') {
+            array_shift($lines);
+        }
+
+        while ($lines !== [] && trim((string) end($lines)) === '') {
+            array_pop($lines);
+        }
+
+        $description = implode("\n", array_map(
+            static fn (string $line): string => rtrim($line),
+            $lines,
+        ));
+
+        return [$summary, $description];
     }
 }

@@ -13,6 +13,15 @@ All notable changes to this project are documented here.
   tool look like the path for people arriving. An example is generated from
   the type when none is written.
 
+### Fixed
+
+- A description written with a list, an indented block or a fenced example
+  arrived as one run-on sentence. `DocBlock` joined every line of a paragraph
+  with a space, so structure the author put there deliberately was destroyed
+  before anything could render it. Descriptions now keep the shape they were
+  written in, and endpoint pages render them as Markdown rather than printing
+  them as text — so a list is a list, and backticks are code.
+
 ### Changed
 
 - `ScrambleExtractor` is now `ExternalAttributeExtractor`, and the attribute
