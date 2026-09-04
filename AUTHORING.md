@@ -280,6 +280,44 @@ Anything unreadable becomes `any`, never a guess. A hand-written `@response`
 always beats a shape inferred from `toArray()`, and an `#[ApiResponse]`
 attribute beats both.
 
+### Response envelopes
+
+Most APIs that answer with plain arrays send them through one helper on a base
+controller:
+
+```php
+public function sendResponse(array $result): JsonResponse
+{
+    return response()->json(['status' => true, 'data' => $result], 200);
+}
+```
+
+`return $this->sendResponse([...])` is followed into that helper, so the
+envelope is documented along with the payload in the place the helper actually
+puts it. It is read out of your code rather than declared in configuration,
+which means it cannot contradict what you ship and cannot double-wrap a
+`@response` you already wrote out in full.
+
+When the payload is something Lusen cannot see into — a service call, say — the
+envelope is still documented with the payload left `any`. A reader who does not
+know their result arrives under `data` will look in the wrong place, so the
+wrapper is worth stating on its own.
+
+**Guard clauses are skipped.** A return sitting directly in the method body
+wins over one nested inside an `if`, so this documents the success shape rather
+than the error it returns first:
+
+```php
+public function show()
+{
+    if (! $this->allowed()) {
+        return $this->sendError('nope');   // not the documented response
+    }
+
+    return $this->sendResponse($order);
+}
+```
+
 ---
 
 ## Attributes

@@ -30,9 +30,24 @@ open question. Pin with `^0.1`.
 - Precedence is unchanged and now spans three sources: an `#[ApiResponse]`
   attribute beats a `@response` docblock, which beats a shape inferred from a
   resource's `toArray()`.
+- **Response envelopes.** `return $this->sendResponse([...])` is followed into
+  the helper it names, so an API that wraps every success in
+  `{status: true, data: …}` documents the wrapper along with the payload, in
+  the place the helper puts it. Read out of the code rather than declared in
+  configuration, so it cannot contradict what ships or double-wrap a shape
+  somebody already wrote out. When the payload is beyond reach the envelope is
+  still documented, with the payload left `any`.
 
 ### Fixed
 
+- A guard clause could be documented as the success response. The first return
+  statement won, so `if (! allowed) return $this->sendError(...)` documented
+  the error envelope as the 200 — and nothing on the page would have told a
+  reader it was wrong. A return in the method body now beats one nested inside
+  a conditional.
+- `true`, `false` and `null` in an array literal arrive as constant fetches
+  rather than scalars, so a field written as `'active' => true` documented as
+  untyped instead of boolean.
 - The build cache did not invalidate when the package itself changed, despite
   its own documentation saying it did. Upgrading Lusen kept serving endpoints
   analysed by the previous version, so a release that taught an extractor to

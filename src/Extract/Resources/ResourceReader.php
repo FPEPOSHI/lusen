@@ -13,6 +13,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\Cast;
+use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Expr\StaticCall;
@@ -214,6 +215,20 @@ final class ResourceReader
 
         if ($value instanceof Float_) {
             return Schema::number()->withExample($value->value);
+        }
+
+        // `true`, `false` and `null` are constant fetches rather than scalars,
+        // so they were reaching the fallback and documenting as untyped.
+        if ($value instanceof ConstFetch) {
+            $constant = $value->name->toLowerString();
+
+            if ($constant === 'true' || $constant === 'false') {
+                return Schema::boolean()->withExample($constant === 'true');
+            }
+
+            if ($constant === 'null') {
+                return Schema::any()->asNullable();
+            }
         }
 
         if ($value instanceof Array_) {
