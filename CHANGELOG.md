@@ -2,6 +2,31 @@
 
 All notable changes to this project are documented here.
 
+## 0.3.1 — 2026-09-04
+
+Two fixes, both found by pointing 0.3.0 at a real application and reading
+what it produced rather than trusting that it worked.
+
+### Fixed
+
+- Middleware declared in a group was invisible. `gatherMiddleware()` reports
+  middleware as it was written, so a route in Laravel's `api` group reported
+  the string `api` and everything inside it — the throttle every request is
+  subject to, and sometimes the authentication — went undocumented. An
+  application throttling its whole API had every endpoint claiming to declare
+  no limit. Groups are resolved to their contents now, with the group name
+  kept so a `routes.middleware` filter still matches it.
+- Header credentials declared in `auth.headers` were dropped whenever
+  middleware identified a scheme, and unreachable even when they survived,
+  because a scheme's headers were only consulted for `apiKey`. They are
+  additive, not alternative: an API wanting a bearer token *and* a client id
+  pair wants all three headers on every request. They now appear in the
+  authentication page, the label and every generated request, and the OpenAPI
+  emitter defines a component for each one rather than referencing keys it
+  never declared.
+- The single-limit sentence read "Every endpoint allows **Rate limited by the
+  `api-global` limiter**", which only ever parsed for a numeric limit.
+
 ## 0.3.0 — 2026-09-04
 
 ### Added
