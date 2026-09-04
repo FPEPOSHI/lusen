@@ -38,7 +38,7 @@ final readonly class RouteCollector
             }
 
             foreach ($this->documentableMethods($route) as $method) {
-                $candidates[] = RouteCandidate::fromRoute($route, $method);
+                $candidates[] = RouteCandidate::fromRoute($route, $method, $this->middlewareGroups());
             }
         }
 
@@ -55,15 +55,74 @@ final readonly class RouteCollector
      *
      * @return list<string>
      */
-    public static function middlewareStrings(Route $route): array
+    /**
+     * @param  array<string, array<mixed>>  $groups
+     * @return list<string>
+     */
+    public static function middlewareStrings(Route $route, array $groups = []): array
     {
         /** @var array<mixed> $middleware */
         $middleware = $route->gatherMiddleware();
 
-        return array_values(array_unique(array_filter(
+        return self::expand(array_values(array_filter(
             $middleware,
             static fn (mixed $m): bool => is_string($m),
-        )));
+        )), $groups);
+    }
+
+    /**
+     * Middleware groups, resolved to what they contain.
+     *
+     * `gatherMiddleware()` reports middleware as it was declared, so a route
+     * in Laravel's `api` group reports the string "api" and everything inside
+     * it - the throttle every request is subject to, sometimes the
+     * authentication too - is invisible. Documentation that misses a rate
+     * limit every caller will hit is documentation that gets someone paged.
+     *
+     * The group name is kept alongside its contents, so a `routes.middleware`
+     * filter written against the group still matches.
+     *
+     * @param  list<string>  $middleware
+     * @param  array<string, array<mixed>>  $groups
+     * @return list<string>
+     */
+    private static function expand(array $middleware, array $groups, int $depth = 0): array
+    {
+        // Groups may reference groups; a handful of levels is more than any
+        // real application uses, and stops a cycle dead.
+        if ($depth > 4) {
+            return $middleware;
+        }
+
+        $expanded = [];
+
+        foreach ($middleware as $item) {
+            $expanded[] = $item;
+
+            if (! isset($groups[$item])) {
+                continue;
+            }
+
+            $inner = array_values(array_filter(
+                $groups[$item],
+                static fn (mixed $m): bool => is_string($m),
+            ));
+
+            $expanded = [...$expanded, ...self::expand($inner, $groups, $depth + 1)];
+        }
+
+        return array_values(array_unique($expanded));
+    }
+
+    /**
+     * @return array<string, array<mixed>>
+     */
+    private function middlewareGroups(): array
+    {
+        /** @var array<string, array<mixed>> $groups */
+        $groups = $this->router->getMiddlewareGroups();
+
+        return $groups;
     }
 
     private function passes(Route $route): bool

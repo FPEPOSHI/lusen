@@ -177,7 +177,7 @@ it('states a single global limit as a sentence rather than a table', function ()
     ]);
 
     expect(generated($spec)['rate-limiting']->markdown)
-        ->toContain('Every endpoint allows **60 requests per minute**.')
+        ->toContain('The same limit applies to every endpoint: **60 requests per minute**.')
         ->and(generated($spec)['rate-limiting']->markdown)->not->toContain('| Limit |');
 });
 

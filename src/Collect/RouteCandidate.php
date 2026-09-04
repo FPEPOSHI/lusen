@@ -24,9 +24,15 @@ final readonly class RouteCandidate
         public ?string $name = null,
         public ?string $controller = null,
         public ?string $action = null,
+        /** @var array<string, array<mixed>> */
+        public array $middlewareGroups = [],
     ) {}
 
-    public static function fromRoute(Route $route, HttpMethod $method): self
+    /**
+     * @param  array<string, array<mixed>>  $middlewareGroups  the router's groups, so
+     *                                                         `api` resolves to what it holds
+     */
+    public static function fromRoute(Route $route, HttpMethod $method, array $middlewareGroups = []): self
     {
         [$controller, $action] = self::resolveTarget($route);
 
@@ -37,6 +43,7 @@ final readonly class RouteCandidate
             name: $route->getName(),
             controller: $controller,
             action: $action,
+            middlewareGroups: $middlewareGroups,
         );
     }
 
@@ -45,7 +52,7 @@ final readonly class RouteCandidate
      */
     public function middleware(): array
     {
-        return RouteCollector::middlewareStrings($this->route);
+        return RouteCollector::middlewareStrings($this->route, $this->middlewareGroups);
     }
 
     /**

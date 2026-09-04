@@ -508,7 +508,10 @@ final class DefaultPages
             // One limit across the whole API is the common case and reads
             // better as a sentence than as a one-row table.
             if (count($byLimit) === 1 && count(reset($byLimit)) === count($spec->endpoints())) {
-                $lines[] = 'Every endpoint allows **'.array_key_first($byLimit).'**.';
+                // Phrased to fit both shapes a limit takes: "60 requests per
+                // minute" and "Rate limited by the `api-global` limiter" do
+                // not both follow "Every endpoint allows".
+                $lines[] = 'The same limit applies to every endpoint: **'.array_key_first($byLimit).'**.';
                 $lines[] = '';
             } else {
                 $lines[] = '| Limit | Endpoints |';

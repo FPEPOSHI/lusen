@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Lusen\Collect\RouteCollector;
 use Lusen\Ir\Enums\HttpMethod;
+use Lusen\SpecBuilder;
 use Lusen\Tests\Fixtures\UserController;
 
 function collector(array $config = []): RouteCollector
@@ -99,4 +100,29 @@ it('reports a closure route as having no controller', function (): void {
 
     expect($candidate->isClosure())->toBeTrue()
         ->and($candidate->sourceFile())->toBeNull();
+});
+
+it('sees through a middleware group to the throttle inside it', function (): void {
+    // Laravel's own `api` group carries the throttle every request is subject
+    // to. gatherMiddleware() reports the group's name and nothing else, so a
+    // rate limit that applies to the whole API was invisible.
+    app('router')->middlewareGroup('metered', ['throttle:120,1', 'auth:sanctum']);
+
+    Route::middleware('metered')->get('api/metered', fn () => null)->name('metered');
+
+    $endpoint = app(SpecBuilder::class)->build()->endpoint('metered');
+
+    expect($endpoint?->rateLimit?->label())->toBe('120 requests per minute')
+        // The same blindness hid authentication declared in a group.
+        ->and($endpoint?->authenticated)->toBeTrue();
+});
+
+it('keeps the group name too, so a middleware filter still matches it', function (): void {
+    app('router')->middlewareGroup('metered', ['throttle:120,1']);
+
+    Route::middleware('metered')->get('api/kept', fn () => null)->name('kept');
+
+    config()->set('lusen.routes.middleware', ['metered']);
+
+    expect(app(SpecBuilder::class)->build()->endpoint('kept'))->not->toBeNull();
 });
