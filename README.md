@@ -1,6 +1,6 @@
 # Lusen
 
-Fast, SEO- and AI-agent-friendly API documentation for Laravel.
+Fast, SEO and AI-agent-friendly API documentation for Laravel.
 
 Lusen reads your application's routes, form requests and resources, and emits
 documentation as **static files** — HTML for people, OpenAPI and Markdown for

@@ -2,16 +2,13 @@
 
 All notable changes to this project are documented here.
 
-## 0.1.0 — 2026-09-04
+## 0.2.0 — 2026-09-04
 
-First tagged release. Nothing below shipped before it, so the Changed and
-Fixed entries describe work done on the way here rather than anything a
-consumer would have run into.
-
-Released as `0.x` deliberately: the emitted surfaces and the endpoint
-identifiers are stable enough to build on, but the configuration shape and the
-IR are still moving, and whether the MCP server stays in this package is an
-open question. Pin with `^0.1`.
+Everything in this release came from pointing 0.1.0 at a real application
+and writing down what it could not read. Its API was thoroughly documented
+already — in `@response` shapes, in documentation-only DTOs, in docblocks
+above validation rules and in another tool's attributes — and Lusen read
+none of it. Endpoints missing documentation there went from 75 of 77 to 29.
 
 ### Added
 
@@ -22,14 +19,17 @@ open question. Pin with `^0.1`.
   answers with plain arrays through a base-controller envelope — which has no
   resource for Lusen to parse — can now document its responses without
   adopting anything new.
+
 - **Classes named in those shapes are read as schemas**: public typed
   properties become fields and their docblock summaries become descriptions.
   Documentation-only DTOs are a common way to keep response shapes beside the
   code, and they are better evidence than inference. Nothing is marked
   required, because a class cannot say which fields are always present.
+
 - Precedence is unchanged and now spans three sources: an `#[ApiResponse]`
   attribute beats a `@response` docblock, which beats a shape inferred from a
   resource's `toArray()`.
+
 - **Scramble's attributes are read.** `#[Group]`, `#[Response]` and the
   `#[QueryParameter]` family become groups, responses and parameters, with
   `type:` resolved through the same reader that handles `@response`. A
@@ -42,6 +42,7 @@ open question. Pin with `^0.1`.
   **Upgrading with a published config:** your `extractors` list replaces the
   package's, so add `Lusen\Extract\ScrambleExtractor::class` to it (before
   `AttributeExtractor`) or the extractor will not run.
+
 - **Parameter descriptions and examples from the rules.** A docblock above an
   entry in `rules()` becomes the parameter's description, and its `@example`
   becomes the example — typed as written, so `3` is a number and the generated
@@ -49,6 +50,7 @@ open question. Pin with `^0.1`.
   sentence rather than replacing it. `attributes()` and `messages()` are not
   used: they carry labels and error text, and are usually `__()` calls that a
   reader which never boots the application cannot resolve.
+
 - **Response envelopes.** `return $this->sendResponse([...])` is followed into
   the helper it names, so an API that wraps every success in
   `{status: true, data: …}` documents the wrapper along with the payload, in
@@ -64,13 +66,26 @@ open question. Pin with `^0.1`.
   the error envelope as the 200 — and nothing on the page would have told a
   reader it was wrong. A return in the method body now beats one nested inside
   a conditional.
+
 - `true`, `false` and `null` in an array literal arrive as constant fetches
   rather than scalars, so a field written as `'active' => true` documented as
   untyped instead of boolean.
+
 - The build cache did not invalidate when the package itself changed, despite
   its own documentation saying it did. Upgrading Lusen kept serving endpoints
   analysed by the previous version, so a release that taught an extractor to
   read something new appeared not to work until someone ran `--fresh`.
+
+## 0.1.0 — 2026-09-04
+
+First tagged release. Nothing below shipped before it, so the Changed and
+Fixed entries describe work done on the way here rather than anything a
+consumer would have run into.
+
+Released as `0.x` deliberately: the emitted surfaces and the endpoint
+identifiers are stable enough to build on, but the configuration shape and the
+IR are still moving, and whether the MCP server stays in this package is an
+open question. Pin with `^0.1`.
 
 ### Changed
 
