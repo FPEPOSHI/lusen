@@ -76,7 +76,11 @@ final readonly class SecurityScheme
             return $this->headers === [] ? ['X-API-Key'] : $this->headers;
         }
 
-        return ['Authorization'];
+        // Declared headers sit alongside the scheme's own rather than instead
+        // of it. An API that wants a bearer token and a client id pair wants
+        // all three on every request, and a reader sent only the token gets a
+        // 401 with nothing on the page to explain it.
+        return ['Authorization', ...$this->headers];
     }
 
     /**
@@ -87,15 +91,18 @@ final readonly class SecurityScheme
      */
     public function schemes(): array
     {
-        if ($this->type !== self::API_KEY) {
-            return [$this->name() => ''];
-        }
-
         $schemes = [];
 
+        if ($this->type !== self::API_KEY) {
+            $schemes[$this->name()] = '';
+        }
+
         foreach ($this->headerNames() as $header) {
-            $key = lcfirst(str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $header))));
-            $schemes[$key] = $header;
+            if ($header === 'Authorization' && $this->type !== self::API_KEY) {
+                continue;
+            }
+
+            $schemes[self::key($header)] = $header;
         }
 
         return $schemes;
@@ -112,14 +119,12 @@ final readonly class SecurityScheme
             return ['Authorization' => 'Basic '.base64_encode('username:password')];
         }
 
-        if ($this->type !== self::API_KEY) {
-            return ['Authorization' => 'Bearer YOUR_TOKEN'];
-        }
-
         $headers = [];
 
         foreach ($this->headerNames() as $header) {
-            $headers[$header] = 'YOUR_'.strtoupper(str_replace(['-', ' '], '_', preg_replace('/^X-/i', '', $header) ?? $header));
+            $headers[$header] = $header === 'Authorization' && $this->type !== self::API_KEY
+                ? 'Bearer YOUR_TOKEN'
+                : 'YOUR_'.strtoupper(str_replace(['-', ' '], '_', preg_replace('/^X-/i', '', $header) ?? $header));
         }
 
         return $headers;
@@ -138,6 +143,15 @@ final readonly class SecurityScheme
             self::OAUTH2 => 'An OAuth2 access token',
             default => 'A bearer token',
         };
+
+        $extra = $this->type === self::API_KEY ? [] : $this->headers;
+
+        if ($extra !== []) {
+            $base .= ', plus the '.implode(' and ', array_map(
+                static fn (string $h): string => "`{$h}`",
+                $extra,
+            )).' '.(count($extra) === 1 ? 'header' : 'headers');
+        }
 
         if ($this->scopes === []) {
             return $base;
@@ -159,5 +173,10 @@ final readonly class SecurityScheme
             'scopes' => $this->scopes ?: null,
             'headers' => $this->headers ?: null,
         ], static fn (mixed $value): bool => $value !== null);
+    }
+
+    private static function key(string $header): string
+    {
+        return lcfirst(str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $header))));
     }
 }

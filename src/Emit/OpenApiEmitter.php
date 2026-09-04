@@ -391,11 +391,16 @@ final readonly class OpenApiEmitter implements Emitter
                 continue;
             }
 
-            if ($scheme->type === SecurityScheme::API_KEY) {
-                foreach ($scheme->schemes() as $key => $header) {
+            // Every named header is its own apiKey component, whatever the
+            // scheme's own type: a security requirement that lists a key it
+            // never defines is an invalid document.
+            foreach ($scheme->schemes() as $key => $header) {
+                if ($header !== '') {
                     $schemes[$key] = ['type' => 'apiKey', 'in' => 'header', 'name' => $header];
                 }
+            }
 
+            if ($scheme->type === SecurityScheme::API_KEY) {
                 continue;
             }
 

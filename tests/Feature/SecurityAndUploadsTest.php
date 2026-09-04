@@ -188,3 +188,41 @@ it('documents basic auth with a real Authorization example', function (): void {
     expect(Snippets::curl(secSpec()->endpoint('s.b')))
         ->toContain("-H 'Authorization: Basic ");
 });
+
+it('keeps declared header credentials alongside a detected scheme', function (): void {
+    // An API wanting a bearer token AND a client id pair wants all three on
+    // every request. Middleware can reveal the token; only config can reveal
+    // the rest, and detecting one must not discard the other.
+    config()->set('lusen.auth.headers', ['X-Client-Id', 'X-Client-Secret']);
+
+    Route::middleware('auth:sanctum')->get('api/paired', fn () => null)->name('paired');
+
+    $scheme = app(SpecBuilder::class)->build()->endpoint('paired')?->securityScheme();
+
+    expect($scheme?->headerNames())->toBe(['Authorization', 'X-Client-Id', 'X-Client-Secret'])
+        ->and($scheme->exampleHeaders())->toBe([
+            'Authorization' => 'Bearer YOUR_TOKEN',
+            'X-Client-Id' => 'YOUR_CLIENT_ID',
+            'X-Client-Secret' => 'YOUR_CLIENT_SECRET',
+        ])
+        ->and($scheme->label())->toContain('`X-Client-Id` and `X-Client-Secret` headers');
+});
+
+it('defines an openapi component for every header the requirement names', function (): void {
+    config()->set('lusen.auth.headers', ['X-Client-Id']);
+
+    Route::middleware('auth:sanctum')->get('api/paired', fn () => null)->name('paired');
+
+    $document = (new OpenApiEmitter)->document(app(SpecBuilder::class)->build());
+
+    $defined = array_keys($document['components']['securitySchemes']);
+    $required = array_keys($document['paths']['/api/paired']['get']['security'][0] ?? []);
+
+    // A requirement naming a component that was never defined is an invalid
+    // document, and nothing downstream would tell you.
+    foreach ($required as $key) {
+        expect($defined)->toContain($key);
+    }
+
+    expect($defined)->toContain('xClientId')->toContain('bearerAuth');
+});

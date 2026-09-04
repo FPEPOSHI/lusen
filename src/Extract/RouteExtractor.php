@@ -325,9 +325,14 @@ final readonly class RouteExtractor implements Extractor
             return $this->isAuthenticated($candidate) ? $this->configuredScheme() : null;
         }
 
+        // Declared headers survive whatever the middleware revealed. They are
+        // not an alternative to the scheme - an API asking for a bearer token
+        // *and* a client id asks for both - and middleware cannot contradict a
+        // statement the author made about the whole API.
         return new SecurityScheme(
             type: $type,
             scopes: array_values(array_unique($scopes)),
+            headers: $this->configuredHeaders(),
         );
     }
 
@@ -340,12 +345,22 @@ final readonly class RouteExtractor implements Extractor
         $type = $this->auth['scheme'] ?? SecurityScheme::BEARER;
         $type = is_string($type) ? $type : SecurityScheme::BEARER;
 
+        return new SecurityScheme(type: $type, headers: $this->configuredHeaders());
+    }
+
+    /**
+     * Header credentials the API always expects, declared in config because
+     * they leave no trace in middleware for anything to detect.
+     *
+     * @return list<string>
+     */
+    private function configuredHeaders(): array
+    {
         $headers = $this->auth['headers'] ?? [];
-        $headers = is_array($headers)
+
+        return is_array($headers)
             ? array_values(array_filter($headers, static fn (mixed $h): bool => is_string($h)))
             : [];
-
-        return new SecurityScheme(type: $type, headers: $headers);
     }
 
     /**
