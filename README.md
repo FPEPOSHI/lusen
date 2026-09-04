@@ -7,10 +7,13 @@ documentation as **static files** — HTML for people, OpenAPI and Markdown for
 machines. There is no build step for consumers, no database, and no JavaScript
 required to read a page.
 
-> **Status: early.** Prose pages, route collection, FormRequest and attribute
-> extraction, request-example generation, and the static HTML, Markdown, OpenAPI,
-> `llms.txt`, sitemap, search and Postman surfaces all work, as does the MCP
-> server.
+> **Status: early — `0.1.0`.** Prose pages, route collection, FormRequest and
+> attribute extraction, request-example generation, API versioning, and the
+> static HTML, Markdown, OpenAPI, `llms.txt`, sitemap, search and Postman
+> surfaces all work, as does the MCP server.
+>
+> Endpoint identifiers and the emitted URLs are already treated as a stability
+> contract. Configuration keys and the IR are not yet, so pin with `^0.1`.
 
 ## Install
 

@@ -2,9 +2,16 @@
 
 All notable changes to this project are documented here.
 
-## Unreleased
+## 0.1.0 — 2026-09-04
 
-Initial scaffold.
+First tagged release. Nothing below shipped before it, so the Changed and
+Fixed entries describe work done on the way here rather than anything a
+consumer would have run into.
+
+Released as `0.x` deliberately: the emitted surfaces and the endpoint
+identifiers are stable enough to build on, but the configuration shape and the
+IR are still moving, and whether the MCP server stays in this package is an
+open question. Pin with `^0.1`.
 
 ### Changed
 
@@ -16,6 +23,12 @@ Initial scaffold.
 
 ### Fixed
 
+- `resources/js/lusen.js` was `export-ignore`d, so the one file the docs read
+  at runtime for copy buttons, the theme toggle and search was missing from
+  every installed package. Pages still rendered — nothing on them waits for
+  JavaScript — so the three features simply never appeared, and never failed
+  in this repository, where the file is present. It ships now, and a test
+  pins every runtime path against `.gitattributes`.
 - The generated introduction listed one bullet per group by its plain name, so
   a versioned API got "Customers" twice with nothing to tell the two apart. It
   names the version, and the at-a-glance table now lists the versions on offer.
