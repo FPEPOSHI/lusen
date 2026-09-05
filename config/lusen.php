@@ -31,7 +31,10 @@ return [
     'base_url' => env('LUSEN_BASE_URL', env('APP_URL', 'http://localhost')),
 
     /*
-     | Extra servers shown in the docs UI switcher, as label => base URL.
+     | Other base URLs the same API answers on, as label => URL - a sandbox,
+     | a regional host. They appear in a switcher in the docs, which rewrites
+     | the base URL in every example on the page, and as `servers` in the
+     | OpenAPI document.
      */
     'servers' => [
         // 'Production' => 'https://api.example.com',
@@ -331,6 +334,16 @@ return [
          */
         'logo' => null,
         'favicon' => null,
+
+        /*
+         | Link every written page to its source, so a reader who spots a
+         | mistake can fix it. `{path}` is replaced with the file's path
+         | relative to the project root. Generated pages have no file behind
+         | them and never get the link.
+         |
+         |     'edit_url' => 'https://github.com/acme/api/edit/main/{path}',
+         */
+        'edit_url' => env('LUSEN_EDIT_URL'),
 
         'dark_mode' => true,
 

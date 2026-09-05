@@ -84,12 +84,13 @@
             : 'No authentication required.' }}
     </p>
 
-    @foreach ([\Lusen\Ir\Enums\ParameterLocation::Path, \Lusen\Ir\Enums\ParameterLocation::Query, \Lusen\Ir\Enums\ParameterLocation::Header, \Lusen\Ir\Enums\ParameterLocation::Body] as $location)
+    @foreach (\Lusen\Ir\Enums\ParameterLocation::cases() as $location)
         @php($parameters = $endpoint->parametersIn($location))
 
         @if ($parameters)
-            <h{{ $sectionLevel }} class="mt-6 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                {{ ucfirst($location->value) }} parameters
+            @php($heading = \Lusen\Support\Outline::parameterHeading($location))
+            <h{{ $sectionLevel }} id="{{ \Lusen\Support\Outline::id($endpoint, $heading) }}" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                {{ $heading }}
             </h{{ $sectionLevel }}>
 
             <div class="mt-2 overflow-x-auto">
@@ -120,21 +121,25 @@
     {{-- The request example is the most load-bearing block on the page: a
          reader copies it, and an agent reads it to learn the exact shape of
          the call. It goes above the responses for that reason. --}}
-    <h{{ $sectionLevel }} class="mt-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Example request</h{{ $sectionLevel }}>
+    <h{{ $sectionLevel }} id="{{ \Lusen\Support\Outline::id($endpoint, 'Example request') }}" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Example request</h{{ $sectionLevel }}>
 
     {{-- Driven by ui.snippets, so the config lists what is actually rendered.
-         Stacked rather than tabbed: tabs would need JavaScript to be usable,
-         and everything on this page has to read without it. --}}
-    @foreach (\Lusen\Support\Snippets::languages(config('lusen.ui.snippets', ['curl'])) as $language => $label)
-        @include('lusen::partials.code', [
-            'label' => $label,
-            'language' => $language === 'curl' ? 'bash' : 'javascript',
-            'code' => \Lusen\Support\Snippets::render($language, $endpoint, $spec->baseUrl),
-        ])
-    @endforeach
+         Stacked and labelled, which is what reads with no JavaScript and what
+         a model retrieving this HTML sees. Where the script runs it turns the
+         set into tabs, so two languages do not push the responses - the thing
+         read next - a screen and a half down the page. --}}
+    <div class="lusen-snippets" data-lusen-tabs>
+        @foreach (\Lusen\Support\Snippets::languages(config('lusen.ui.snippets', ['curl'])) as $language => $label)
+            @include('lusen::partials.code', [
+                'label' => $label,
+                'language' => $language === 'curl' ? 'bash' : 'javascript',
+                'code' => \Lusen\Support\Snippets::render($language, $endpoint, $spec->baseUrl),
+            ])
+        @endforeach
+    </div>
 
     @if ($endpoint->responses)
-        <h{{ $sectionLevel }} class="mt-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Responses</h{{ $sectionLevel }}>
+        <h{{ $sectionLevel }} id="{{ \Lusen\Support\Outline::id($endpoint, 'Responses') }}" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Responses</h{{ $sectionLevel }}>
 
         <div class="mt-3 space-y-5">
             @foreach ($endpoint->responses as $response)
