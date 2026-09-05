@@ -47,10 +47,12 @@
     </a>
 </div>
 
-<div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 sm:px-6 lg:flex-row lg:px-8">
+
+<div class="mx-auto flex max-w-[96rem] flex-col gap-8 px-4 sm:px-6 lg:flex-row lg:px-8">
 
     
-    <aside class="lusen-nav order-last w-full shrink-0 border-slate-200 lg:order-first lg:w-64 lg:border-r dark:border-slate-800">
+    
+    <aside class="lusen-nav order-last w-full shrink-0 border-slate-200 lg:order-first lg:w-64 lg:border-r xl:w-72 dark:border-slate-800">
         
         <div class="border-t border-slate-200 py-10 lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto lg:border-t-0 lg:pr-4 dark:border-slate-800">
             <nav id="navigation" aria-label="Documentation">
@@ -83,12 +85,6 @@
     <p class="lusen-search-empty" hidden>No matches.</p>
 </form>
 
-            
-        <button type="button" data-lusen-theme hidden
-                class="mb-4 w-full rounded-md border border-slate-200 px-3 py-1.5 text-left text-sm text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
-            <span data-lusen-theme-label>Theme</span>
-        </button>
-    
             
         <label class="sr-only" for="lusen-server">Base URL</label>
         <select id="lusen-server" data-lusen-server hidden
@@ -472,9 +468,8 @@
 
     <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Search products</h1>
 
-    <div class="xl:grid xl:grid-cols-[minmax(0,1fr)_13rem] xl:gap-10">
-        <div class="min-w-0 xl:col-start-1 xl:row-start-1">
-            <article id="v1-products-search"
+    
+    <article id="v1-products-search"
          class="scroll-mt-8 mt-6">
 
     <div class="flex flex-wrap items-center gap-3">
@@ -509,41 +504,64 @@
                 No authentication required.
     </p>
 
-            
-                    
-                                <h2 id="v1-products-search-query-parameters" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Query parameters
-            </h2>
+    <div class="xl:grid xl:grid-cols-[minmax(0,1fr)_30rem] xl:items-start xl:gap-8">
 
-            <div class="mt-2 overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead>
-                        <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
-                            <th scope="col" class="py-2 pr-4 font-medium">Name</th>
-                            <th scope="col" class="py-2 pr-4 font-medium">Type</th>
-                            <th scope="col" class="py-2 pr-4 font-medium">Required</th>
-                            <th scope="col" class="py-2 font-medium">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">term</td>
-                                <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">string</td>
-                                <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
-                                <td class="py-2 text-slate-600 dark:text-slate-400">The search term.</td>
-                            </tr>
-                                            </tbody>
-                </table>
-            </div>
-                    
-                    
-            
-    
-    <h2 id="v1-products-search-example-request" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Example request</h2>
+        
+        <div class="min-w-0">
 
-    
-    <div class="lusen-snippets" data-lusen-tabs>
-                    <figure class="lusen-code">
+                            
+                                            
+                                                        <h2 id="v1-products-search-query-parameters" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Query parameters
+                    </h2>
+
+                    <div class="mt-2 overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
+                                    <th scope="col" class="py-2 pr-4 font-medium">Name</th>
+                                    <th scope="col" class="py-2 pr-4 font-medium">Type</th>
+                                    <th scope="col" class="py-2 pr-4 font-medium">Required</th>
+                                    <th scope="col" class="py-2 font-medium">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">term</td>
+                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">string</td>
+                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
+                                        <td class="py-2 text-slate-600 dark:text-slate-400">The search term.</td>
+                                    </tr>
+                                                            </tbody>
+                        </table>
+                    </div>
+                                            
+                                            
+                            
+                            
+                <h2 id="v1-products-search-responses" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Responses</h2>
+
+                <div class="mt-3 space-y-5">
+                                                                    <div>
+                            <p class="flex flex-wrap items-center gap-2">
+                                <span class="lusen-status lusen-status-ok">200</span>
+                                <span class="text-sm text-slate-600 dark:text-slate-400">Matching products.</span>
+                            </p>
+
+                            
+                                                    </div>
+                                    </div>
+                    </div>
+
+        
+        <div class="mt-8 xl:mt-6 xl:sticky xl:top-8">
+
+            
+            <h2 id="v1-products-search-example-request" class="scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Example request</h2>
+
+            
+            <div class="lusen-snippets" data-lusen-tabs="snippet">
+                                    <figure class="lusen-code">
     <figcaption class="lusen-code-head">
         <span class="lusen-code-label">cURL</span>
         <button type="button" class="lusen-copy" data-lusen-copy hidden>Copy</button>
@@ -551,38 +569,38 @@
     <pre class="lusen-code-body"><code class="language-bash"><span class="tok-cmd">curl</span><span class="tok-flag"> -X</span> GET <span class="tok-str">&#039;https://api.acme.example/api/v1/products/search?term=term&#039;</span> <span class="tok-punc">\</span>
  <span class="tok-flag"> -H</span> <span class="tok-str">&#039;Accept: application/json&#039;</span></code></pre>
 </figure>
-                    <figure class="lusen-code">
+                                    <figure class="lusen-code">
     <figcaption class="lusen-code-head">
         <span class="lusen-code-label">JavaScript</span>
         <button type="button" class="lusen-copy" data-lusen-copy hidden>Copy</button>
     </figcaption>
-    <pre class="lusen-code-body"><code class="language-javascript">const response = await fetch(&#039;https://api.acme.example/api/v1/products/search?term=term&#039;, {
-  method: &#039;GET&#039;,
-  headers: {
-    &#039;Accept&#039;: &#039;application/json&#039;
+    <pre class="lusen-code-body"><code class="language-javascript"><span class="tok-lit">const</span> response = <span class="tok-lit">await</span> <span class="tok-cmd">fetch</span>(<span class="tok-str">&#039;https://api.acme.example/api/v1/products/search?term=term&#039;</span>, {
+  <span class="tok-key">method</span>: <span class="tok-str">&#039;GET&#039;</span>,
+  <span class="tok-key">headers</span>: {
+    <span class="tok-key">&#039;Accept&#039;</span>: <span class="tok-str">&#039;application/json&#039;</span>
   }
 });
 
-const data = await response.json();</code></pre>
+<span class="tok-lit">const</span> data = <span class="tok-lit">await</span> response.<span class="tok-cmd">json</span>();</code></pre>
 </figure>
-            </div>
+                            </div>
 
-            <h2 id="v1-products-search-responses" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Responses</h2>
+            <div class="lusen-try" data-lusen-try>
+        <script type="application/json" data-lusen-request>{"method":"GET","title":"Search products","baseUrl":"https:\/\/api.acme.example","path":"\/api\/v1\/products\/search","url":"https:\/\/api.acme.example\/api\/v1\/products\/search?term=term","headers":{"Accept":"application\/json"},"fields":[{"name":"term","in":"query","type":"string","required":true,"description":"The search term.","value":"term","enum":[]}],"body":null,"auth":null,"rateLimit":null,"deprecated":true}</script>
 
-        <div class="mt-3 space-y-5">
-                                            <div>
-                    <p class="flex flex-wrap items-center gap-2">
-                        <span class="lusen-status lusen-status-ok">200</span>
-                        <span class="text-sm text-slate-600 dark:text-slate-400">Matching products.</span>
-                    </p>
+        <button type="button" data-lusen-try-open hidden
+                class="mt-2 w-full rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
+            Try it
+        </button>
+    </div>
 
-                    
-                                                                                </div>
+            
                     </div>
-    
+    </div>
+
 </article>
 
-            <nav aria-label="Pagination" class="mt-12 flex flex-wrap gap-4 border-t border-slate-200 pt-6 dark:border-slate-800">
+    <nav aria-label="Pagination" class="mt-12 flex flex-wrap gap-4 border-t border-slate-200 pt-6 dark:border-slate-800">
                     <a href="/lusen/endpoints/v1-products-index.html" rel="prev" class="group flex-1 rounded-lg border border-slate-200 p-4 hover:border-indigo-500 dark:border-slate-800">
                 <span class="text-xs uppercase tracking-wider text-slate-500">Previous</span>
                 <span class="mt-1 block text-sm font-medium text-slate-900 dark:text-white">List products</span>
@@ -590,718 +608,44 @@ const data = await response.json();</code></pre>
         
             </nav>
 
-            <p class="mt-8 text-sm text-slate-500">
-                This page as
-                <a href="/lusen/endpoints/v1-products-search.md" class="underline hover:text-slate-900 dark:hover:text-white">Markdown</a>,
-                or the whole API as
-                <a href="/lusen/openapi.json" class="underline hover:text-slate-900 dark:hover:text-white">OpenAPI</a>.
-            </p>
-        </div>
+    <p class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
+        <span>
+            This page as
+            <a href="/lusen/endpoints/v1-products-search.md" class="underline hover:text-slate-900 dark:hover:text-white">Markdown</a>,
+            or the whole API as
+            <a href="/lusen/openapi.json" class="underline hover:text-slate-900 dark:hover:text-white">OpenAPI</a>.
+        </span>
 
         
-        <div class="hidden xl:col-start-2 xl:row-start-1 xl:block xl:pt-6">
-            <div class="xl:sticky xl:top-10 xl:max-h-[calc(100vh-5rem)] xl:overflow-y-auto">
-    <nav aria-labelledby="toc-heading">
-        <h2 id="toc-heading" class="text-xs font-semibold uppercase tracking-wider text-slate-500">On this page</h2>
-        <ul class="mt-3 space-y-1 border-l border-slate-200 dark:border-slate-800">
-                            <li>
-                    <a href="#v1-products-search-query-parameters"
-                       class="-ml-px block border-l border-transparent py-1 text-sm text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white pl-3">
-                        Query parameters
-                    </a>
-                </li>
-                            <li>
-                    <a href="#v1-products-search-example-request"
-                       class="-ml-px block border-l border-transparent py-1 text-sm text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white pl-3">
-                        Example request
-                    </a>
-                </li>
-                            <li>
-                    <a href="#v1-products-search-responses"
-                       class="-ml-px block border-l border-transparent py-1 text-sm text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white pl-3">
-                        Responses
-                    </a>
-                </li>
-                    </ul>
-    </nav>
-
-            <div class="mt-8">
-            <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500">This page</h2>
-
-            
-            <ul class="mt-3 flex flex-wrap gap-x-5 text-sm xl:block xl:space-y-1">
-                <li>
-                    <a href="/lusen/endpoints/v1-products-search.md" class="block py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
-                        Markdown
-                    </a>
-                </li>
-                <li>
-                    
-                    <button type="button" data-lusen-copy-page="/lusen/endpoints/v1-products-search.md" hidden
-                            class="block py-1 text-left text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
-                        Copy for an LLM
-                    </button>
-                </li>
-                <li>
-                    <a href="/lusen/openapi.json" class="block py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
-                        OpenAPI
-                    </a>
-                </li>
-                            </ul>
-        </div>
-    </div>
-        </div>
-    </div>
+        <button type="button" data-lusen-copy-page="/lusen/endpoints/v1-products-search.md" hidden
+                class="underline hover:text-slate-900 dark:hover:text-white">
+            Copy for an LLM
+        </button>
+    </p>
 
     </main>
 
 </div>
 
-<footer class="mx-auto max-w-7xl px-4 py-10 text-xs text-slate-500 sm:px-6 lg:px-8">
+<footer class="mx-auto flex max-w-[96rem] flex-wrap items-center justify-between gap-4 px-4 py-10 text-xs text-slate-500 sm:px-6 lg:px-8">
     <p>
         Generated by <a href="https://github.com/fpeposhi/lusen" class="underline hover:text-slate-900 dark:hover:text-white">Lusen</a>.
         Machine-readable:
         <a href="/lusen/openapi.json" class="underline hover:text-slate-900 dark:hover:text-white">OpenAPI</a>,
         <a href="/lusen/llms.txt" class="underline hover:text-slate-900 dark:hover:text-white">llms.txt</a>.
     </p>
-</footer>
 
-<script>/*
- | Progressive enhancement only.
- |
- | Every control this file touches starts hidden, or starts as a link that
- | already works, and is upgraded here. A reader without JavaScript gets a
- | complete, navigable page rather than dead buttons: the menu link jumps to
- | the navigation at the end of the document, the snippets stay stacked and
- | labelled, and search is simply absent.
- |
- | No framework and no build step: this ships as-is inside the page.
- */
-(function () {
-    'use strict';
-
-    var mobile = window.matchMedia ? window.matchMedia('(max-width: 1023px)') : null;
-
-    function isNarrow() {
-        return mobile ? mobile.matches : false;
-    }
-
-    /* ---------------------------------------------------------------- copy */
-
-    function flash(button, message) {
-        var previous = button.getAttribute('data-lusen-label') || button.textContent;
-
-        button.setAttribute('data-lusen-label', previous);
-        button.textContent = message;
-        button.classList.add('is-copied');
-
-        setTimeout(function () {
-            button.textContent = previous;
-            button.classList.remove('is-copied');
-        }, 1600);
-    }
-
-    function initCopy() {
-        if (!navigator.clipboard) return;
-
-        document.querySelectorAll('[data-lusen-copy]').forEach(function (button) {
-            button.hidden = false;
-
-            button.addEventListener('click', function () {
-                var block = button.closest('.lusen-code');
-                var code = block && block.querySelector('code');
-
-                if (!code) return;
-
-                navigator.clipboard.writeText(code.innerText).then(function () {
-                    flash(button, 'Copied');
-                });
-            });
-        });
-    }
-
-    /*
-     | Hands over the page's Markdown twin rather than its HTML.
-     |
-     | Pasting a documentation page into a model is the common case now, and
-     | copying the rendered page brings navigation, badges and markup the model
-     | pays for and cannot use. The .md file is the same content without any of
-     | that, and it already exists.
-     */
-    function initCopyPage() {
-        if (!navigator.clipboard || !window.fetch) return;
-
-        document.querySelectorAll('[data-lusen-copy-page]').forEach(function (button) {
-            button.hidden = false;
-
-            button.addEventListener('click', function () {
-                fetch(button.getAttribute('data-lusen-copy-page'))
-                    .then(function (response) {
-                        if (!response.ok) throw new Error('unavailable');
-                        return response.text();
-                    })
-                    .then(function (markdown) {
-                        return navigator.clipboard.writeText(markdown);
-                    })
-                    .then(function () {
-                        flash(button, 'Copied');
-                    })
-                    .catch(function () {
-                        flash(button, 'Copy failed');
-                    });
-            });
-        });
-    }
-
-    /* ---------------------------------------------------------------- menu */
-
-    /*
-     | The navigation sits at the end of the document on a narrow screen, and
-     | the bar at the top links to it. That already works; this upgrades the
-     | link to a control that opens the same element as a panel, so reaching
-     | the navigation does not mean losing your place in the page.
-     */
-    var menu = null;
-
-    function closeMenu() {
-        if (!menu || !menu.open) return;
-
-        menu.open = false;
-        menu.nav.classList.remove('is-open');
-        menu.toggle.setAttribute('aria-expanded', 'false');
-        menu.toggle.textContent = 'Menu';
-        document.body.classList.remove('lusen-locked');
-    }
-
-    function openMenu() {
-        if (!menu || menu.open) return;
-
-        menu.open = true;
-        menu.nav.classList.add('is-open');
-        menu.toggle.setAttribute('aria-expanded', 'true');
-        menu.toggle.textContent = 'Close';
-        document.body.classList.add('lusen-locked');
-    }
-
-    function initMenu() {
-        var toggle = document.querySelector('[data-lusen-menu]');
-        var nav = document.querySelector('.lusen-nav');
-
-        if (!toggle || !nav) return;
-
-        menu = { toggle: toggle, nav: nav, open: false };
-
-        toggle.setAttribute('aria-expanded', 'false');
-
-        toggle.addEventListener('click', function (event) {
-            event.preventDefault();
-
-            if (menu.open) closeMenu();
-            else openMenu();
-        });
-
-        // At runtime the whole API is one page and every link is a fragment,
-        // so a panel that stayed open would cover what was just navigated to.
-        nav.addEventListener('click', function (event) {
-            if (event.target.closest('a')) closeMenu();
-        });
-
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') closeMenu();
-        });
-
-        // Widening past the breakpoint puts the navigation back in its column,
-        // where a leftover open state would pin it over the content.
-        if (mobile && mobile.addEventListener) {
-            mobile.addEventListener('change', function () {
-                if (!isNarrow()) closeMenu();
-            });
-        }
-    }
-
-    /* -------------------------------------------------------------- search */
-
-    var index = null;
-    var loading = null;
-
-    function loadIndex(url) {
-        if (index) return Promise.resolve(index);
-        if (loading) return loading;
-
-        loading = fetch(url)
-            .then(function (response) {
-                if (!response.ok) throw new Error('unavailable');
-                return response.json();
-            })
-            .then(function (data) {
-                index = (data && data.items) || [];
-                return index;
-            });
-
-        return loading;
-    }
-
-    function score(item, terms) {
-        var title = item.title.toLowerCase();
-        var path = (item.path || '').toLowerCase();
-        var text = (item.text || '').toLowerCase();
-        var total = 0;
-
-        for (var i = 0; i < terms.length; i++) {
-            var term = terms[i];
-
-            if (title.indexOf(term) === 0) total += 10;
-            else if (title.indexOf(term) !== -1) total += 6;
-            else if (path.indexOf(term) !== -1) total += 4;
-            else if (text.indexOf(term) !== -1) total += 1;
-            else return 0; // every term must match somewhere
-        }
-
-        return total;
-    }
-
-    function search(terms) {
-        return index
-            .map(function (item) { return { item: item, score: score(item, terms) }; })
-            .filter(function (hit) { return hit.score > 0; })
-            .sort(function (a, b) { return b.score - a.score; })
-            .slice(0, 10)
-            .map(function (hit) { return hit.item; });
-    }
-
-    function initSearch() {
-        var form = document.querySelector('[data-lusen-search]');
-        var url = window.lusenSearchIndex;
-
-        if (!form || !url || !window.fetch) return;
-
-        var input = form.querySelector('input');
-        var list = form.querySelector('.lusen-search-results');
-        var empty = form.querySelector('.lusen-search-empty');
-        var hint = form.querySelector('[data-lusen-search-hint]');
-        var options = [];
-        var active = -1;
-
-        function highlight(next) {
-            if (options.length === 0) return;
-
-            // Wraps, so holding one arrow key cycles instead of dead-ending.
-            active = (next + options.length) % options.length;
-
-            options.forEach(function (option, position) {
-                var on = position === active;
-                option.classList.toggle('is-active', on);
-                option.setAttribute('aria-selected', on ? 'true' : 'false');
-            });
-
-            input.setAttribute('aria-activedescendant', options[active].id);
-            options[active].scrollIntoView({ block: 'nearest' });
-        }
-
-        function close() {
-            list.hidden = true;
-            empty.hidden = true;
-            options = [];
-            active = -1;
-            input.setAttribute('aria-expanded', 'false');
-            input.removeAttribute('aria-activedescendant');
-        }
-
-        function render(results) {
-            list.textContent = '';
-            options = [];
-            active = -1;
-            input.removeAttribute('aria-activedescendant');
-
-            results.forEach(function (item, position) {
-                var li = document.createElement('li');
-                var a = document.createElement('a');
-
-                li.setAttribute('role', 'presentation');
-
-                a.href = item.url;
-                a.className = 'lusen-search-hit';
-                a.id = 'lusen-search-option-' + position;
-                a.setAttribute('role', 'option');
-                a.setAttribute('aria-selected', 'false');
-
-                if (item.method) {
-                    var badge = document.createElement('span');
-                    badge.className = 'lusen-search-method';
-                    badge.textContent = item.method;
-                    a.appendChild(badge);
-                }
-
-                var label = document.createElement('span');
-                label.className = 'lusen-search-title';
-                label.textContent = item.title;
-                a.appendChild(label);
-
-                if (item.context) {
-                    var context = document.createElement('span');
-                    context.className = 'lusen-search-context';
-                    context.textContent = item.context;
-                    a.appendChild(context);
-                }
-
-                li.appendChild(a);
-                list.appendChild(li);
-                options.push(a);
-            });
-
-            list.hidden = results.length === 0;
-            empty.hidden = results.length !== 0;
-            input.setAttribute('aria-expanded', results.length === 0 ? 'false' : 'true');
-        }
-
-        form.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            // Enter with nothing highlighted takes the best match, which is
-            // what someone who typed and hit return meant.
-            if (options.length > 0) options[active === -1 ? 0 : active].click();
-        });
-
-        input.addEventListener('input', function () {
-            var query = input.value.trim().toLowerCase();
-
-            if (query.length < 2) {
-                close();
-                return;
-            }
-
-            loadIndex(url).then(function () {
-                render(search(query.split(/\s+/)));
-            }).catch(function () { form.hidden = true; });
-        });
-
-        input.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                input.value = '';
-                close();
-                input.blur();
-                return;
-            }
-
-            if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                highlight(active + 1);
-            } else if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                highlight(active - 1);
-            } else if (event.key === 'Enter' && active !== -1) {
-                event.preventDefault();
-                options[active].click();
-            }
-        });
-
-        // A click anywhere else is a dismissal; the results otherwise sit over
-        // the navigation until something is typed.
-        document.addEventListener('click', function (event) {
-            if (!form.contains(event.target)) close();
-        });
-
-        /*
-         | The shortcut everyone tries first, and slash for the people who came
-         | from a terminal. Both are announced in the field rather than left to
-         | be discovered - on a pointer device, where the keys exist.
-         */
-        document.addEventListener('keydown', function (event) {
-            var focused = document.activeElement || document.body;
-            var typing = /^(INPUT|TEXTAREA|SELECT)$/.test(focused.tagName) || focused.isContentEditable;
-
-            var shortcut = (event.key === 'k' && (event.metaKey || event.ctrlKey))
-                || (event.key === '/' && !typing && !event.metaKey && !event.ctrlKey && !event.altKey);
-
-            if (!shortcut) return;
-
-            event.preventDefault();
-
-            // On a narrow screen the field is inside the navigation panel, so
-            // the panel has to come up with it.
-            if (isNarrow()) openMenu();
-
-            input.focus();
-            input.select();
-        });
-
-        if (hint && window.matchMedia && window.matchMedia('(hover: hover)').matches) {
-            hint.textContent = /Mac|iPhone|iPad/.test(navigator.platform || '') ? '⌘K' : 'Ctrl K';
-            hint.hidden = false;
-        }
-
-        // Only reveal the box once an index is known to be reachable: a search
-        // field that cannot search is worse than none at all.
-        loadIndex(url)
-            .then(function () { form.hidden = false; })
-            .catch(function () { form.hidden = true; });
-    }
-
-    /* ---------------------------------------------------------------- tabs */
-
-    /*
-     | Request examples ship stacked, one labelled block per language, because
-     | that is what reads without JavaScript and what a model retrieving the
-     | HTML should see. Where the script runs they become tabs: three languages
-     | stacked push the responses - the thing you read next - a screen and a
-     | half down the page.
-     |
-     | The choice is remembered, so a reader who works in JavaScript is not
-     | reselecting it on every endpoint.
-     */
-    var SNIPPET_KEY = 'lusen-snippet';
-
-    function storedSnippet() {
-        try { return localStorage.getItem(SNIPPET_KEY); } catch (e) { return null; }
-    }
-
-    var snippetId = 0;
-
-    function initTabs() {
-        var preferred = storedSnippet();
-
-        document.querySelectorAll('[data-lusen-tabs]').forEach(function (set) {
-            var blocks = Array.prototype.slice.call(set.querySelectorAll('.lusen-code'));
-
-            if (blocks.length < 2) return;
-
-            var names = blocks.map(function (block, index) {
-                var label = block.querySelector('.lusen-code-label');
-
-                return label ? label.textContent.trim() : 'Example ' + (index + 1);
-            });
-
-            // One strip per block, sitting in the block's own head beside its
-            // copy button. Only one block is ever visible, so what a reader
-            // sees is a single bar - tabs on the left, copy on the right -
-            // rather than a strip stacked on top of a header.
-            var strips = blocks.map(function () { return []; });
-
-            function select(position, focus) {
-                blocks.forEach(function (block, index) {
-                    block.hidden = index !== position;
-                });
-
-                strips.forEach(function (tabs) {
-                    tabs.forEach(function (tab, index) {
-                        var on = index === position;
-                        tab.setAttribute('aria-selected', on ? 'true' : 'false');
-                        tab.tabIndex = on ? 0 : -1;
-                        tab.classList.toggle('is-active', on);
-                    });
-                });
-
-                if (focus) strips[position][position].focus();
-            }
-
-            blocks.forEach(function (block) {
-                block.id = 'lusen-snippet-' + (++snippetId);
-                block.setAttribute('role', 'tabpanel');
-            });
-
-            blocks.forEach(function (block, blockIndex) {
-                var head = block.querySelector('.lusen-code-head');
-
-                if (!head) return;
-
-                var strip = document.createElement('div');
-
-                strip.className = 'lusen-tabs';
-                strip.setAttribute('role', 'tablist');
-
-                names.forEach(function (name, index) {
-                    var tab = document.createElement('button');
-
-                    tab.type = 'button';
-                    tab.className = 'lusen-tab';
-                    tab.textContent = name;
-                    tab.setAttribute('role', 'tab');
-                    tab.setAttribute('aria-controls', blocks[index].id);
-
-                    tab.addEventListener('click', function () {
-                        select(index, false);
-
-                        try { localStorage.setItem(SNIPPET_KEY, name); } catch (e) {}
-                    });
-
-                    tab.addEventListener('keydown', function (event) {
-                        if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
-
-                        event.preventDefault();
-                        select((index + (event.key === 'ArrowRight' ? 1 : -1) + names.length) % names.length, true);
-                    });
-
-                    strips[blockIndex].push(tab);
-                    strip.appendChild(tab);
-                });
-
-                head.insertBefore(strip, head.firstChild);
-            });
-
-            set.classList.add('is-tabbed');
-
-            var remembered = names.indexOf(preferred);
-
-            select(remembered === -1 ? 0 : remembered, false);
-        });
-    }
-
-    /* ------------------------------------------------------------- servers */
-
-    /*
-     | Switching the base URL rewrites it wherever it appears in the page -
-     | every example, the full URL line, the prose - so the request a reader
-     | copies is against the server they picked.
-     |
-     | Text nodes rather than innerHTML: the examples are highlighted at build
-     | time, and rewriting markup would mean re-parsing spans on every change
-     | and losing anything the reader had selected.
-     */
-    function initServers() {
-        var select = document.querySelector('[data-lusen-server]');
-        var root = document.getElementById('content');
-
-        if (!select || !root || select.options.length < 2) return;
-
-        var current = select.options[0].value;
-
-        function rewrite(next) {
-            if (next === current || next === '') return;
-
-            var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
-            var node;
-
-            while ((node = walker.nextNode())) {
-                if (node.nodeValue.indexOf(current) !== -1) {
-                    node.nodeValue = node.nodeValue.split(current).join(next);
-                }
-            }
-
-            current = next;
-        }
-
-        var stored = null;
-
-        try { stored = localStorage.getItem('lusen-server'); } catch (e) {}
-
-        if (stored) {
-            for (var i = 0; i < select.options.length; i++) {
-                if (select.options[i].value === stored) {
-                    select.value = stored;
-                    rewrite(stored);
-                    break;
-                }
-            }
-        }
-
-        select.addEventListener('change', function () {
-            rewrite(select.value);
-
-            try { localStorage.setItem('lusen-server', select.value); } catch (e) {}
-        });
-
-        select.hidden = false;
-    }
-
-    /* --------------------------------------------------------------- theme */
-
-    function initTheme() {
-        var button = document.querySelector('[data-lusen-theme]');
-
-        if (!button) return;
-
-        var label = button.querySelector('[data-lusen-theme-label]');
-        var root = document.documentElement;
-
-        function stored() {
-            try { return localStorage.getItem('lusen-theme'); } catch (e) { return null; }
-        }
-
-        function systemDark() {
-            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        }
-
-        function current() {
-            return root.getAttribute('data-theme') || (systemDark() ? 'dark' : 'light');
-        }
-
-        function paint() {
-            var choice = stored();
-            label.textContent = choice === null
-                ? 'Theme: system'
-                : (choice === 'dark' ? 'Theme: dark' : 'Theme: light');
-        }
-
-        button.addEventListener('click', function () {
-            // Cycles through the three real states, so a reader can get back
-            // to following the operating system.
-            var next = stored() === null
-                ? (current() === 'dark' ? 'light' : 'dark')
-                : (stored() === 'dark' ? null : 'dark');
-
-            try {
-                if (next === null) {
-                    localStorage.removeItem('lusen-theme');
-                    root.removeAttribute('data-theme');
-                } else {
-                    localStorage.setItem('lusen-theme', next);
-                    root.setAttribute('data-theme', next);
-                }
-            } catch (e) {}
-
-            paint();
-        });
-
-        paint();
-        button.hidden = false;
-    }
-
-    /* ------------------------------------------------------------- sidebar */
-
-    /*
-     | The sidebar scrolls independently, so on an API with forty endpoints the
-     | page you are reading is often below the fold of its own navigation, and
-     | nothing on screen says where you are.
-     */
-    function initSidebar() {
-        var current = document.querySelector('.lusen-nav [aria-current="page"]');
-
-        if (!current || isNarrow()) return;
-
-        var pane = current.closest('.lusen-nav div');
-
-        if (!pane || pane.scrollHeight <= pane.clientHeight) return;
-
-        // Measured rather than read off offsetTop, which is relative to
-        // whichever ancestor happens to be positioned.
-        var offset = current.getBoundingClientRect().top
-            - pane.getBoundingClientRect().top
-            + pane.scrollTop;
-
-        if (offset > pane.clientHeight - 80) {
-            pane.scrollTop = offset - pane.clientHeight / 2;
-        }
-    }
-
-    function init() {
-        initCopy();
-        initCopyPage();
-        initMenu();
-        initSearch();
-        initTabs();
-        initServers();
-        initTheme();
-        initSidebar();
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-})();
-</script>
+            
+        <button type="button" data-lusen-theme hidden
+                class="rounded-md border border-slate-200 px-2.5 py-1 text-xs text-slate-500 hover:border-indigo-500 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
+            <span data-lusen-theme-label>Theme</span>
+        </button>
+    </footer>
+
+    
+    <script src="/lusen/assets/lusen.js" defer></script>
 <script>window.lusenSearchIndex = "\/lusen\/search-index.json";</script>
+    <script>window.lusenTryIt = {"credentials":false,"persist":"session","baseUrl":"https:\/\/api.acme.example"};</script>
 
 </body>
 </html>

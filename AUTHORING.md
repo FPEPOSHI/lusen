@@ -601,6 +601,13 @@ version when the API has more than one.
     'edit_url'  => null,                      // 'https://github.com/acme/api/edit/main/{path}'
 ],
 
+'try_it' => [
+    'enabled'       => false,                 // see "Letting readers send the request"
+    'methods'       => ['GET'],
+    'persist_token' => 'session',             // session | local | none
+    'credentials'   => false,
+],
+
 'seo' => [
     'canonical_origin' => 'https://example.com',  // scheme + host, no path
     'noindex'          => false,
@@ -617,6 +624,39 @@ worse than none.
 switcher in the sidebar that rewrites the base URL in every example on the
 page, so a reader working against your sandbox copies a sandbox request — and
 they are the `servers` array in the OpenAPI document.
+
+### Letting readers send the request
+
+```php
+'try_it' => [
+    'enabled'       => env('LUSEN_TRY_IT', false),
+    'methods'       => ['GET'],       // widen at your own risk
+    'persist_token' => 'session',     // session | none
+    'credentials'   => false,         // send cookies cross-origin
+],
+```
+
+Every endpoint whose method is listed gets a **Try it** dialog: one field per
+parameter, prefilled with the same values the printed example uses, a field per
+header the auth scheme requires, and the body as JSON where there is one.
+
+The request is sent by the reader's browser straight to your API — there is no
+proxy — so it works when the docs and the API share an origin, and otherwise
+needs your API to allow the docs origin with
+`Access-Control-Allow-Origin`. When it does not, the page explains that rather
+than reporting a failure that looks like an outage.
+
+Readers set their credential once, in a **Set up to test** section on the
+Authentication page, and every dialog on the site uses it. Where it is kept is
+`persist_token`: `session` (until the tab closes, the default), `none` (memory
+only) or `local`, which offers the reader a *Remember on this browser*
+checkbox. That choice is about lifetime, not secrecy — no browser store hides a
+value from scripts on the same origin — so the shorter it lives, the smaller
+the window. It is scoped to the base URL it belongs to, never appears in a
+copied example, and a *Forget* button clears it.
+
+`#[ApiDoc(tryIt: false)]` withholds the form from one operation. It can only
+ever remove: an endpoint cannot opt into a playground the site has turned off.
 
 `edit_url` puts an *Edit this page* link beside every page somebody wrote.
 `{path}` is replaced with the file's path relative to your project root, so
