@@ -41,7 +41,7 @@
             "url": "/lusen/pages/rate-limiting.html",
             "kind": "page",
             "context": "Getting started",
-            "text": "Requests are rate limited per client. Exceeding a limit returns `429 Too Many Requests`. Limits Staying within the limit"
+            "text": "Requests are rate limited per client. Exceeding a limit returns 429 Too Many Requests. Limits Staying within the limit"
         },
         {
             "title": "Pagination",
