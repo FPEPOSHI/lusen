@@ -115,13 +115,46 @@ final class Str
     }
 
     /**
+     * Markdown reduced to the text it renders as.
+     *
+     * Descriptions are written in Markdown and read as Markdown on the page,
+     * but they are also used where no renderer will ever see them: a
+     * <meta name="description">, JSON-LD, the search index, a one-line index
+     * entry. A backtick that renders as code on the page is just a backtick in
+     * a search result, and "Send the `Idempotency-Key` header" is what the
+     * snippet under your link then says.
+     *
+     * Underscores are deliberately left alone. `_emphasis_` is rare in API
+     * prose and `customer_id` is not, and mangling an identifier to italicise
+     * something nobody wrote is the worse trade.
+     */
+    public static function plain(string $value): string
+    {
+        $replacements = [
+            '/!\[([^\]]*)\]\([^)]*\)/' => '$1',   // image: keep the alt text
+            '/\[([^\]]+)\]\([^)]*\)/' => '$1',    // link: keep the label
+            '/\[([^\]]+)\]\[[^\]]*\]/' => '$1',  // reference link, same
+            '/\*\*([^*]+)\*\*/' => '$1',
+            '/\*([^*]+)\*/' => '$1',
+            '/`+([^`]*)`+/' => '$1',
+        ];
+
+        foreach ($replacements as $pattern => $replacement) {
+            $value = preg_replace($pattern, $replacement, $value) ?? $value;
+        }
+
+        $flat = preg_replace('/\s+/', ' ', strip_tags($value)) ?? $value;
+
+        return trim($flat);
+    }
+
+    /**
      * Collapses a description to a single line fit for a <meta name="description">
      * or an llms.txt entry.
      */
     public static function summarise(string $value, int $limit = 155): string
     {
-        $flat = preg_replace('/\s+/', ' ', strip_tags($value)) ?? $value;
-        $flat = trim($flat);
+        $flat = self::plain($value);
 
         if (mb_strlen($flat) <= $limit) {
             return $flat;
