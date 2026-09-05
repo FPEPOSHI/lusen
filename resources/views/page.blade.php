@@ -16,13 +16,24 @@
 
     <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{{ $page->title }}</h1>
 
-    @include('lusen::partials.toc', ['contents' => $contents])
+    {{-- The contents comes first in the document and second in the layout: on a
+         narrow screen it belongs under the title, where a reader looks for it,
+         and on a wide one it belongs in the margin the prose column leaves
+         empty. Grid placement gets both from one element rather than rendering
+         it twice and hiding one. --}}
+    <div class="mt-6 xl:grid xl:grid-cols-[minmax(0,1fr)_13rem] xl:gap-10">
+        <div class="mb-8 xl:col-start-2 xl:row-start-1 xl:mb-0">
+            @include('lusen::partials.rail', ['contents' => $contents])
+        </div>
 
-    {{-- Rendered from the page's Markdown. Prose styling lives here rather
-         than in the Markdown itself so authored and generated pages look the
-         same. --}}
-    <div class="lusen-prose">{!! $body !!}</div>
+        <div class="min-w-0 xl:col-start-1 xl:row-start-1">
+            {{-- Rendered from the page's Markdown. Prose styling lives here
+                 rather than in the Markdown itself so authored and generated
+                 pages look the same. --}}
+            <div class="lusen-prose">{!! $body !!}</div>
 
-    @include('lusen::partials.pager', ['pager' => $pager])
+            @include('lusen::partials.pager', ['pager' => $pager])
+        </div>
+    </div>
 
 @endsection

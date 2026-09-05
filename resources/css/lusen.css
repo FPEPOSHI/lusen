@@ -402,6 +402,71 @@
         color: var(--color-slate-500);
     }
 
+    .lusen-search-field { position: relative; }
+
+    /* The shortcut, printed where the shortcut applies. Never in the way of
+       typing: the input reserves the room and this cannot be clicked. */
+    .lusen-search-hint {
+        position: absolute;
+        top: 50%;
+        right: 0.5rem;
+        transform: translateY(-50%);
+        pointer-events: none;
+        border: 1px solid var(--color-slate-200);
+        border-radius: 0.25rem;
+        padding: 0.05rem 0.3rem;
+        font-family: var(--font-mono);
+        font-size: 0.625rem;
+        color: var(--color-slate-400);
+    }
+
+    /* The arrow-key selection. Distinct from :hover, because the pointer and
+       the keyboard can be pointing at two different results at once. */
+    .lusen-search-hit.is-active {
+        background: var(--color-slate-100);
+        box-shadow: inset 2px 0 0 var(--color-indigo-500);
+    }
+
+    /* ------------------------------------------------------------- tabs */
+
+    /*
+     | Request examples are stacked in the HTML and become tabs where the
+     | script runs. The strip is built into each block's own head, and only one
+     | block is ever visible, so the result reads as a single bar - languages
+     | on the left, copy on the right.
+     */
+    .lusen-snippets.is-tabbed .lusen-code + .lusen-code { margin-top: 0; }
+    .lusen-snippets.is-tabbed .lusen-code-head { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    .lusen-snippets.is-tabbed .lusen-code-label { display: none; }
+
+    .lusen-tabs { display: flex; gap: 0.125rem; }
+
+    .lusen-tab {
+        border: 0;
+        border-radius: 0.25rem;
+        background: transparent;
+        padding: 0.25rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--color-slate-400);
+        cursor: pointer;
+    }
+
+    .lusen-tab:hover { color: var(--color-white); }
+
+    .lusen-tab.is-active {
+        background: var(--color-slate-800);
+        color: var(--color-white);
+    }
+
+    .lusen-tab:focus-visible {
+        outline: 2px solid var(--color-indigo-500);
+        outline-offset: -2px;
+    }
+
+
     :root[data-theme="dark"] .lusen-status-ok,
     :root[data-theme="dark"] .lusen-status-warn,
     :root[data-theme="dark"] .lusen-status-bad { background: transparent; }
@@ -417,7 +482,9 @@
 
     :root[data-theme="dark"] .lusen-search-hit { border-color: var(--color-slate-800); }
     :root[data-theme="dark"] .lusen-search-hit:hover { background: var(--color-slate-800); }
+    :root[data-theme="dark"] .lusen-search-hit.is-active { background: var(--color-slate-800); }
     :root[data-theme="dark"] .lusen-search-title { color: var(--color-white); }
+    :root[data-theme="dark"] .lusen-search-hint { border-color: var(--color-slate-700); color: var(--color-slate-500); }
 
     @media (prefers-color-scheme: dark) {
         :root:not([data-theme="light"]) .lusen-status-ok,
@@ -435,6 +502,102 @@
 
         :root:not([data-theme="light"]) .lusen-search-hit { border-color: var(--color-slate-800); }
         :root:not([data-theme="light"]) .lusen-search-hit:hover { background: var(--color-slate-800); }
+        :root:not([data-theme="light"]) .lusen-search-hit.is-active { background: var(--color-slate-800); }
         :root:not([data-theme="light"]) .lusen-search-title { color: var(--color-white); }
+        :root:not([data-theme="light"]) .lusen-search-hint { border-color: var(--color-slate-700); color: var(--color-slate-500); }
+    }
+}
+
+/*
+ | An anchored heading has to clear the bar at the top of a narrow screen,
+ | which is sticky. Unlayered so it beats the `scroll-mt-*` utilities the views
+ | set for the wide layout, where there is no bar to clear.
+ */
+@media (max-width: 1023px) {
+    [id] { scroll-margin-top: 4.5rem; }
+}
+
+/*
+ | The navigation as a panel on narrow screens.
+ |
+ | Below the sidebar breakpoint the navigation is the last thing in the
+ | document and the bar at the top links to it, which works with no
+ | JavaScript. This is the upgrade: the same element over the page, so
+ | reaching the navigation does not mean losing your place. The class is only
+ | ever set by the script.
+ |
+ | Unlayered because it has to beat the spacing utilities on the element it
+ | takes over.
+ */
+@media (max-width: 1023px) {
+    .lusen-nav.is-open {
+        position: fixed;
+        inset: 3.25rem 0 0;
+        z-index: 40;
+        overflow-y: auto;
+        background: var(--color-white);
+        padding: 0 1rem 4rem;
+    }
+
+    .lusen-nav.is-open > div {
+        border-top: 0;
+        padding-top: 1.5rem;
+    }
+
+    :root[data-theme="dark"] .lusen-nav.is-open { background: var(--color-slate-950); }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) .lusen-nav.is-open { background: var(--color-slate-950); }
+    }
+}
+
+/* The page behind the panel must not scroll under it. */
+body.lusen-locked { overflow: hidden; }
+
+/*
+ | Unlayered on purpose: both rules have to beat a utility class. `scroll-smooth`
+ | is on <html>, and the print rules undo layout utilities.
+ */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+}
+
+/*
+ | Print.
+ |
+ | An API reference gets printed and pasted into tickets, and what belongs on
+ | paper is the endpoint - not thirty navigation links, a search box that
+ | cannot search and a theme toggle. Link targets are spelled out, because a
+ | printed link that does not say where it goes is a dead end.
+ */
+@media print {
+    .lusen-nav,
+    .lusen-search,
+    .lusen-copy,
+    .lusen-tabs,
+    [data-lusen-menu],
+    [data-lusen-theme],
+    [data-lusen-copy-page] {
+        display: none !important;
+    }
+
+    /* Tabs hide every snippet but one on screen; on paper there is no way to
+       switch, so all of them print. */
+    .lusen-snippets .lusen-code[hidden] { display: block !important; }
+
+    .lusen-code,
+    .lusen-code-body,
+    .lusen-prose pre {
+        background: transparent !important;
+        color: #000 !important;
+        border: 1px solid #999;
+    }
+
+    .lusen-code-body [class^="tok-"] { color: #000 !important; }
+
+    .lusen-prose a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+        word-break: break-all;
     }
 }

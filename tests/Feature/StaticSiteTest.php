@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\Route;
 use Lusen\Emit\Contracts\Renderer;
 use Lusen\Emit\HtmlEmitter;
 use Lusen\Ir\ApiSpec;
+use Lusen\Ir\Page;
 use Lusen\SpecBuilder;
 use Lusen\Support\Links;
+use Lusen\Support\Outline;
 use Lusen\Tests\Fixtures\OrderController;
 use Lusen\Tests\Fixtures\UserController;
 
@@ -265,4 +267,97 @@ it('renders a configured logo and favicon', function (): void {
 
 it('omits them when unset', function (): void {
     expect(staticEmitter()->index(staticSpec()))->not->toContain('rel="icon"');
+});
+
+it('renders the navigation once, reachable at every width', function (): void {
+    // The sidebar used to be `hidden lg:block` with the search box inside it,
+    // so a reader who arrived on a phone had no navigation and no search at
+    // all - only the page they landed on.
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    expect(substr_count($html, 'id="navigation"'))->toBe(1)
+        ->and($html)->toContain('href="#navigation"')
+        ->and($html)->toContain('href="#navigation" data-lusen-menu');
+});
+
+it('anchors every section of an endpoint page and lists them beside it', function (): void {
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('orders.store'), $spec);
+
+    // The contents is only worth anything if the anchors it points at exist.
+    foreach (Outline::forEndpoint($spec->endpoint('orders.store')) as $section) {
+        expect($html)->toContain('id="'.$section['id'].'"')
+            ->and($html)->toContain('href="#'.$section['id'].'"');
+    }
+
+    expect($html)->toContain('On this page');
+});
+
+it('offers the page markdown to a reader pasting it into a model', function (): void {
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    expect($html)->toContain('data-lusen-copy-page="/docs/endpoints/users-index.md"');
+});
+
+it('ships the request examples stacked, for the script to tab', function (): void {
+    // Tabs are an enhancement: the HTML a model retrieves has every language
+    // in it, and a reader without JavaScript sees them all, labelled.
+    config()->set('lusen.ui.snippets', ['curl', 'javascript']);
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    expect($html)->toContain('<div class="lusen-snippets" data-lusen-tabs>')
+        ->and(substr_count($html, 'lusen-code-body'))->toBeGreaterThan(1);
+});
+
+it('links a written page to its source when an edit url is configured', function (): void {
+    config()->set('lusen.ui.edit_url', 'https://github.com/acme/api/edit/main/{path}');
+
+    $written = new Page(
+        id: 'webhooks',
+        title: 'Webhooks',
+        markdown: "## Signing\n\nBody.",
+        sourceFile: 'resources/docs/guides/webhooks.md',
+    );
+
+    expect(staticEmitter()->page($written, staticSpec()))
+        ->toContain('href="https://github.com/acme/api/edit/main/resources/docs/guides/webhooks.md"')
+        ->toContain('Edit this page');
+});
+
+it('offers no edit link for a page nobody wrote', function (): void {
+    // The introduction Lusen derives has no file behind it, and a link to a
+    // file that does not exist is worse than no link.
+    config()->set('lusen.ui.edit_url', 'https://github.com/acme/api/edit/main/{path}');
+
+    $spec = staticSpec();
+
+    expect($spec->page('introduction')->sourceFile)->toBeNull()
+        ->and(staticEmitter()->page($spec->page('introduction'), $spec))->not->toContain('Edit this page');
+});
+
+it('offers none at all when no edit url is configured', function (): void {
+    $written = new Page(id: 'webhooks', title: 'Webhooks', markdown: 'Body.', sourceFile: 'resources/docs/webhooks.md');
+
+    expect(staticEmitter()->page($written, staticSpec()))->not->toContain('Edit this page');
+});
+
+it('offers a base url switcher when the api answers on more than one', function (): void {
+    config()->set('lusen.servers', ['Sandbox' => 'https://sandbox.test/']);
+
+    $spec = staticSpec();
+
+    expect(staticEmitter()->endpoint($spec->endpoint('users.index'), $spec))
+        ->toContain('<select id="lusen-server" data-lusen-server hidden')
+        // Trailing slashes are trimmed, or the rewrite would double them.
+        ->toContain('<option value="https://sandbox.test">Sandbox</option>')
+        ->toContain('<option value="https://api.test">api.test</option>');
+});
+
+it('omits the switcher when there is only one base url', function (): void {
+    $spec = staticSpec();
+
+    expect(staticEmitter()->endpoint($spec->endpoint('users.index'), $spec))->not->toContain('id="lusen-server"');
 });

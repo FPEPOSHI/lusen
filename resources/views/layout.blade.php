@@ -10,6 +10,10 @@
       - Theme is set by a `prefers-color-scheme`-aware class on <html>, with
         no flash-of-wrong-theme script, because no JS is allowed to be
         load-bearing here.
+      - Every screen size reaches every page. The navigation is rendered once
+        and moved by CSS - a column beside the content on wide screens, the
+        end of the document on narrow ones, where the bar at the top of the
+        page links to it.
 --}}
 <!doctype html>
 <html lang="en" class="scroll-smooth">
@@ -71,91 +75,33 @@
     Skip to content
 </a>
 
-<div class="mx-auto flex max-w-7xl gap-8 px-4 sm:px-6 lg:px-8">
+{{-- Narrow screens have no room for a column of navigation, so it sits at the
+     end of the document and this bar points at it. The control is a link to
+     that anchor, which works with no JavaScript at all; the script upgrades it
+     to a toggle that opens the same navigation as a panel instead of sending
+     the reader to the bottom of the page. --}}
+<div class="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur sm:px-6 lg:hidden dark:border-slate-800 dark:bg-slate-950/90">
+    <a href="{{ $links->index() }}" class="min-w-0 truncate text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
+        {{ $spec->title }}
+    </a>
 
-    <aside class="hidden w-64 shrink-0 border-r border-slate-200 lg:block dark:border-slate-800">
-        {{-- Sticky: the sidebar is the only way between pages, and a long
-             endpoint body would otherwise scroll it out of reach. It scrolls
-             independently once it outgrows the viewport. --}}
-        <div class="sticky top-0 max-h-screen overflow-y-auto py-10 pr-4">
-        <nav aria-label="Documentation">
-            {{-- The API's name leads the sidebar. It is the one thing on the
-                 page that says which documentation this is, so it belongs
-                 above the controls rather than under them. --}}
-            <a href="{{ $links->index() }}" class="block text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
-                @if (config('lusen.ui.logo'))
-                    <img src="{{ config('lusen.ui.logo') }}" alt="{{ $spec->title }}" class="mb-2 h-8 w-auto">
-                @endif
-                {{ $spec->title }}
-            </a>
-            <p class="mt-1 mb-4 font-mono text-xs text-slate-500">v{{ $spec->version }}</p>
+    <a href="#navigation" data-lusen-menu aria-controls="navigation"
+       class="shrink-0 rounded-md border border-slate-200 px-2.5 py-1 text-sm font-medium text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
+        Menu
+    </a>
+</div>
 
-            @include('lusen::partials.search')
+<div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 sm:px-6 lg:flex-row lg:px-8">
 
-            @if (config('lusen.ui.dark_mode', true))
-                {{-- Hidden until JavaScript reveals it: a theme button that
-                     cannot change the theme is worse than none. --}}
-                <button type="button" data-lusen-theme hidden
-                        class="mb-4 w-full rounded-md border border-slate-200 px-3 py-1.5 text-left text-sm text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
-                    <span data-lusen-theme-label>Theme</span>
-                </button>
-            @endif
-
-            <ul class="mt-8 space-y-6">
-                @foreach ($spec->sections as $section)
-                    <li>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ $section->name }}</span>
-                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
-                            @foreach ($section->pages as $sectionPage)
-                                <li>
-                                    <a href="{{ $links->page($sectionPage) }}"
-                                       @if (($current ?? null) === 'page:'.$sectionPage->id) aria-current="page" @endif
-                                       class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white {{ ($current ?? null) === 'page:'.$sectionPage->id ? 'border-indigo-500 font-medium text-slate-900 dark:text-white' : 'border-transparent text-slate-600 dark:text-slate-400' }}">
-                                        {{ $sectionPage->title }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </li>
-                @endforeach
-
-                {{-- A version heading rather than "(v2)" on twenty group
-                     labels: the sidebar is scanned vertically, and one heading
-                     over eight groups reads faster than eight suffixes.
-                     Groups arrive newest version first, so this only has to
-                     notice the changes. --}}
-                @php($sidebarVersion = false)
-
-                @foreach ($spec->groups as $group)
-                    @if ($spec->isVersioned() && $sidebarVersion !== $group->version)
-                        @php($sidebarVersion = $group->version)
-                        <li class="border-t border-slate-200 pt-4 dark:border-slate-800">
-                            <span class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                                {{ $group->version === null ? 'Any version' : ($spec->apiVersion($group->version)?->label() ?? $group->version) }}
-                            </span>
-                        </li>
-                    @endif
-
-                    <li>
-                        <a href="{{ $links->group($group) }}" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
-                            {{ $group->name }}
-                        </a>
-                        <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
-                            @foreach ($group->endpoints as $endpoint)
-                                <li>
-                                    <a href="{{ $links->endpoint($endpoint) }}"
-                                       @if (($current ?? null) === 'endpoint:'.$endpoint->id) aria-current="page" @endif
-                                       class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white {{ ($current ?? null) === 'endpoint:'.$endpoint->id ? 'border-indigo-500 font-medium text-slate-900 dark:text-white' : 'border-transparent text-slate-600 dark:text-slate-400' }}">
-                                        @include('lusen::partials.method-badge', ['method' => $endpoint->method, 'compact' => true])
-                                        <span class="truncate">{{ $endpoint->summary ?? $endpoint->path() }}</span>
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </li>
-                @endforeach
-            </ul>
-        </nav>
+    {{-- `order-last` moves it below the content on narrow screens without
+         moving it in the document, so the reading order stays what it is on
+         a wide one and the skip link still does its job. --}}
+    <aside class="lusen-nav order-last w-full shrink-0 border-slate-200 lg:order-first lg:w-64 lg:border-r dark:border-slate-800">
+        {{-- Sticky on wide screens: the sidebar is the only way between pages,
+             and a long endpoint body would otherwise scroll it out of reach.
+             It scrolls independently once it outgrows the viewport. --}}
+        <div class="border-t border-slate-200 py-10 lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto lg:border-t-0 lg:pr-4 dark:border-slate-800">
+            @include('lusen::partials.nav')
         </div>
     </aside>
 
