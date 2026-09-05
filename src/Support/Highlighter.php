@@ -13,9 +13,9 @@ namespace Lusen\Support;
  * otherwise readable with JavaScript switched off. Emitting spans while the
  * page is generated costs the reader nothing at all.
  *
- * Scope is exactly what the docs emit: JSON bodies and shell commands.
- * Anything else is escaped and left alone rather than mangled by a
- * half-correct tokenizer.
+ * Scope is exactly what the docs emit: JSON bodies, shell commands and the
+ * JavaScript snippet. Anything else is escaped and left alone rather than
+ * mangled by a half-correct tokenizer.
  */
 final class Highlighter
 {
@@ -24,6 +24,7 @@ final class Highlighter
         return match ($language) {
             'json' => self::json($code),
             'bash', 'sh', 'shell', 'curl' => self::shell($code),
+            'javascript', 'js' => self::javascript($code),
             default => self::escape($code),
         };
     }
@@ -83,6 +84,51 @@ final class Highlighter
                 }
 
                 return '<span class="tok-punc">'.self::escape($match[4]).'</span>';
+            },
+            self::escapeOutsideMatches($code, $pattern),
+        );
+
+        return $result ?? self::escape($code);
+    }
+
+    /**
+     * The fetch snippet: keywords, the calls, object keys and their values.
+     *
+     * Written for what `Snippets::javascript()` emits rather than for the
+     * language - one page had a coloured cURL block above a plain JavaScript
+     * one, which reads as a bug in the docs. A general JavaScript tokenizer
+     * would be a much larger thing to get wrong.
+     */
+    public static function javascript(string $code): string
+    {
+        $pattern = '/(\'(?:[^\'\\\\]|\\\\.)*\'|"(?:[^"\\\\]|\\\\.)*")(\s*:)?'
+            .'|\b(const|let|var|await|async|function|return|new|typeof)\b'
+            .'|\b(true|false|null|undefined)\b'
+            .'|((?<![\w.])-?\d+(?:\.\d+)?\b)'
+            .'|\b([A-Za-z_$][\w$]*)(?=\s*\()'
+            .'|\b([A-Za-z_$][\w$]*)(?=\s*:)/';
+
+        $result = preg_replace_callback(
+            $pattern,
+            static function (array $match): string {
+                // A string followed by a colon is a key, exactly as in JSON.
+                if (($match[1] ?? '') !== '') {
+                    $class = ($match[2] ?? '') !== '' ? 'tok-key' : 'tok-str';
+
+                    return '<span class="'.$class.'">'.self::escape($match[1]).'</span>'
+                        .self::escape($match[2] ?? '');
+                }
+
+                // Keyword, literal, number, the name being called, a bare key.
+                $classes = [3 => 'tok-lit', 4 => 'tok-lit', 5 => 'tok-num', 6 => 'tok-cmd', 7 => 'tok-key'];
+
+                foreach ($classes as $group => $class) {
+                    if (($match[$group] ?? '') !== '') {
+                        return '<span class="'.$class.'">'.self::escape($match[$group]).'</span>';
+                    }
+                }
+
+                return self::escape($match[0]);
             },
             self::escapeOutsideMatches($code, $pattern),
         );
