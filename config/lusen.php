@@ -356,6 +356,67 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Try it
+    |--------------------------------------------------------------------------
+    |
+    | A form on every endpoint page that sends the request and shows what came
+    | back. Off by default: it is your API that gets called, from your reader's
+    | browser, and that should be a decision rather than a surprise.
+    |
+    | There is no proxy. The request goes straight from the page to your API,
+    | which means it works when the two share an origin - runtime mode, or docs
+    | served from the API's own domain - and otherwise needs your API to allow
+    | the docs origin:
+    |
+    |     Access-Control-Allow-Origin: https://docs.example.com
+    |     Access-Control-Allow-Headers: authorization, content-type
+    |
+    | When that header is missing the browser blocks the response and the page
+    | says so, naming both origins, rather than reporting a failure that looks
+    | like your API is down.
+    |
+    */
+
+    'try_it' => [
+        'enabled' => env('LUSEN_TRY_IT', false),
+
+        /*
+         | Which methods get the form. The default is deliberately the safe
+         | half of the API: a Send button beside DELETE /customers/{id}, on a
+         | page whose base URL is production, is a mistake waiting for a
+         | distracted reader.
+         */
+        'methods' => ['GET'],
+
+        /*
+         | Where a credential the reader types is kept.
+         |
+         |     session   until the tab closes  (the default)
+         |     none      in memory; reloading asks again
+         |     local     until they clear it, and only if they tick the box
+         |
+         | Lifetime is the only thing this changes. No browser store hides a
+         | value from scripts running on the same site, and a token that has to
+         | be attached to a fetch cannot be hidden from the code attaching it -
+         | so the shorter it lives, the smaller the window. `local` shows the
+         | reader a checkbox and a Forget button rather than deciding for them.
+         |
+         | It never leaves the browser except as a header on the request it
+         | authenticates, and never appears in a copied example.
+         */
+        'persist_token' => 'session',
+
+        /*
+         | Send cookies with cross-origin requests, for a session-authenticated
+         | API. Your API must also answer with
+         | `Access-Control-Allow-Credentials: true` and name the docs origin
+         | exactly - a wildcard is refused for credentialed requests.
+         */
+        'credentials' => false,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Search engine optimisation
     |--------------------------------------------------------------------------
     */

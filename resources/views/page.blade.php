@@ -32,6 +32,14 @@
                  pages look the same. --}}
             <div class="lusen-prose">{!! $body !!}</div>
 
+            {{-- The page that explains the credentials is where you set them.
+                 Keyed on the page rather than on a marker in its Markdown, so
+                 an authored authentication page gets the section too and the
+                 .md twin stays free of markup it cannot render. --}}
+            @if ($page->id === 'authentication')
+                @include('lusen::partials.auth-setup')
+            @endif
+
             @include('lusen::partials.pager', ['pager' => $pager])
         </div>
     </div>

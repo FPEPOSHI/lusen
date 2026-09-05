@@ -6,6 +6,13 @@
     It must repeat the base URL, the auth requirement, every parameter and a
     complete example. Never write "see the authentication section above" here
     - the reader may not have an above.
+
+    Two columns from `xl` up: what the endpoint is on the left, what a call to
+    it looks like on the right. That is the shape every API reference a
+    developer already reads has settled on, and it earns its keep - the
+    parameter you are reading about and the example that uses it are on screen
+    at the same time, rather than a scroll apart. One column below that, in
+    document order: reference first, then the examples.
 --}}
 @php($standalone = $standalone ?? false)
 {{-- The same partial sits at two depths, so its headings cannot be fixed:
@@ -84,90 +91,121 @@
             : 'No authentication required.' }}
     </p>
 
-    @foreach (\Lusen\Ir\Enums\ParameterLocation::cases() as $location)
-        @php($parameters = $endpoint->parametersIn($location))
+    <div class="xl:grid xl:grid-cols-[minmax(0,1fr)_30rem] xl:items-start xl:gap-8">
 
-        @if ($parameters)
-            @php($heading = \Lusen\Support\Outline::parameterHeading($location))
-            <h{{ $sectionLevel }} id="{{ \Lusen\Support\Outline::id($endpoint, $heading) }}" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                {{ $heading }}
-            </h{{ $sectionLevel }}>
+        {{-- What the endpoint takes and what it answers with. --}}
+        <div class="min-w-0">
 
-            <div class="mt-2 overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead>
-                        <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
-                            <th scope="col" class="py-2 pr-4 font-medium">Name</th>
-                            <th scope="col" class="py-2 pr-4 font-medium">Type</th>
-                            <th scope="col" class="py-2 pr-4 font-medium">Required</th>
-                            <th scope="col" class="py-2 font-medium">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($parameters as $parameter)
-                            <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">{{ $parameter->name }}</td>
-                                <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">{{ $parameter->schema->label() }}</td>
-                                <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">{{ $parameter->required ? 'yes' : 'no' }}</td>
-                                <td class="py-2 text-slate-600 dark:text-slate-400">{{ $parameter->description }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    @endforeach
+            @foreach (\Lusen\Ir\Enums\ParameterLocation::cases() as $location)
+                @php($parameters = $endpoint->parametersIn($location))
 
-    {{-- The request example is the most load-bearing block on the page: a
-         reader copies it, and an agent reads it to learn the exact shape of
-         the call. It goes above the responses for that reason. --}}
-    <h{{ $sectionLevel }} id="{{ \Lusen\Support\Outline::id($endpoint, 'Example request') }}" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Example request</h{{ $sectionLevel }}>
+                @if ($parameters)
+                    @php($heading = \Lusen\Support\Outline::parameterHeading($location))
+                    <h{{ $sectionLevel }} id="{{ \Lusen\Support\Outline::id($endpoint, $heading) }}" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        {{ $heading }}
+                    </h{{ $sectionLevel }}>
 
-    {{-- Driven by ui.snippets, so the config lists what is actually rendered.
-         Stacked and labelled, which is what reads with no JavaScript and what
-         a model retrieving this HTML sees. Where the script runs it turns the
-         set into tabs, so two languages do not push the responses - the thing
-         read next - a screen and a half down the page. --}}
-    <div class="lusen-snippets" data-lusen-tabs>
-        @foreach (\Lusen\Support\Snippets::languages(config('lusen.ui.snippets', ['curl'])) as $language => $label)
-            @include('lusen::partials.code', [
-                'label' => $label,
-                'language' => $language === 'curl' ? 'bash' : 'javascript',
-                'code' => \Lusen\Support\Snippets::render($language, $endpoint, $spec->baseUrl),
-            ])
-        @endforeach
-    </div>
-
-    @if ($endpoint->responses)
-        <h{{ $sectionLevel }} id="{{ \Lusen\Support\Outline::id($endpoint, 'Responses') }}" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Responses</h{{ $sectionLevel }}>
-
-        <div class="mt-3 space-y-5">
-            @foreach ($endpoint->responses as $response)
-                @php($tone = $response->isSuccess() ? 'ok' : ($response->status >= 500 ? 'bad' : 'warn'))
-                <div>
-                    <p class="flex flex-wrap items-center gap-2">
-                        <span class="lusen-status lusen-status-{{ $tone }}">{{ $response->status }}</span>
-                        <span class="text-sm text-slate-600 dark:text-slate-400">{{ $response->label() }}</span>
-                    </p>
-
-                    @if ($response->schema)
-                        @include('lusen::partials.schema-table', ['schema' => $response->schema])
-                    @endif
-
-                    @forelse ($response->examples as $example)
-                        @include('lusen::partials.code', [
-                            'label' => $response->status.' '.$response->reasonPhrase(),
-                            'language' => str_contains($example->contentType, 'json') ? 'json' : 'text',
-                            'code' => $example->render(),
-                        ])
-                    @empty
-                        @if ($response->status === 204)
-                            <p class="mt-1 text-sm text-slate-500">No response body.</p>
-                        @endif
-                    @endforelse
-                </div>
+                    <div class="mt-2 overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
+                                    <th scope="col" class="py-2 pr-4 font-medium">Name</th>
+                                    <th scope="col" class="py-2 pr-4 font-medium">Type</th>
+                                    <th scope="col" class="py-2 pr-4 font-medium">Required</th>
+                                    <th scope="col" class="py-2 font-medium">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($parameters as $parameter)
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">{{ $parameter->name }}</td>
+                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">{{ $parameter->schema->label() }}</td>
+                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">{{ $parameter->required ? 'yes' : 'no' }}</td>
+                                        <td class="py-2 text-slate-600 dark:text-slate-400">{{ $parameter->description }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
             @endforeach
+
+            @if ($endpoint->responses)
+                {{-- The statuses and their fields. The bodies themselves are in
+                     the column beside this one: what a field means is reference
+                     and belongs with the parameters, what one looks like is an
+                     example and belongs with the request. --}}
+                <h{{ $sectionLevel }} id="{{ \Lusen\Support\Outline::id($endpoint, 'Responses') }}" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Responses</h{{ $sectionLevel }}>
+
+                <div class="mt-3 space-y-5">
+                    @foreach ($endpoint->responses as $response)
+                        @php($tone = $response->isSuccess() ? 'ok' : ($response->status >= 500 ? 'bad' : 'warn'))
+                        <div>
+                            <p class="flex flex-wrap items-center gap-2">
+                                <span class="lusen-status lusen-status-{{ $tone }}">{{ $response->status }}</span>
+                                <span class="text-sm text-slate-600 dark:text-slate-400">{{ $response->label() }}</span>
+                            </p>
+
+                            @if ($response->schema)
+                                @include('lusen::partials.schema-table', ['schema' => $response->schema])
+                            @endif
+
+                            @if ($response->examples === [] && $response->status === 204)
+                                <p class="mt-1 text-sm text-slate-500">No response body.</p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
-    @endif
+
+        {{-- The call itself. Sticky on its own page, where the reference beside
+             it is long enough to scroll past. --}}
+        <div class="mt-8 xl:mt-6 {{ $standalone ? 'xl:sticky xl:top-8' : '' }}">
+
+            {{-- The request example is the most load-bearing block on the page:
+                 a reader copies it, and an agent reads it to learn the exact
+                 shape of the call. It leads the column for that reason. --}}
+            <h{{ $sectionLevel }} id="{{ \Lusen\Support\Outline::id($endpoint, 'Example request') }}" class="scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Example request</h{{ $sectionLevel }}>
+
+            {{-- Driven by ui.snippets, so the config lists what is actually
+                 rendered. Stacked and labelled, which is what reads with no
+                 JavaScript and what a model retrieving this HTML sees; the
+                 script turns the set into tabs. --}}
+            <div class="lusen-snippets" data-lusen-tabs="snippet">
+                @foreach (\Lusen\Support\Snippets::languages(config('lusen.ui.snippets', ['curl'])) as $language => $label)
+                    @include('lusen::partials.code', [
+                        'label' => $label,
+                        'language' => $language === 'curl' ? 'bash' : 'javascript',
+                        'code' => \Lusen\Support\Snippets::render($language, $endpoint, $spec->baseUrl),
+                    ])
+                @endforeach
+            </div>
+
+            @include('lusen::partials.try-it', ['endpoint' => $endpoint, 'spec' => $spec])
+
+            @php($bodies = array_values(array_filter($endpoint->responses, fn ($response): bool => $response->examples !== [])))
+
+            @if ($bodies !== [])
+                <h{{ $sectionLevel }} class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Example response</h{{ $sectionLevel }}>
+
+                {{-- One status at a time where the script runs: an endpoint
+                     that documents a 200, a 404 and a 422 otherwise puts two
+                     bodies nobody asked for between the reader and the one
+                     they did. Stacked and labelled without it. --}}
+                <div class="lusen-snippets" data-lusen-tabs="response">
+                    @foreach ($bodies as $response)
+                        @foreach ($response->examples as $example)
+                            @include('lusen::partials.code', [
+                                'label' => $response->status.' '.$response->reasonPhrase(),
+                                'language' => str_contains($example->contentType, 'json') ? 'json' : 'text',
+                                'code' => $example->render(),
+                            ])
+                        @endforeach
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
 
 </article>

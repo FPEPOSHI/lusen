@@ -45,6 +45,11 @@ $spec = $spec->withSections(PageSections::build($spec, $authored));
 
 $app = Application::create();
 $app['config']->set('lusen.seo.json_ld', true);
+
+// The showcase turns the playground on, because a shop window that hides the
+// feature is not showing the product. api.acme.example does not exist, so
+// pressing Send here demonstrates the failure path rather than a call.
+$app['config']->set('lusen.try_it', ['enabled' => true, 'methods' => ['GET'], 'persist_token' => 'session', 'credentials' => false]);
 $app->register(LusenServiceProvider::class);
 
 $renderer = new BladeRenderer($app['view']);

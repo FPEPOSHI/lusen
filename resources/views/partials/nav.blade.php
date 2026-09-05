@@ -21,15 +21,6 @@
 
     @include('lusen::partials.search')
 
-    @if (config('lusen.ui.dark_mode', true))
-        {{-- Hidden until JavaScript reveals it: a theme button that cannot
-             change the theme is worse than none. --}}
-        <button type="button" data-lusen-theme hidden
-                class="mb-4 w-full rounded-md border border-slate-200 px-3 py-1.5 text-left text-sm text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
-            <span data-lusen-theme-label>Theme</span>
-        </button>
-    @endif
-
     @if ($spec->servers && $spec->baseUrl)
         {{-- An API with a sandbox is two base URLs, and a reader who copies an
              example against the wrong one gets a confusing 401 rather than an

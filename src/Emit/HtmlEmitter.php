@@ -51,6 +51,10 @@ final readonly class HtmlEmitter implements Emitter
             // inlines, because there it is a single page and there is no
             // second request to save.
             new EmittedFile('assets/lusen.css', Assets::css(), 'text/css'),
+            // Linked for the same reason as the stylesheet, and more so now
+            // that it carries the playground: inlining it would repeat tens of
+            // kilobytes on every endpoint page, where one cached file does.
+            new EmittedFile('assets/lusen.js', Assets::js(), 'text/javascript'),
             EmittedFile::html('index.html', $this->index($spec)),
         ];
 
@@ -80,6 +84,7 @@ final readonly class HtmlEmitter implements Emitter
             'links' => $this->links,
             'docsUrl' => $this->links->base(),
             'cssHref' => $this->links->asset('lusen.css'),
+            'jsHref' => $this->links->asset('lusen.js'),
             'canonical' => $this->links->canonicalIndex(),
             'title' => $spec->title,
             'description' => Str::summarise($spec->description ?? $spec->title),
@@ -105,6 +110,7 @@ final readonly class HtmlEmitter implements Emitter
             'links' => $this->links,
             'docsUrl' => $this->links->base(),
             'cssHref' => $this->links->asset('lusen.css'),
+            'jsHref' => $this->links->asset('lusen.js'),
             'canonical' => $this->links->canonicalPage($page),
             'title' => $page->title.' — '.$spec->title,
             'description' => $page->summary(),
@@ -125,6 +131,7 @@ final readonly class HtmlEmitter implements Emitter
             'links' => $this->links,
             'docsUrl' => $this->links->base(),
             'cssHref' => $this->links->asset('lusen.css'),
+            'jsHref' => $this->links->asset('lusen.js'),
             'canonical' => $this->links->canonicalEndpoint($endpoint),
             // The <title> leads with the operation, not the API name: a search
             // result and a browser tab both truncate from the right.
