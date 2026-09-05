@@ -230,7 +230,10 @@ it('renders every configured snippet language', function (): void {
     expect(staticEmitter()->endpoint($spec->endpoint('users.index'), $spec))
         ->toContain('>cURL<')
         ->toContain('>JavaScript<')
-        ->toContain('const response');
+        // Highlighted at build time, like the cURL block beside it: one
+        // coloured example above a plain one reads as a bug in the docs.
+        ->toContain('<span class="tok-lit">const</span> response')
+        ->toContain('<span class="tok-cmd">fetch</span>');
 });
 
 it('does not claim content negotiation on a static page', function (): void {

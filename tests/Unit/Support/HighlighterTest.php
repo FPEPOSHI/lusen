@@ -55,3 +55,28 @@ it('leaves an unknown language escaped but unstyled', function (): void {
 it('is deterministic', function (): void {
     expect(Highlighter::json('{"a":1}'))->toBe(Highlighter::json('{"a":1}'));
 });
+
+it('colours the javascript snippet the way it colours the curl one', function (): void {
+    // One coloured block above a plain one reads as a bug in the docs.
+    $html = Highlighter::highlight("const response = await fetch('https://api.test', {\n  method: 'GET'\n});", 'javascript');
+
+    expect($html)->toContain('<span class="tok-lit">const</span>')
+        ->toContain('<span class="tok-lit">await</span>')
+        ->toContain('<span class="tok-cmd">fetch</span>')
+        ->toContain('<span class="tok-key">method</span>')
+        ->toContain('<span class="tok-str">&#039;GET&#039;</span>');
+});
+
+it('reads a quoted key as a key and its value as a string', function (): void {
+    $html = Highlighter::highlight("{'Authorization': 'Bearer token'}", 'javascript');
+
+    expect($html)->toContain('<span class="tok-key">&#039;Authorization&#039;</span>')
+        ->toContain('<span class="tok-str">&#039;Bearer token&#039;</span>');
+});
+
+it('escapes javascript it does not tokenise', function (): void {
+    expect(Highlighter::highlight('const a = b < c && d > e;', 'javascript'))
+        ->toContain('&lt;')
+        ->toContain('&gt;')
+        ->toContain('&amp;&amp;');
+});
