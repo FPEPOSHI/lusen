@@ -2,6 +2,92 @@
 
 All notable changes to this project are documented here.
 
+## 0.5.0 — 2026-09-05
+
+Sending the request, and the two-column reference every developer already
+knows how to read.
+
+### Added
+
+- **Try it.** A dialog on every endpoint page that sends the request and shows
+  what came back - status, time, size and body. It is a `<dialog>` where the
+  browser has one, which is what brings the focus trap, Escape-to-close and
+  the dimmed page without any of that being written by hand; where it is not,
+  the same panel opens in place under the button. **Off by default**, and
+  limited to `GET` when it is on: a Send button beside a write, on a page
+  whose base URL is production, is a mistake waiting for a distracted reader.
+  `#[ApiDoc(tryIt: false)]` withdraws one endpoint; nothing can opt an
+  endpoint *into* a playground the site has turned off.
+
+  There is no proxy, because a package of flat files has nowhere to put one.
+  The request goes straight from the browser to the API, which works
+  same-origin - runtime mode, or docs on the API's own domain - and otherwise
+  needs the API to allow the docs origin. When it does not, the page says so
+  in those words, names both origins and prints the two headers that would fix
+  it. A browser reports a blocked response and a dead API identically, and
+  "Failed to fetch" sends people to look at the wrong thing.
+
+  The dialog repeats what a reader needs before they send - the operation, the
+  host it goes to, the scheme, the rate limit, whether it is deprecated, and
+  every field's type and description - because it covers the page that says
+  all that. Beside the form, the call as it currently stands, updated as the
+  fields are edited, so nobody has to press send to find out what send would
+  do.
+- **A *Set up to test* section on the Authentication page.** The credential is
+  typed once there and every Try it on the site sends it; the fields in each
+  dialog are the same store, so changing one changes the other. An API that
+  wants a bearer token wants the same token on every endpoint, and retyping it
+  per page is what stops people using a playground by the third endpoint.
+
+  `persist_token` decides how long it lives: `session` until the tab closes -
+  the default - `none` for in-memory only, or `local`, which shows the reader a
+  *Remember on this browser* checkbox rather than deciding for them. Lifetime
+  is the only lever there is: no browser store hides a value from scripts on
+  the same origin, and a token that has to be attached to a fetch cannot be
+  hidden from the code attaching it. So it is scoped to the base URL it is for,
+  never written into a copied example, masked in the preview, and one *Forget*
+  button clears it.
+- **Response bodies are tabbed by status.** An endpoint documenting a 200, a
+  404 and a 422 used to put two bodies nobody asked for between the reader and
+  the one they wanted.
+
+### Fixed
+
+- The JavaScript request example was never highlighted. `Highlighter` knew
+  JSON and shell, and everything else fell through to plain escaped text - so
+  every endpoint page showed a coloured cURL block above a grey JavaScript one,
+  which reads as a bug in the docs rather than as a limit of the tokenizer. It
+  is written for what `Snippets::javascript()` emits rather than for the
+  language, which is the same bargain the other two make.
+
+### Changed
+
+- **Endpoint pages are two columns from `xl` up**: what the endpoint is on the
+  left, what a call to it looks like on the right, with the examples sticky
+  beside the reference. The parameter you are reading about and the example
+  that uses it are now on screen together rather than a scroll apart. One
+  column below that, in document order - reference first, then the examples.
+- The theme toggle moved to the footer. It is set once and then never touched
+  again, and it was holding the place at the top of the sidebar that belongs to
+  what the reader came for.
+- The contents column on endpoint pages went with it: the margin belongs to
+  the call, and a list of four links to sections already on screen was paying
+  for it with the width the parameter table needed. Prose pages keep theirs,
+  and every section anchor stays exactly where it was.
+- **The page is 96rem wide, not 80.** An endpoint page is three things side by
+  side now - navigation, reference, examples - and at 80rem the parameter
+  table paid for it, wrapping a type like "string, one of pending, paid,
+  shipped, refunded" over three lines. The sidebar widens with it, so
+  "Register a webhook endpo…" is a whole summary again. Nothing changes below
+  1280px, where the viewport was always the constraint.
+- **Static output links the script instead of inlining it.** It carries the
+  playground now, and inlining put tens of kilobytes into every endpoint page.
+  The runtime renderer still inlines: one page, no second request to save.
+- `Support\RequestModel` assembles a request; `Snippets` renders what it
+  returns. The page hands the browser the same model, so the request a reader
+  copies and the request a reader sends cannot drift apart. `Snippets::url()`
+  moved to `RequestModel::url()`.
+
 ## 0.4.0 — 2026-09-04
 
 The reading experience, which had been built for one screen and one reader.

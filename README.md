@@ -7,7 +7,7 @@ documentation as **static files** — HTML for people, OpenAPI and Markdown for
 machines. There is no build step for consumers, no database, and no JavaScript
 required to read a page.
 
-> **Status: early — `0.4.0`.** Prose pages, route collection, FormRequest and
+> **Status: early — `0.5.0`.** Prose pages, route collection, FormRequest and
 > attribute extraction, request-example generation, API versioning, and the
 > static HTML, Markdown, OpenAPI, `llms.txt`, sitemap, search and Postman
 > surfaces all work, as does the MCP server.
@@ -288,14 +288,18 @@ in the path to read, so its controllers say so with
 Documentation people avoid is documentation nobody maintains, so the reading
 experience is a feature rather than a skin:
 
+- **Two columns on an endpoint page.** What the endpoint is on the left, what
+  a call to it looks like on the right, sticky beside the reference — the
+  parameter you are reading about and the example that uses it on screen
+  together. One column, in reading order, on a narrow screen.
 - **Navigation at every width.** Rendered once and moved by CSS — a column
   beside the content on a laptop, a panel behind one tap on a phone, and the
   end of the document with no JavaScript at all.
 - **A contents column** on every page. Each of an endpoint's sections carries
   a stable anchor, so `#users-index-responses` is a link worth citing.
-- **Tabbed request examples**, remembered across pages. They ship stacked, so
-  a reader without JavaScript — and a model reading the HTML — still gets
-  every language.
+- **Tabbed request examples**, remembered across pages, and response bodies
+  tabbed by status. Both ship stacked, so a reader without JavaScript — and a
+  model reading the HTML — still gets every one.
 - **Search on `⌘K`** over a prebuilt index, with the arrow keys. No search
   service, no API key.
 - **A base URL switcher** when `servers` lists more than one, rewriting the
@@ -304,6 +308,47 @@ experience is a feature rather than a skin:
   markup.
 - **`ui.edit_url`** puts an *Edit this page* link on everything you wrote —
   the cheapest thing there is for keeping prose honest.
+
+## Try it, without a proxy
+
+Turn it on and every documented `GET` grows a **Try it** dialog that sends the
+request and shows what came back:
+
+```php
+'try_it' => [
+    'enabled' => env('LUSEN_TRY_IT', false),   // off until you say so
+    'methods' => ['GET'],                      // a Send button beside a write is a footgun
+],
+```
+
+The request goes **straight from the browser to your API**. There is no
+Lusen server in the middle, because static docs have nowhere to put one. So it
+works out of the box when the docs and the API share an origin — runtime mode,
+or docs on the API's own domain — and otherwise your API has to allow the docs
+origin:
+
+```http
+Access-Control-Allow-Origin: https://docs.example.com
+Access-Control-Allow-Headers: authorization, content-type
+```
+
+When that header is missing, the page says exactly that, names both origins and
+prints the two lines above with your values in them. A browser reports a
+blocked response and an API that is genuinely down in identical terms, and
+`TypeError: Failed to fetch` sends people to look at the wrong thing.
+
+The dialog repeats everything the page behind it says — the host, the scheme,
+the rate limit, each field's type and description — and shows the call as it
+stands, updated as you edit it, so nobody has to press send to find out what
+send would do.
+
+Readers set their credential once, in a **Set up to test** section on the
+Authentication page, and every dialog uses it. It stays in their browser for
+the tab (`persist_token` can extend that to the browser, behind a checkbox they
+tick), goes out only as the header it authenticates, is masked in the preview,
+and never ends up in the snippet the copy button hands over.
+`#[ApiDoc(tryIt: false)]` withdraws a single endpoint — an export that takes a
+minute, a search that costs money per call.
 
 ## Writing the parts Lusen cannot infer
 
