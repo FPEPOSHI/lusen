@@ -9,7 +9,6 @@ use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Page;
 use Lusen\SpecBuilder;
 use Lusen\Support\Links;
-use Lusen\Support\Outline;
 use Lusen\Tests\Fixtures\OrderController;
 use Lusen\Tests\Fixtures\UserController;
 
@@ -284,17 +283,37 @@ it('renders the navigation once, reachable at every width', function (): void {
         ->and($html)->toContain('href="#navigation" data-lusen-menu');
 });
 
-it('anchors every section of an endpoint page and lists them beside it', function (): void {
+it('anchors every section of an endpoint page', function (): void {
+    // The anchors are a stability contract: #orders-store-responses is what a
+    // search result deep-links to and what a model cites.
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    expect($html)->toContain('id="users-index-query-parameters"')
+        ->toContain('id="users-index-example-request"')
+        ->toContain('id="users-index-responses"');
+});
+
+it('puts the call beside the reference rather than under it', function (): void {
     $spec = staticSpec();
     $html = staticEmitter()->endpoint($spec->endpoint('orders.store'), $spec);
 
-    // The contents is only worth anything if the anchors it points at exist.
-    foreach (Outline::forEndpoint($spec->endpoint('orders.store')) as $section) {
-        expect($html)->toContain('id="'.$section['id'].'"')
-            ->and($html)->toContain('href="#'.$section['id'].'"');
-    }
+    expect($html)->toContain('xl:grid-cols-[minmax(0,1fr)_30rem]')
+        // The reference column comes first in the document, so the page still
+        // reads method, parameters, example - the grid places the rest.
+        ->and(strpos($html, 'Body parameters'))->toBeLessThan(strpos($html, 'Example request'));
+});
 
-    expect($html)->toContain('On this page');
+it('tabs response bodies by status where there is more than one', function (): void {
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.show'), $spec);
+
+    // Two documented statuses, so the script has something to tab between;
+    // stacked and labelled without it.
+    expect($html)->toContain('<div class="lusen-snippets" data-lusen-tabs="response">')
+        ->toContain('Example response')
+        ->toContain('200 OK')
+        ->toContain('404 Not Found');
 });
 
 it('offers the page markdown to a reader pasting it into a model', function (): void {
@@ -311,7 +330,7 @@ it('ships the request examples stacked, for the script to tab', function (): voi
     $spec = staticSpec();
     $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
 
-    expect($html)->toContain('<div class="lusen-snippets" data-lusen-tabs>')
+    expect($html)->toContain('<div class="lusen-snippets" data-lusen-tabs="snippet">')
         ->and(substr_count($html, 'lusen-code-body'))->toBeGreaterThan(1);
 });
 
@@ -363,4 +382,70 @@ it('omits the switcher when there is only one base url', function (): void {
     $spec = staticSpec();
 
     expect(staticEmitter()->endpoint($spec->endpoint('users.index'), $spec))->not->toContain('id="lusen-server"');
+});
+
+it('offers no way to send a request until a site turns it on', function (): void {
+    $spec = staticSpec();
+
+    expect(staticEmitter()->endpoint($spec->endpoint('users.index'), $spec))
+        ->not->toContain('data-lusen-request');
+});
+
+it('carries the request as data when try it is on', function (): void {
+    config()->set('lusen.try_it', ['enabled' => true, 'methods' => ['GET']]);
+
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    expect($html)->toContain('<script type="application/json" data-lusen-request>')
+        ->toContain('"method":"GET"')
+        ->toContain('window.lusenTryIt');
+});
+
+it('withholds it from a method the site did not allow', function (): void {
+    // GET only by default: a Send button beside a write, on a page whose base
+    // URL is production, is a mistake waiting for a distracted reader.
+    config()->set('lusen.try_it', ['enabled' => true, 'methods' => ['GET']]);
+
+    $spec = staticSpec();
+
+    expect(staticEmitter()->endpoint($spec->endpoint('orders.store'), $spec))
+        ->not->toContain('data-lusen-request');
+});
+
+it('links the script instead of inlining it into every page', function (): void {
+    // It carries the playground now; inlining would repeat tens of kilobytes
+    // once per endpoint.
+    $spec = staticSpec();
+
+    expect(staticEmitter()->endpoint($spec->endpoint('users.index'), $spec))
+        ->toContain('<script src="/docs/assets/lusen.js" defer></script>');
+});
+
+it('puts the credential setup on the page that explains credentials', function (): void {
+    config()->set('lusen.try_it', ['enabled' => true, 'methods' => ['GET']]);
+
+    $spec = staticSpec();
+
+    expect(staticEmitter()->page($spec->page('authentication'), $spec))
+        ->toContain('Set up to test')
+        ->toContain('data-lusen-auth-input="Authorization"')
+        // HTML only: the Markdown twin has no form to offer, so it says
+        // nothing about one.
+        ->and(staticEmitter()->page($spec->page('introduction'), $spec))->not->toContain('Set up to test');
+});
+
+it('offers no credential setup when try it is off', function (): void {
+    $spec = staticSpec();
+
+    expect(staticEmitter()->page($spec->page('authentication'), $spec))->not->toContain('Set up to test');
+});
+
+it('asks for nothing on an api with no authenticated endpoint', function (): void {
+    config()->set('lusen.try_it', ['enabled' => true, 'methods' => ['GET']]);
+    config()->set('lusen.routes.include', ['api/documented*']);
+
+    $spec = staticSpec();
+
+    expect($spec->page('authentication'))->toBeNull();
 });

@@ -148,6 +148,7 @@ final readonly class AttributeExtractor implements Extractor
                 deprecated: $doc->deprecated,
                 tags: $doc->tags === [] ? null : $doc->tags,
                 version: $doc->version,
+                tryIt: $doc->tryIt,
             );
         }
 

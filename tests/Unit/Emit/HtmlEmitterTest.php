@@ -35,11 +35,12 @@ function htmlEmitter(Renderer $renderer): HtmlEmitter
     );
 }
 
-it('emits a stylesheet, an index and one page per endpoint', function (): void {
+it('emits the shared assets, an index and one page per endpoint', function (): void {
     $paths = array_map(fn ($f): string => $f->path, htmlEmitter(recordingRenderer())->emit(fixtureSpec()));
 
     expect($paths)->toBe([
         'assets/lusen.css',
+        'assets/lusen.js',
         'index.html',
         'endpoints/users-index.html',
         'endpoints/users-store.html',

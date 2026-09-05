@@ -467,6 +467,206 @@
     }
 
 
+    /* ----------------------------------------------------------- try it */
+
+    /*
+     | The request form, as a dialog over the page.
+     |
+     | A <dialog> where the browser has one, which is why there is no backdrop
+     | of our own here and no focus handling in the script: the element brings
+     | both. Where it is a plain <div> instead, the same rules render it as a
+     | panel in the flow under the button.
+     */
+    .lusen-try-panel {
+        width: min(64rem, calc(100vw - 2rem));
+        max-height: 88vh;
+        overflow-y: auto;
+        margin: auto;
+        border: 1px solid var(--color-slate-200);
+        border-radius: 0.75rem;
+        background: var(--color-white);
+        padding: 1rem 1.25rem 1.25rem;
+        color: var(--color-slate-800);
+    }
+
+    dialog.lusen-try-panel::backdrop {
+        background: rgb(15 23 42 / 0.45);
+    }
+
+    .lusen-try-head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--color-slate-200);
+    }
+
+    /* The dialog covers the page, so it has to say which call it is about. */
+    .lusen-try-method {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--color-slate-500);
+    }
+
+    .lusen-try-path {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        color: var(--color-slate-900);
+    }
+
+    .lusen-try-close {
+        border: 1px solid var(--color-slate-200);
+        border-radius: 0.375rem;
+        background: transparent;
+        padding: 0.15rem 0.5rem;
+        font-size: 0.75rem;
+        color: var(--color-slate-500);
+        cursor: pointer;
+    }
+
+    .lusen-try-close:hover { color: var(--color-slate-900); border-color: var(--color-slate-400); }
+
+    /* What the call is, before the form to change it. */
+    .lusen-try-notes { margin-bottom: 1rem; }
+
+    .lusen-try-title {
+        margin-bottom: 0.5rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--color-slate-900);
+    }
+
+    .lusen-try-facts {
+        display: grid;
+        gap: 0.25rem 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    }
+
+    .lusen-try-fact {
+        display: flex;
+        gap: 0.5rem;
+        font-size: 0.8125rem;
+    }
+
+    .lusen-try-fact-label {
+        flex: none;
+        width: 7.5rem;
+        color: var(--color-slate-500);
+    }
+
+    .lusen-try-fact-value {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--color-slate-900);
+    }
+
+    /* Form on the left, what it will send on the right - one column until
+       there is room for two. */
+    .lusen-try-columns {
+        display: grid;
+        gap: 1.25rem;
+        align-items: start;
+    }
+
+    @media (min-width: 52rem) {
+        .lusen-try-columns { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+        .lusen-try-preview { position: sticky; top: 0; }
+    }
+
+    .lusen-try-preview .lusen-code { margin-top: 0; }
+    .lusen-try-preview .lusen-code-body {
+        max-height: 22rem;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .lusen-try-field { display: block; margin-bottom: 0.875rem; }
+
+    /* The description that was on the page the dialog is covering. */
+    .lusen-try-note {
+        display: block;
+        margin-bottom: 0.25rem;
+        font-size: 0.75rem;
+        line-height: 1.45;
+        color: var(--color-slate-500);
+    }
+
+    .lusen-try-label {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--color-slate-900);
+    }
+
+    .lusen-try-hint {
+        display: block;
+        margin-bottom: 0.25rem;
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-slate-500);
+    }
+
+    .lusen-try-input {
+        width: 100%;
+        border: 1px solid var(--color-slate-200);
+        border-radius: 0.375rem;
+        background: var(--color-white);
+        padding: 0.3rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        color: var(--color-slate-900);
+    }
+
+    .lusen-try-input:focus {
+        border-color: var(--color-indigo-500);
+        outline: none;
+    }
+
+    .lusen-try-body { resize: vertical; line-height: 1.5; }
+
+    .lusen-try-send {
+        border: 1px solid var(--color-indigo-600);
+        border-radius: 0.375rem;
+        background: var(--color-indigo-600);
+        padding: 0.35rem 0.9rem;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--color-white);
+        cursor: pointer;
+    }
+
+    .lusen-try-send:hover { background: var(--color-indigo-500); }
+    .lusen-try-send[disabled] { opacity: 0.6; cursor: default; }
+
+    .lusen-try-status {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        font-size: 0.8125rem;
+        color: var(--color-slate-600);
+    }
+
+    /* A blocked request is not a failed one, and does not get the colour of
+       something the reader did wrong. */
+    .lusen-try-warn { color: var(--color-amber-700); }
+    .lusen-try-bad { color: var(--color-rose-700); }
+
+    .lusen-try-meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-slate-500); }
+
+    .lusen-try-output { margin-top: 0.5rem; }
+
     :root[data-theme="dark"] .lusen-status-ok,
     :root[data-theme="dark"] .lusen-status-warn,
     :root[data-theme="dark"] .lusen-status-bad { background: transparent; }
@@ -485,6 +685,25 @@
     :root[data-theme="dark"] .lusen-search-hit.is-active { background: var(--color-slate-800); }
     :root[data-theme="dark"] .lusen-search-title { color: var(--color-white); }
     :root[data-theme="dark"] .lusen-search-hint { border-color: var(--color-slate-700); color: var(--color-slate-500); }
+    :root[data-theme="dark"] .lusen-try-panel {
+        border-color: var(--color-slate-800);
+        background: var(--color-slate-900);
+        color: var(--color-slate-300);
+    }
+    :root[data-theme="dark"] .lusen-try-head { border-color: var(--color-slate-800); }
+    :root[data-theme="dark"] .lusen-try-path { color: var(--color-white); }
+    :root[data-theme="dark"] .lusen-try-title { color: var(--color-white); }
+    :root[data-theme="dark"] .lusen-try-fact-value { color: var(--color-slate-200); }
+    :root[data-theme="dark"] .lusen-try-close { border-color: var(--color-slate-700); }
+    :root[data-theme="dark"] .lusen-try-close:hover { color: var(--color-white); }
+    :root[data-theme="dark"] .lusen-try-label { color: var(--color-white); }
+    :root[data-theme="dark"] .lusen-try-input {
+        border-color: var(--color-slate-700);
+        background: var(--color-slate-900);
+        color: var(--color-white);
+    }
+    :root[data-theme="dark"] .lusen-try-warn { color: var(--color-amber-400); }
+    :root[data-theme="dark"] .lusen-try-bad { color: var(--color-rose-400); }
 
     @media (prefers-color-scheme: dark) {
         :root:not([data-theme="light"]) .lusen-status-ok,
@@ -505,6 +724,25 @@
         :root:not([data-theme="light"]) .lusen-search-hit.is-active { background: var(--color-slate-800); }
         :root:not([data-theme="light"]) .lusen-search-title { color: var(--color-white); }
         :root:not([data-theme="light"]) .lusen-search-hint { border-color: var(--color-slate-700); color: var(--color-slate-500); }
+        :root:not([data-theme="light"]) .lusen-try-panel {
+            border-color: var(--color-slate-800);
+            background: var(--color-slate-900);
+            color: var(--color-slate-300);
+        }
+        :root:not([data-theme="light"]) .lusen-try-head { border-color: var(--color-slate-800); }
+        :root:not([data-theme="light"]) .lusen-try-path { color: var(--color-white); }
+        :root:not([data-theme="light"]) .lusen-try-title { color: var(--color-white); }
+        :root:not([data-theme="light"]) .lusen-try-fact-value { color: var(--color-slate-200); }
+        :root:not([data-theme="light"]) .lusen-try-close { border-color: var(--color-slate-700); }
+        :root:not([data-theme="light"]) .lusen-try-close:hover { color: var(--color-white); }
+        :root:not([data-theme="light"]) .lusen-try-label { color: var(--color-white); }
+        :root:not([data-theme="light"]) .lusen-try-input {
+            border-color: var(--color-slate-700);
+            background: var(--color-slate-900);
+            color: var(--color-white);
+        }
+        :root:not([data-theme="light"]) .lusen-try-warn { color: var(--color-amber-400); }
+        :root:not([data-theme="light"]) .lusen-try-bad { color: var(--color-rose-400); }
     }
 }
 
@@ -577,6 +815,8 @@ body.lusen-locked { overflow: hidden; }
     .lusen-tabs,
     [data-lusen-menu],
     [data-lusen-theme],
+    [data-lusen-try-open],
+    .lusen-try-panel,
     [data-lusen-copy-page] {
         display: none !important;
     }

@@ -24,6 +24,11 @@ use Attribute;
  * `version` is how a header-versioned API says so. Lusen reads a version out of
  * a `/api/v2/…` path on its own; an API that negotiates its version in an
  * `Accept` header leaves nothing to read, so the controller has to say.
+ *
+ * `tryIt: false` withholds the playground from one operation while the rest of
+ * the API keeps it - an export that takes a minute, a search that costs money
+ * per call. It only ever removes: an endpoint cannot opt into a playground the
+ * site has turned off.
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 final readonly class ApiDoc
@@ -39,5 +44,6 @@ final readonly class ApiDoc
         public ?bool $deprecated = null,
         public array $tags = [],
         public ?string $version = null,
+        public ?bool $tryIt = null,
     ) {}
 }

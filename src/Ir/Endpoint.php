@@ -26,6 +26,7 @@ final readonly class Endpoint
      * @param  list<string>  $sourceFiles  absolute paths the extractors read; drives incremental rebuilds
      * @param  string|null  $version  the API version this endpoint belongs to, as its URL spells it
      * @param  string|null  $supersededBy  id of the same operation in a newer version, when there is one
+     * @param  bool|null  $tryIt  false withholds the playground from this operation; null leaves the site's setting alone
      */
     public function __construct(
         public string $id,
@@ -45,6 +46,7 @@ final readonly class Endpoint
         public ?SecurityScheme $security = null,
         public ?string $version = null,
         public ?string $supersededBy = null,
+        public ?bool $tryIt = null,
     ) {}
 
     public static function make(
@@ -109,6 +111,7 @@ final readonly class Endpoint
                 : null,
             version: Data::nullableString($data, 'version'),
             supersededBy: Data::nullableString($data, 'supersededBy'),
+            tryIt: isset($data['tryIt']) ? Data::bool($data, 'tryIt') : null,
         );
     }
 
@@ -226,6 +229,7 @@ final readonly class Endpoint
         ?SecurityScheme $security = null,
         ?string $version = null,
         ?string $supersededBy = null,
+        ?bool $tryIt = null,
     ): self {
         return new self(
             id: $this->id,
@@ -245,6 +249,7 @@ final readonly class Endpoint
             security: $security ?? $this->security,
             version: $version ?? $this->version,
             supersededBy: $supersededBy ?? $this->supersededBy,
+            tryIt: $tryIt ?? $this->tryIt,
         );
     }
 
@@ -275,6 +280,7 @@ final readonly class Endpoint
             'security' => $this->security?->toArray(),
             'version' => $this->version,
             'supersededBy' => $this->supersededBy,
+            'tryIt' => $this->tryIt,
         ], static fn (mixed $v): bool => $v !== null);
     }
 }

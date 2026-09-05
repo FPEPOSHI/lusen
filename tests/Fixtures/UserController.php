@@ -22,8 +22,8 @@ final class UserController
 
     #[ApiDoc(summary: 'Show a user')]
     #[Authenticated]
-    #[ApiResponse(200, 'The user.')]
-    #[ApiResponse(404, 'No user with that id.')]
+    #[ApiResponse(200, 'The user.', example: ['id' => 1, 'name' => 'Ada'])]
+    #[ApiResponse(404, 'No user with that id.', example: ['message' => 'No user with that id.'])]
     public function show(): void {}
 
     #[ApiDoc(summary: 'Throttled endpoint')]
