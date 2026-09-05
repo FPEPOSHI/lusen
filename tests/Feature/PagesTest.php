@@ -136,3 +136,22 @@ it('keeps the spec round-trippable with pages', function (): void {
 
     expect(ApiSpec::fromJson($spec->toJson())->toJson())->toBe($spec->toJson());
 });
+
+it('records where a page was written, relative to the project', function (): void {
+    // An absolute path is machine-specific, so it would make the IR serialise
+    // differently on a laptop and in CI - and `/docs` hands the IR to anyone
+    // who asks for JSON.
+    writePage($this->docs, 'guides/webhooks.md', "---\ntitle: Webhooks\n---\nBody.");
+
+    $page = (new PageCollector($this->docs, dirname($this->docs)))->collect()[0];
+
+    expect($page->sourceFile)->toBe(basename($this->docs).'/guides/webhooks.md');
+});
+
+it('leaves the path alone when it is not under the project root', function (): void {
+    writePage($this->docs, 'webhooks.md', 'Body.');
+
+    $page = (new PageCollector($this->docs, '/somewhere/else'))->collect()[0];
+
+    expect($page->sourceFile)->toBe($this->docs.'/webhooks.md');
+});

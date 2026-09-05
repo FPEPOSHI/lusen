@@ -69,6 +69,7 @@ final class LusenServiceProvider extends ServiceProvider
 
         $this->app->bind(PageCollector::class, fn (): PageCollector => new PageCollector(
             $this->pagesPath(),
+            $this->app->basePath(),
         ));
 
         // Bound explicitly because it takes configuration; the others are
