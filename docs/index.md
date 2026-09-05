@@ -21,7 +21,7 @@ Write new integrations against `v2`. Every endpoint below states the version it 
 - [Versioning](/lusen/pages/versioning.md) — This API serves 2 versions at once. The version is part of the path, so a request names the version it wants.
 - [Authentication](/lusen/pages/authentication.md) — Authenticated endpoints expect a bearer token.
 - [Errors](/lusen/pages/errors.md) — Errors are returned with a conventional HTTP status and a JSON body.
-- [Rate limiting](/lusen/pages/rate-limiting.md) — Requests are rate limited per client. Exceeding a limit returns `429 Too Many Requests`.
+- [Rate limiting](/lusen/pages/rate-limiting.md) — Requests are rate limited per client. Exceeding a limit returns 429 Too Many Requests.
 
 ## Guides
 

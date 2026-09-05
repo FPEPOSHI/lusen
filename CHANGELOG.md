@@ -2,6 +2,67 @@
 
 All notable changes to this project are documented here.
 
+## 0.4.0 — 2026-09-04
+
+The reading experience, which had been built for one screen and one reader.
+
+### Added
+
+- **Navigation on every screen size.** The sidebar was `hidden lg:block` and
+  the search box lived inside it, so a reader who arrived on a phone — from a
+  search result, which is the common case for a per-endpoint page — had no
+  navigation, no search and no way out of the page they landed on. The
+  navigation is now rendered once and moved by CSS: a column beside the content
+  on wide screens, the end of the document on narrow ones, with a bar at the
+  top of the page linking to it. The script upgrades that link to a panel, so
+  reaching the navigation does not mean losing your place. Nothing here needs
+  JavaScript to work.
+- **A contents column beside every page.** Prose pages had a boxed table of
+  contents; endpoint pages had nothing, and a wide screen left a third of
+  itself empty. Both now carry one, along with the page's other
+  representations. Every section of an endpoint page — each parameter table,
+  the example, the responses — has a stable anchor derived from the endpoint
+  id, so `#users-index-responses` is a citable deep link rather than a place
+  to scroll to.
+- **Copy for an LLM**, on every page. It copies the page's Markdown twin, not
+  the rendered HTML: pasting documentation into a model is what people do now,
+  and the rendered page makes the model pay for navigation and markup it
+  cannot use.
+- **Tabbed request examples.** They ship stacked and labelled — that is what
+  reads with no JavaScript, and what a model retrieving the HTML sees — and
+  become tabs where the script runs, because two languages stacked push the
+  responses a screen and a half down the page. The chosen language is
+  remembered across pages.
+- **A base URL switcher**, which `config/lusen.php` had described for two
+  releases without one existing. `servers` now produces a control that rewrites
+  the base URL everywhere it appears on the page, so a reader working against
+  a sandbox copies a sandbox request.
+- **`ui.edit_url`**, putting an *Edit this page* link beside every page
+  somebody wrote. `{path}` is replaced with the file's path relative to the
+  project root. Generated pages have no file behind them and never get one.
+- **`lusen:check --json`**, so coverage can go in a dashboard or a PR comment
+  without parsing two-column console output.
+- Search keyboard handling: `⌘K` or `/` to focus, arrows to move through the
+  results, enter to open one. The results are a proper combobox listbox now
+  rather than a list with a listbox role and nothing to select.
+- Print styles, and `prefers-reduced-motion` is respected. What prints is the
+  endpoint, not thirty navigation links and a search box that cannot search;
+  every request example prints, since paper has no tabs to switch.
+
+### Fixed
+
+- Descriptions written in Markdown reached places no renderer sees them.
+  `<meta name="description">`, JSON-LD, `llms.txt`, the search index and the
+  index listing all printed the source text, so a snippet under a search
+  result read *Send the `Idempotency-Key` header* — backticks included.
+  `Str::summarise()` now reduces Markdown to the text it renders as; the page
+  body and the Markdown mirror are untouched. Underscores are left alone,
+  since `customer_id` is more common in API prose than `_emphasis_`.
+- A prose page recorded the absolute path it was read from, which put a
+  machine-specific value in an IR that has to serialise identically everywhere
+  — and handed it to anyone who asked `/docs` for JSON. Pages now record where
+  they were written relative to the project root.
+
 ## 0.3.2 — 2026-09-04
 
 ### Fixed
