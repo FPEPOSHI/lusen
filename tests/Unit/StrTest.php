@@ -28,3 +28,27 @@ it('truncates on a word boundary and marks the cut', function (): void {
 it('flattens whitespace and strips tags for meta descriptions', function (): void {
     expect(Str::summarise("<p>Two\n\n  lines</p>"))->toBe('Two lines');
 });
+
+it('reduces markdown to the text it renders as', function (): void {
+    // A backtick renders as code on the page and as a backtick in a search
+    // result, and the same string is used for both.
+    expect(Str::plain('Send the `Idempotency-Key` header'))->toBe('Send the Idempotency-Key header')
+        ->and(Str::plain('Reads **every** field and *some* others'))->toBe('Reads every field and some others')
+        ->and(Str::plain('See [the guide](https://example.test/guide)'))->toBe('See the guide')
+        ->and(Str::plain('See [the guide][guide]'))->toBe('See the guide')
+        ->and(Str::plain('![A diagram](diagram.png) follows'))->toBe('A diagram follows');
+});
+
+it('leaves underscores alone, because identifiers use them', function (): void {
+    expect(Str::plain('Filter by customer_id or created_at'))->toBe('Filter by customer_id or created_at');
+});
+
+it('flattens whitespace and html the same way it always did', function (): void {
+    expect(Str::plain("Two\n\nparagraphs and <b>markup</b>"))->toBe('Two paragraphs and markup');
+});
+
+it('strips markdown before measuring the limit', function (): void {
+    // Otherwise the backticks eat into the budget and the sentence is cut
+    // shorter than it needed to be.
+    expect(Str::summarise('`'.str_repeat('a', 150).'`', 155))->toBe(str_repeat('a', 150));
+});

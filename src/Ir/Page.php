@@ -70,7 +70,9 @@ final readonly class Page
     public function summary(): string
     {
         if ($this->description !== null && $this->description !== '') {
-            return $this->description;
+            // Not truncated: an author who wrote a description meant that
+            // sentence. It is still flattened, because it is printed as text.
+            return Str::plain($this->description);
         }
 
         foreach (explode("\n\n", $this->markdown) as $block) {
