@@ -7,6 +7,7 @@ use Lusen\Ir\Enums\HttpMethod;
 use Lusen\Ir\Enums\ParameterLocation;
 use Lusen\Ir\Parameter;
 use Lusen\Ir\Schema;
+use Lusen\Support\RequestModel;
 use Lusen\Support\Snippets;
 
 it('substitutes path placeholders with example values', function (): void {
@@ -14,7 +15,7 @@ it('substitutes path placeholders with example values', function (): void {
         new Parameter('user', ParameterLocation::Path, Schema::integer(), true),
     ]);
 
-    expect(Snippets::url($endpoint, 'https://api.test'))->toBe('https://api.test/api/users/1');
+    expect(RequestModel::url($endpoint, 'https://api.test'))->toBe('https://api.test/api/users/1');
 });
 
 it('handles laravel optional path syntax', function (): void {
@@ -22,7 +23,7 @@ it('handles laravel optional path syntax', function (): void {
         new Parameter('user', ParameterLocation::Path, Schema::integer()),
     ]);
 
-    expect(Snippets::url($endpoint))->toBe('/api/users/1');
+    expect(RequestModel::url($endpoint))->toBe('/api/users/1');
 });
 
 it('puts only required query parameters in the url', function (): void {
@@ -31,8 +32,8 @@ it('puts only required query parameters in the url', function (): void {
         new Parameter('per_page', ParameterLocation::Query, Schema::integer()),
     ]);
 
-    expect(Snippets::url($endpoint))->toBe('/api/users?scope=scope')
-        ->and(Snippets::url($endpoint))->not->toContain('per_page');
+    expect(RequestModel::url($endpoint))->toBe('/api/users?scope=scope')
+        ->and(RequestModel::url($endpoint))->not->toContain('per_page');
 });
 
 it('adds a bearer header only for authenticated endpoints', function (): void {
@@ -99,7 +100,7 @@ it('url-encodes example values in the path', function (): void {
         new Parameter('name', ParameterLocation::Path, Schema::string(), true),
     ]);
 
-    expect(Snippets::url($endpoint))->toBe('/api/users/Jane%20Doe');
+    expect(RequestModel::url($endpoint))->toBe('/api/users/Jane%20Doe');
 });
 
 it('only offers languages it can actually produce', function (): void {
