@@ -16,7 +16,12 @@ use Lusen\Support\Str;
  */
 final readonly class PageCollector
 {
-    public function __construct(private string $path) {}
+    /**
+     * @param  string|null  $root  project root, so a page records where it was
+     *                             written relative to the repository rather
+     *                             than where this machine happens to keep it
+     */
+    public function __construct(private string $path, private ?string $root = null) {}
 
     /**
      * @return list<Page>
@@ -85,8 +90,25 @@ final readonly class PageCollector
             section: $matter['section'] ?? ($isNested ? Str::title($parent) : null),
             description: $matter['description'] ?? null,
             order: isset($matter['order']) ? (int) $matter['order'] : 0,
-            sourceFile: $file,
+            sourceFile: $this->relative($file),
         );
+    }
+
+    /**
+     * The path as someone editing the repository would type it.
+     *
+     * An absolute path is machine-specific, so it would put a build-varying
+     * value in an IR that has to serialise the same everywhere, and it is what
+     * `/docs` hands back to anyone who asks for JSON. It is also useless to
+     * the one thing that wants it: a link to the file in a code host.
+     */
+    private function relative(string $file): string
+    {
+        $root = $this->root === null ? null : rtrim($this->root, '/').'/';
+
+        return $root !== null && str_starts_with($file, $root)
+            ? substr($file, strlen($root))
+            : $file;
     }
 
     /**
