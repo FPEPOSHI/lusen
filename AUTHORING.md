@@ -598,6 +598,7 @@ version when the API has more than one.
     'favicon'   => null,                      // URL
     'dark_mode' => true,                      // shows the light/dark/system toggle
     'snippets'  => ['curl', 'javascript'],    // request examples, in order
+    'edit_url'  => null,                      // 'https://github.com/acme/api/edit/main/{path}'
 ],
 
 'seo' => [
@@ -611,6 +612,16 @@ version when the API has more than one.
 `canonical_origin` is worth setting: without it there are no canonical URLs and
 no sitemap, because a sitemap needs absolute URLs and a relative canonical is
 worse than none.
+
+`servers` are the other base URLs the same API answers on. They become a
+switcher in the sidebar that rewrites the base URL in every example on the
+page, so a reader working against your sandbox copies a sandbox request — and
+they are the `servers` array in the OpenAPI document.
+
+`edit_url` puts an *Edit this page* link beside every page somebody wrote.
+`{path}` is replaced with the file's path relative to your project root, so
+`resources/docs/guides/webhooks.md` lands on the right file in your code host.
+Generated pages have no file behind them and never get the link.
 
 There is no colour setting. The stylesheet is prebuilt with literal Tailwind
 class names — which is what lets Lusen install without Node — so a palette
@@ -626,7 +637,9 @@ Views land in `resources/views/vendor/lusen`. Both the static build and the
 runtime preview render through them, so a change shows up in both. Two things
 to keep if you edit them:
 
-- Every page must be readable with JavaScript disabled.
+- Every page must be readable with JavaScript disabled. Search, the snippet
+  tabs, the copy buttons, the base-URL switcher and the menu on small screens
+  are all enhancements over markup that already works without them.
 - Tailwind classes must appear as literal strings — the CSS is prebuilt, so a
   class assembled from a variable will not exist.
 
@@ -637,6 +650,7 @@ to keep if you edit them:
 ```bash
 php artisan lusen:check            # what is still undocumented
 php artisan lusen:check --strict   # exit non-zero, for CI
+php artisan lusen:check --json     # the same findings, for a script
 ```
 
 It reports endpoints with no description, no documented response, or

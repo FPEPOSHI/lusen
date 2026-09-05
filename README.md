@@ -7,7 +7,7 @@ documentation as **static files** — HTML for people, OpenAPI and Markdown for
 machines. There is no build step for consumers, no database, and no JavaScript
 required to read a page.
 
-> **Status: early — `0.3.2`.** Prose pages, route collection, FormRequest and
+> **Status: early — `0.4.0`.** Prose pages, route collection, FormRequest and
 > attribute extraction, request-example generation, API versioning, and the
 > static HTML, Markdown, OpenAPI, `llms.txt`, sitemap, search and Postman
 > surfaces all work, as does the MCP server.
@@ -40,7 +40,10 @@ Most Laravel API docs packages optimise for one reader: a developer with a
 browser. Lusen assumes three, and treats them as equally important.
 
 **People** get server-rendered HTML, one endpoint per page, styled with
-Tailwind. Readable with JavaScript disabled.
+Tailwind — a contents column beside the page, tabbed request examples, search
+on `⌘K`, and navigation that works on a phone. All of it readable with
+JavaScript disabled: every control is an enhancement over markup that already
+works without it.
 
 **Search engines** get canonical URLs, real meta descriptions, JSON-LD
 `TechArticle` and `BreadcrumbList` data, and a sitemap. Nothing is behind a
@@ -62,6 +65,7 @@ than scraped HTML:
 | `/docs/pages/versioning.html` | Which API versions exist, and what changed between the newest two |
 | `/docs/postman.json` | A Postman collection, for poking the API before writing code |
 | `Accept: text/markdown` | Any docs URL returns Markdown instead of HTML (runtime mode) |
+| **Copy for an LLM** | A button on every page that copies its Markdown, not its HTML |
 
 Two rules make those surfaces actually usable:
 
@@ -279,6 +283,28 @@ at its successor. An API that negotiates its version in a header leaves nothing
 in the path to read, so its controllers say so with
 `#[ApiDoc(version: 'v2')]`.
 
+## Built to be read
+
+Documentation people avoid is documentation nobody maintains, so the reading
+experience is a feature rather than a skin:
+
+- **Navigation at every width.** Rendered once and moved by CSS — a column
+  beside the content on a laptop, a panel behind one tap on a phone, and the
+  end of the document with no JavaScript at all.
+- **A contents column** on every page. Each of an endpoint's sections carries
+  a stable anchor, so `#users-index-responses` is a link worth citing.
+- **Tabbed request examples**, remembered across pages. They ship stacked, so
+  a reader without JavaScript — and a model reading the HTML — still gets
+  every language.
+- **Search on `⌘K`** over a prebuilt index, with the arrow keys. No search
+  service, no API key.
+- **A base URL switcher** when `servers` lists more than one, rewriting the
+  host in every example so what gets copied is what was chosen.
+- **Copy for an LLM**, handing over the page's Markdown rather than its
+  markup.
+- **`ui.edit_url`** puts an *Edit this page* link on everything you wrote —
+  the cheapest thing there is for keeping prose honest.
+
 ## Writing the parts Lusen cannot infer
 
 Prose pages, examples worth writing by hand, attributes, docblock tags and
@@ -306,6 +332,7 @@ php artisan lusen:build --path=/tmp/docs     # override the output directory
 php artisan lusen:build --fresh              # ignore the incremental cache
 php artisan lusen:check                      # report endpoints missing documentation
 php artisan lusen:check --strict             # ...and fail CI when any are
+php artisan lusen:check --json               # the same findings, for a script
 ```
 
 Builds are incremental. An endpoint is re-analysed only when its route or one
