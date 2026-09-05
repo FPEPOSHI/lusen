@@ -23,7 +23,8 @@ final class CheckCommand extends Command
      * @var string
      */
     protected $signature = 'lusen:check
-        {--strict : Exit non-zero when anything is missing}';
+        {--strict : Exit non-zero when anything is missing}
+        {--json : Report as JSON, for a script rather than a person}';
 
     /**
      * @var string
@@ -34,6 +35,10 @@ final class CheckCommand extends Command
     {
         $spec = $builder->build();
         $endpoints = $spec->endpoints();
+
+        if ($this->option('json')) {
+            return $this->reportJson($endpoints === [] ? [] : $this->findings($spec), count($endpoints));
+        }
 
         if ($endpoints === []) {
             $this->components->warn('No routes matched. Check `routes.include` in config/lusen.php.');
@@ -67,6 +72,33 @@ final class CheckCommand extends Command
         ));
 
         return $this->option('strict') ? self::FAILURE : self::SUCCESS;
+    }
+
+    /**
+     * The same findings, for something that is not a person.
+     *
+     * A team tracking documentation coverage wants it in a dashboard or a PR
+     * comment, and parsing the two-column output to get there is the kind of
+     * thing that breaks the first time a label is reworded.
+     *
+     * @param  array<string, list<string>>  $findings
+     */
+    private function reportJson(array $findings, int $total): int
+    {
+        $this->output->writeln((string) json_encode([
+            'endpoints' => $total,
+            'documented' => $total - count($findings),
+            'findings' => array_map(
+                static fn (string $endpoint, array $problems): array => [
+                    'endpoint' => $endpoint,
+                    'problems' => $problems,
+                ],
+                array_keys($findings),
+                array_values($findings),
+            ),
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        return $findings !== [] && $this->option('strict') ? self::FAILURE : self::SUCCESS;
     }
 
     /**
