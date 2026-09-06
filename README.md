@@ -7,7 +7,7 @@ documentation as **static files** — HTML for people, OpenAPI and Markdown for
 machines. There is no build step for consumers, no database, and no JavaScript
 required to read a page.
 
-> **Status: early — `0.5.0`.** Prose pages, route collection, FormRequest and
+> **Status: early — `0.5.1`.** Prose pages, route collection, FormRequest and
 > attribute extraction, request-example generation, API versioning, and the
 > static HTML, Markdown, OpenAPI, `llms.txt`, sitemap, search and Postman
 > surfaces all work, as does the MCP server.

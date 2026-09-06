@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here.
 
-## Unreleased
+## 0.5.1 — 2026-09-06
 
 ### Added
 
@@ -34,13 +34,37 @@ All notable changes to this project are documented here.
   pull request. `sourceFiles` is stripped: those are absolute paths kept for
   the incremental cache, and in a committed file they are one developer's home
   directory and a spurious diff on every other machine.
+- **Ask an assistant, with the question already written.** Every endpoint page,
+  every prose page and the index carry a link that hands the page to ChatGPT or
+  Claude with the prompt composed: read this URL, answer from what it says, and
+  say so when it does not. The link names the page's Markdown twin rather than
+  the rendered HTML, so the model reads the source instead of a screenshot of a
+  layout; from the index it names `llms-full.txt`, because somebody asking about
+  the API as a whole wants the model to have the whole thing.
+
+  Both the providers and the prompt are configuration. Assistants change their
+  deep-link shape without warning and new ones appear, and a docs site should
+  not wait for a release of this package to keep a button working.
+- **PHP request examples, in both flavours.** `PHP (Laravel)` for an application
+  with Laravel's HTTP client, `PHP (Guzzle)` for everything else, alongside cURL
+  and JavaScript. This package documents Laravel applications and whoever
+  integrates with one is usually writing PHP too, so both are on by default.
+  They render `RequestModel` like every other snippet, so they cannot drift from
+  the cURL block above them or from the request the playground sends, and the
+  highlighter has learned PHP so no tab sits grey beside a coloured one.
 
 ### Changed
 
 - Response bodies are tabbed by status code alone — `201`, `422` — rather than
-  by code and reason phrase. The phrase is still on the status table directly
-  above, where it is the first thing said about the status rather than a
-  repetition of it.
+  by code and reason phrase. A tab strip reading "201 Created" and "422
+  Unprocessable Entity" spends its width on words every reader already knows,
+  and the phrase is still on the status table directly above, where it is the
+  first thing said about a status rather than a repetition of it.
+- The page's other representations — Markdown, OpenAPI, Copy for an LLM, the
+  assistants and the edit link — each carry an icon. Five pieces of small grey
+  text in a row have to be read; a document, braces, a clipboard, a sparkle and
+  a pencil can be scanned. Inline SVG from one partial, inheriting
+  `currentColor`, so no second request and no second colour rule.
 
 ## 0.5.0 — 2026-09-05
 
