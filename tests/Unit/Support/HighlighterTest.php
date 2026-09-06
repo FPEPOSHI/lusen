@@ -80,3 +80,23 @@ it('escapes javascript it does not tokenise', function (): void {
         ->toContain('&gt;')
         ->toContain('&amp;&amp;');
 });
+
+it('colours the php snippets, so no tab sits grey beside a coloured one', function (): void {
+    $html = Highlighter::highlight(
+        "use GuzzleHttp\\Client;\n\n\$client = new Client();\n\n['headers' => ['Accept' => 'application/json']]",
+        'php',
+    );
+
+    expect($html)->toContain('<span class="tok-lit">use</span>')
+        ->toContain('<span class="tok-lit">new</span>')
+        ->toContain('<span class="tok-flag">$client</span>')
+        ->toContain('<span class="tok-key">&#039;Accept&#039;</span>')
+        ->toContain('<span class="tok-str">&#039;application/json&#039;</span>');
+});
+
+it('escapes php it does not tokenise', function (): void {
+    expect(Highlighter::highlight('$a = $b < $c && $d > $e;', 'php'))
+        ->toContain('&lt;')
+        ->toContain('&gt;')
+        ->toContain('&amp;&amp;');
+});

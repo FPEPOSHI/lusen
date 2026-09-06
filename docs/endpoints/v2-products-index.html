@@ -601,6 +601,36 @@
 
 <span class="tok-lit">const</span> data = <span class="tok-lit">await</span> response.<span class="tok-cmd">json</span>();</code></pre>
 </figure>
+                                    <figure class="lusen-code">
+    <figcaption class="lusen-code-head">
+        <span class="lusen-code-label">PHP (Laravel)</span>
+        <button type="button" class="lusen-copy" data-lusen-copy hidden>Copy</button>
+    </figcaption>
+    <pre class="lusen-code-body"><code class="language-php"><span class="tok-lit">use</span> Illuminate\Support\Facades\Http;
+
+<span class="tok-flag">$response</span> = Http::<span class="tok-cmd">withHeaders</span>([
+    <span class="tok-key">&#039;Accept&#039;</span> =&gt; <span class="tok-str">&#039;application/json&#039;</span>,
+])-&gt;<span class="tok-cmd">get</span>(<span class="tok-str">&#039;https://api.acme.example/api/v2/products&#039;</span>);
+
+<span class="tok-flag">$data</span> = <span class="tok-flag">$response</span>-&gt;<span class="tok-cmd">json</span>();</code></pre>
+</figure>
+                                    <figure class="lusen-code">
+    <figcaption class="lusen-code-head">
+        <span class="lusen-code-label">PHP (Guzzle)</span>
+        <button type="button" class="lusen-copy" data-lusen-copy hidden>Copy</button>
+    </figcaption>
+    <pre class="lusen-code-body"><code class="language-php"><span class="tok-lit">use</span> GuzzleHttp\Client;
+
+<span class="tok-flag">$client</span> = <span class="tok-lit">new</span> <span class="tok-cmd">Client</span>();
+
+<span class="tok-flag">$response</span> = <span class="tok-flag">$client</span>-&gt;<span class="tok-cmd">request</span>(<span class="tok-str">&#039;GET&#039;</span>, <span class="tok-str">&#039;https://api.acme.example/api/v2/products&#039;</span>, [
+    <span class="tok-key">&#039;headers&#039;</span> =&gt; [
+        <span class="tok-key">&#039;Accept&#039;</span> =&gt; <span class="tok-str">&#039;application/json&#039;</span>,
+    ],
+]);
+
+<span class="tok-flag">$data</span> = <span class="tok-cmd">json_decode</span>((string) <span class="tok-flag">$response</span>-&gt;<span class="tok-cmd">getBody</span>(), <span class="tok-lit">true</span>);</code></pre>
+</figure>
                             </div>
 
             <div class="lusen-try" data-lusen-try>

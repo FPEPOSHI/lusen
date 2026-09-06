@@ -25,6 +25,7 @@ final class Highlighter
             'json' => self::json($code),
             'bash', 'sh', 'shell', 'curl' => self::shell($code),
             'javascript', 'js' => self::javascript($code),
+            'php' => self::php($code),
             default => self::escape($code),
         };
     }
@@ -121,6 +122,52 @@ final class Highlighter
 
                 // Keyword, literal, number, the name being called, a bare key.
                 $classes = [3 => 'tok-lit', 4 => 'tok-lit', 5 => 'tok-num', 6 => 'tok-cmd', 7 => 'tok-key'];
+
+                foreach ($classes as $group => $class) {
+                    if (($match[$group] ?? '') !== '') {
+                        return '<span class="'.$class.'">'.self::escape($match[$group]).'</span>';
+                    }
+                }
+
+                return self::escape($match[0]);
+            },
+            self::escapeOutsideMatches($code, $pattern),
+        );
+
+        return $result ?? self::escape($code);
+    }
+
+    /**
+     * The PHP snippets: use statements, variables, array keys and the calls.
+     *
+     * Scoped the same way the JavaScript pass is - to what `Snippets` emits,
+     * not to the language. A tab strip with a coloured cURL block beside a
+     * plain grey PHP one reads as a bug in the docs, and a general PHP
+     * tokenizer is a far larger thing to get wrong than the six shapes these
+     * two snippets actually use.
+     */
+    public static function php(string $code): string
+    {
+        $pattern = '/(\'(?:[^\'\\\\]|\\\\.)*\')(\s*=>)?'
+            .'|\b(use|new)\b'
+            .'|\b(true|false|null)\b'
+            .'|(\$[A-Za-z_]\w*)'
+            .'|((?<![\w.])-?\d+(?:\.\d+)?\b)'
+            .'|\b([A-Za-z_]\w*)(?=\s*\()/';
+
+        $result = preg_replace_callback(
+            $pattern,
+            static function (array $match): string {
+                // A string followed by => is an array key, the same way a
+                // string followed by a colon is one in JSON.
+                if (($match[1] ?? '') !== '') {
+                    $class = ($match[2] ?? '') !== '' ? 'tok-key' : 'tok-str';
+
+                    return '<span class="'.$class.'">'.self::escape($match[1]).'</span>'
+                        .self::escape($match[2] ?? '');
+                }
+
+                $classes = [3 => 'tok-lit', 4 => 'tok-lit', 5 => 'tok-flag', 6 => 'tok-num', 7 => 'tok-cmd'];
 
                 foreach ($classes as $group => $class) {
                     if (($match[$group] ?? '') !== '') {

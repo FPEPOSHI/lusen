@@ -373,9 +373,14 @@ return [
 
         /*
          | Request-example languages shown on each endpoint, in order.
-         | Supported: curl, javascript.
+         | Supported: curl, javascript, laravel, guzzle.
+         |
+         | The two PHP flavours are on by default because the applications
+         | this package documents are Laravel ones, and whoever is calling
+         | your API is usually writing PHP too. Drop either if that is not
+         | true of your readers.
          */
-        'snippets' => ['curl', 'javascript'],
+        'snippets' => ['curl', 'javascript', 'laravel', 'guzzle'],
 
         /*
          | Buttons that hand a page to an assistant with the question already

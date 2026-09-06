@@ -176,7 +176,7 @@
                 @foreach (\Lusen\Support\Snippets::languages(config('lusen.ui.snippets', ['curl'])) as $language => $label)
                     @include('lusen::partials.code', [
                         'label' => $label,
-                        'language' => $language === 'curl' ? 'bash' : 'javascript',
+                        'language' => \Lusen\Support\Snippets::syntax($language),
                         'code' => \Lusen\Support\Snippets::render($language, $endpoint, $spec->baseUrl),
                     ])
                 @endforeach

@@ -126,3 +126,70 @@ it('renders the language it is asked for', function (): void {
         ->and(Snippets::render('curl', $endpoint))->toStartWith('curl ')
         ->and(Snippets::render('unknown', $endpoint))->toStartWith('curl ');
 });
+
+it('offers both php clients, and drops a language it cannot render', function (): void {
+    expect(Snippets::languages(['curl', 'laravel', 'guzzle']))
+        ->toBe(['curl' => 'cURL', 'laravel' => 'PHP (Laravel)', 'guzzle' => 'PHP (Guzzle)']);
+
+    // The config must not be able to promise a snippet that does not exist.
+    expect(Snippets::languages(['curl', 'kotlin']))->toBe(['curl' => 'cURL']);
+});
+
+it('names the syntax each snippet is highlighted as', function (): void {
+    // In Snippets rather than in the Blade that renders the tabs, or the next
+    // language added is coloured as JavaScript until somebody notices.
+    expect(Snippets::syntax('laravel'))->toBe('php')
+        ->and(Snippets::syntax('guzzle'))->toBe('php')
+        ->and(Snippets::syntax('javascript'))->toBe('javascript')
+        ->and(Snippets::syntax('curl'))->toBe('bash');
+});
+
+it('writes a laravel http call with the headers the endpoint requires', function (): void {
+    $endpoint = Endpoint::make(HttpMethod::Post, 'api/users', 'users.store')->with(
+        authenticated: true,
+        parameters: [
+            new Parameter('email', ParameterLocation::Body, Schema::string()->withExample('ada@example.com'), required: true),
+        ],
+    );
+
+    $php = Snippets::laravel($endpoint, 'https://api.test');
+
+    expect($php)->toContain('use Illuminate\Support\Facades\Http;')
+        ->toContain("'Authorization' => 'Bearer YOUR_TOKEN',")
+        ->toContain("->post('https://api.test/api/users', [")
+        ->toContain("'email' => 'ada@example.com',")
+        ->toContain('$data = $response->json();');
+});
+
+it('calls straight through when there is no body to send', function (): void {
+    $php = Snippets::laravel(Endpoint::make(HttpMethod::Get, 'api/users'), 'https://api.test');
+
+    expect($php)->toContain("->get('https://api.test/api/users');")
+        ->not->toContain('[]');
+});
+
+it('writes a guzzle request with headers and a json body', function (): void {
+    $endpoint = Endpoint::make(HttpMethod::Post, 'api/users', 'users.store')->with(
+        parameters: [
+            new Parameter('tags', ParameterLocation::Body, Schema::arrayOf(Schema::string()->withExample('vip'))),
+        ],
+    );
+
+    $php = Snippets::guzzle($endpoint, 'https://api.test');
+
+    expect($php)->toContain('use GuzzleHttp\Client;')
+        ->toContain("\$client->request('POST', 'https://api.test/api/users', [")
+        ->toContain("'json' => [")
+        ->toContain("'tags' => [")
+        ->toContain('$data = json_decode((string) $response->getBody(), true);');
+});
+
+it('escapes a quote in an example rather than breaking the snippet', function (): void {
+    $endpoint = Endpoint::make(HttpMethod::Post, 'api/users')->withParameters([
+        new Parameter('name', ParameterLocation::Body, Schema::string()->withExample("O'Brien"), required: true),
+    ]);
+
+    // A snippet that will not parse is worse than no snippet at all.
+    expect(Snippets::laravel($endpoint))->toContain("'name' => 'O\\'Brien',")
+        ->and(Snippets::guzzle($endpoint))->toContain("'name' => 'O\\'Brien',");
+});
