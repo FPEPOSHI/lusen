@@ -309,11 +309,15 @@ it('tabs response bodies by status where there is more than one', function (): v
     $html = staticEmitter()->endpoint($spec->endpoint('users.show'), $spec);
 
     // Two documented statuses, so the script has something to tab between;
-    // stacked and labelled without it.
+    // stacked and labelled without it. The label is the code alone - a tab
+    // strip reading "200 OK" and "404 Not Found" spends its width on words
+    // every reader already knows, and the phrase is still on the status table
+    // directly above.
     expect($html)->toContain('<div class="lusen-snippets" data-lusen-tabs="response">')
         ->toContain('Example response')
-        ->toContain('200 OK')
-        ->toContain('404 Not Found');
+        ->toContain('<span class="lusen-code-label">200</span>')
+        ->toContain('<span class="lusen-code-label">404</span>')
+        ->not->toContain('<span class="lusen-code-label">404 Not Found</span>');
 });
 
 it('offers the page markdown to a reader pasting it into a model', function (): void {

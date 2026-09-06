@@ -197,7 +197,7 @@
                     @foreach ($bodies as $response)
                         @foreach ($response->examples as $example)
                             @include('lusen::partials.code', [
-                                'label' => $response->status.' '.$response->reasonPhrase(),
+                                'label' => (string) $response->status,
                                 'language' => str_contains($example->contentType, 'json') ? 'json' : 'text',
                                 'code' => $example->render(),
                             ])

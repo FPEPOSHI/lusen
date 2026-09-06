@@ -35,6 +35,13 @@ All notable changes to this project are documented here.
   the incremental cache, and in a committed file they are one developer's home
   directory and a spurious diff on every other machine.
 
+### Changed
+
+- Response bodies are tabbed by status code alone — `201`, `422` — rather than
+  by code and reason phrase. The phrase is still on the status table directly
+  above, where it is the first thing said about the status rather than a
+  repetition of it.
+
 ## 0.5.0 — 2026-09-05
 
 Sending the request, and the two-column reference every developer already
