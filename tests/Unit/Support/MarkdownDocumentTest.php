@@ -79,3 +79,17 @@ it('escapes markup inside a fence', function (): void {
     expect(MarkdownDocument::render("```json\n{\"x\": \"<script>\"}\n```")->html)
         ->not->toContain('<script>');
 });
+
+it('renders one line without the paragraph it would sit in', function (): void {
+    expect(MarkdownDocument::inline('requires a new body parameter `idempotency_key`'))
+        ->toBe('requires a new body parameter <code>idempotency_key</code>');
+});
+
+it('escapes a field name that looks like markup', function (): void {
+    expect(MarkdownDocument::inline('field `a<b>c` changed'))->toContain('a&lt;b&gt;c');
+});
+
+it('leaves anything that is not a single paragraph alone', function (): void {
+    // Half-unwrapping something unexpected would be worse than not touching it.
+    expect(MarkdownDocument::inline("one\n\ntwo"))->toContain('<p>');
+});

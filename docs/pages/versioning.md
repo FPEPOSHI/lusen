@@ -37,3 +37,10 @@ In `v1` but not in `v2`:
 - `GET /api/v1/products/search` — Search products
 
 The other 8 operations exist in both versions at the same path. Each one's page links to its newer edition.
+
+What changed in the operations both versions have:
+
+- `GET /api/v2/customers` — List customers
+  - accepts a new optional query parameter `q`
+- `POST /api/v2/orders` — Create an order
+  - requires a new header parameter `Idempotency-Key`

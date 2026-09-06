@@ -130,6 +130,48 @@ final class SpecDiff
     }
 
     /**
+     * One operation compared with another, identity left out of it.
+     *
+     * Separate from `endpoint()` because identity only means something when
+     * both sides are meant to be the same endpoint. Two versions of one
+     * operation have different ids and different paths by construction - that
+     * is what a version is - so a comparison across versions has to start
+     * after the questions `between()` asks about whether this is still the
+     * same thing.
+     *
+     * @return list<Change>
+     */
+    public static function operation(Endpoint $before, Endpoint $after): array
+    {
+        $subject = self::subject($after);
+        $changes = [];
+
+        if (! $before->authenticated && $after->authenticated) {
+            $changes[] = Change::breaking('endpoint.authenticated', $subject, 'now requires authentication');
+        }
+
+        if ($before->authenticated && ! $after->authenticated) {
+            $changes[] = Change::notice(
+                'endpoint.public',
+                $subject,
+                'no longer requires authentication - it is now open to anyone who finds it',
+            );
+        }
+
+        $changes = [...$changes, ...self::scopes($before, $after, $subject)];
+
+        if (! $before->deprecated && $after->deprecated) {
+            $changes[] = Change::notice('endpoint.deprecated', $subject, 'is now deprecated');
+        }
+
+        return [
+            ...$changes,
+            ...self::parameters($before, $after, $subject),
+            ...self::responses($before, $after, $subject),
+        ];
+    }
+
+    /**
      * Spec-level facts. A version disappearing is the largest breaking change
      * an API can make, and no single endpoint comparison can see it.
      *
@@ -166,40 +208,17 @@ final class SpecDiff
      */
     private static function endpoint(Endpoint $before, Endpoint $after): array
     {
-        $subject = self::subject($after);
         $changes = [];
 
         if ($before->uri !== $after->uri || $before->method !== $after->method) {
             $changes[] = Change::breaking(
                 'endpoint.moved',
-                $subject,
+                self::subject($after),
                 'moved from `'.$before->method->value.' '.$before->path().'`',
             );
         }
 
-        if (! $before->authenticated && $after->authenticated) {
-            $changes[] = Change::breaking('endpoint.authenticated', $subject, 'now requires authentication');
-        }
-
-        if ($before->authenticated && ! $after->authenticated) {
-            $changes[] = Change::notice(
-                'endpoint.public',
-                $subject,
-                'no longer requires authentication - it is now open to anyone who finds it',
-            );
-        }
-
-        $changes = [...$changes, ...self::scopes($before, $after, $subject)];
-
-        if (! $before->deprecated && $after->deprecated) {
-            $changes[] = Change::notice('endpoint.deprecated', $subject, 'is now deprecated');
-        }
-
-        return [
-            ...$changes,
-            ...self::parameters($before, $after, $subject),
-            ...self::responses($before, $after, $subject),
-        ];
+        return [...$changes, ...self::operation($before, $after)];
     }
 
     /**

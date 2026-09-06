@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lusen\Pages;
 
+use Lusen\Diff\Severity;
+use Lusen\Diff\VersionDiff;
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\ApiVersion;
 use Lusen\Ir\Endpoint;
@@ -285,7 +287,54 @@ final class DefaultPages
             $lines[] = '';
         }
 
-        return $lines;
+        return [...$lines, ...self::versionChanges($spec, $previous->name, $current->name, $now)];
+    }
+
+    /**
+     * What changed inside the operations both versions expose.
+     *
+     * The list above says which operations `v2` added and which `v1` had that
+     * it dropped, and used to stop there - leaving the reader with "the other
+     * eight exist in both versions" and no way to find out whether their
+     * request still works. Both editions are in the spec, so this is derived
+     * rather than written, and an operation that changed in no way at all is
+     * left out: a migration list naming forty untouched endpoints buries the
+     * three worth reading.
+     *
+     * Breaking first within each operation, because between two versions that
+     * grade is exactly the work migrating costs.
+     *
+     * @param  array<string, Endpoint>  $current  the newer version's operations, in page order
+     * @return list<string>
+     */
+    private static function versionChanges(ApiSpec $spec, string $older, string $newer, array $current): array
+    {
+        $changed = VersionDiff::between($spec, $older, $newer);
+
+        if ($changed === []) {
+            return [];
+        }
+
+        $lines = ['What changed in the operations both versions have:', ''];
+
+        foreach ($current as $key => $endpoint) {
+            if (! isset($changed[$key])) {
+                continue;
+            }
+
+            $lines[] = "- `{$endpoint->method->value} {$endpoint->path()}`"
+                .($endpoint->summary === null ? '' : " — {$endpoint->summary}");
+
+            foreach (Severity::cases() as $severity) {
+                foreach ($changed[$key] as $change) {
+                    if ($change->severity === $severity) {
+                        $lines[] = "  - {$change->detail}";
+                    }
+                }
+            }
+        }
+
+        return [...$lines, ''];
     }
 
     /**

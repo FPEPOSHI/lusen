@@ -10,6 +10,10 @@ use Lusen\Emit\OpenApiEmitter;
 use Lusen\Emit\PostmanEmitter;
 use Lusen\Emit\SearchIndexEmitter;
 use Lusen\Ir\ApiSpec;
+use Lusen\Ir\Enums\ParameterLocation;
+use Lusen\Ir\Group;
+use Lusen\Ir\Parameter;
+use Lusen\Ir\Schema;
 use Lusen\Pages\DefaultPages;
 use Lusen\Support\Links;
 
@@ -182,4 +186,35 @@ it('writes no versioning page for an api with one version', function (): void {
     $ids = array_map(fn ($page): string => $page->id, DefaultPages::fill(fixtureSpec(), []));
 
     expect($ids)->not->toContain('versioning');
+});
+
+it('says what changed inside an operation both versions expose', function (): void {
+    $spec = versionedFixtureSpec();
+
+    // Give v2's edition of the shared operation something v1's does not have.
+    $groups = array_map(function ($group) {
+        if ($group->version !== 'v2') {
+            return $group;
+        }
+
+        return new Group('Users', [$group->endpoints[0]->with(parameters: [
+            new Parameter('q', ParameterLocation::Query, Schema::string()),
+        ])], version: 'v2');
+    }, $spec->groups);
+
+    $pages = DefaultPages::fill($spec->withGroups($groups), []);
+    $versioning = array_values(array_filter($pages, fn ($page): bool => $page->id === 'versioning'))[0];
+
+    expect($versioning->markdown)->toContain('What changed in the operations both versions have:')
+        ->toContain('- `GET /api/v2/users` — List users')
+        ->toContain('  - accepts a new optional query parameter `q`');
+});
+
+it('says nothing about changes when both editions are identical', function (): void {
+    // The fixture's two editions of the shared operation are the same, and a
+    // migration list of untouched endpoints buries the ones that moved.
+    $pages = DefaultPages::fill(versionedFixtureSpec(), []);
+    $versioning = array_values(array_filter($pages, fn ($page): bool => $page->id === 'versioning'))[0];
+
+    expect($versioning->markdown)->not->toContain('What changed in the operations');
 });

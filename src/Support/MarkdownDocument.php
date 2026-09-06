@@ -46,6 +46,29 @@ final class MarkdownDocument
     }
 
     /**
+     * One line of Markdown, without the paragraph it would otherwise sit in.
+     *
+     * Change details name parameters and fields in backticks, and printing
+     * them raw would put a stray backtick on the page beside a `code` span
+     * three lines above it. Rendered through the same converter as everything
+     * else, so a field name containing a `<` is escaped by the thing that
+     * already knows how, rather than by a second rule here that would drift.
+     */
+    public static function inline(string $markdown): string
+    {
+        $html = trim(self::render($markdown)->html);
+
+        // A single paragraph is the shape a one-line render always has; only
+        // that wrapper comes off, so anything unexpected is left intact
+        // rather than half-unwrapped.
+        if (str_starts_with($html, '<p>') && str_ends_with($html, '</p>') && substr_count($html, '<p>') === 1) {
+            return substr($html, 3, -4);
+        }
+
+        return $html;
+    }
+
+    /**
      * Headings worth putting in an on-page table of contents. h1 is the page
      * title and h4 or deeper is noise in a sidebar.
      *

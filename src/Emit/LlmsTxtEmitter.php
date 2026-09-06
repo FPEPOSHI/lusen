@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lusen\Emit;
 
+use Lusen\Diff\VersionDiff;
 use Lusen\Emit\Contracts\Emitter;
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Endpoint;
@@ -181,6 +182,8 @@ final class LlmsTxtEmitter implements Emitter
                 3,
                 successor: $successor,
                 successorUrl: $successor === null ? null : $this->links->markdown($successor),
+                changes: VersionDiff::forEndpoint($spec, $endpoint),
+                changedFrom: VersionDiff::previousVersion($spec, $endpoint->version),
             )];
         }
 

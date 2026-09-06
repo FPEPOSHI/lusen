@@ -91,6 +91,31 @@
             : 'No authentication required.' }}
     </p>
 
+    {{-- What a reader arriving from the previous version has to change.
+         Above the parameter table rather than below it: somebody migrating
+         is about to read that table, and the useful thing is knowing which
+         rows are new before they compare forty of them by eye. Derived from
+         the two editions in the spec, so it cannot drift from either. --}}
+    @php($sinceLast = \Lusen\Diff\VersionDiff::forEndpoint($spec, $endpoint))
+
+    @if ($sinceLast !== [])
+        <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800/50">
+            <p class="font-medium text-slate-900 dark:text-white">
+                Changed since <code class="font-mono">{{ \Lusen\Diff\VersionDiff::previousVersion($spec, $endpoint->version) }}</code>
+            </p>
+
+            <ul class="mt-1 space-y-1 text-slate-600 dark:text-slate-400">
+                @foreach (\Lusen\Diff\Severity::cases() as $grade)
+                    @foreach ($sinceLast as $sinceChange)
+                        @if ($sinceChange->severity === $grade)
+                            <li>{!! \Lusen\Support\MarkdownDocument::inline($sinceChange->detail) !!}</li>
+                        @endif
+                    @endforeach
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="xl:grid xl:grid-cols-[minmax(0,1fr)_30rem] xl:items-start xl:gap-8">
 
         {{-- What the endpoint takes and what it answers with. --}}

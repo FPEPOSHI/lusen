@@ -599,6 +599,19 @@
 <li><code>GET /api/v1/products/search</code> — Search products</li>
 </ul>
 <p>The other 8 operations exist in both versions at the same path. Each one's page links to its newer edition.</p>
+<p>What changed in the operations both versions have:</p>
+<ul>
+<li><code>GET /api/v2/customers</code> — List customers
+<ul>
+<li>accepts a new optional query parameter <code>q</code></li>
+</ul>
+</li>
+<li><code>POST /api/v2/orders</code> — Create an order
+<ul>
+<li>requires a new header parameter <code>Idempotency-Key</code></li>
+</ul>
+</li>
+</ul>
 </div>
 
             

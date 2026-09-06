@@ -138,6 +138,13 @@ In `v1` but not in `v2`:
 
 The other 8 operations exist in both versions at the same path. Each one's page links to its newer edition.
 
+What changed in the operations both versions have:
+
+- `GET /api/v2/customers` — List customers
+  - accepts a new optional query parameter `q`
+- `POST /api/v2/orders` — Create an order
+  - requires a new header parameter `Idempotency-Key`
+
 
 ### Authentication
 
@@ -351,6 +358,10 @@ Create and manage the people who place orders.
 List customers
 
 Returns a paginated list of customers, newest first. Use `status` to narrow the list, and `q` to search across name and email.
+
+Changed since `v1`:
+
+- accepts a new optional query parameter `q`
 
 Full URL: `https://api.acme.example/api/v2/customers`
 
@@ -678,6 +689,10 @@ curl -X GET 'https://api.acme.example/api/v2/orders' \
 Create an order
 
 Creates an order in `pending` state. Send the `Idempotency-Key` header so a retried request cannot double-charge.
+
+Changed since `v1`:
+
+- requires a new header parameter `Idempotency-Key`
 
 Full URL: `https://api.acme.example/api/v2/orders`
 

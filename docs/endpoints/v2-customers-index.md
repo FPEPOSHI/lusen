@@ -17,6 +17,10 @@ Part of the [Acme Commerce API](/lusen/index.html) documentation.
 
 Returns a paginated list of customers, newest first. Use `status` to narrow the list, and `q` to search across name and email.
 
+Changed since `v1`:
+
+- accepts a new optional query parameter `q`
+
 Full URL: `https://api.acme.example/api/v2/customers`
 
 API version: `v2`.

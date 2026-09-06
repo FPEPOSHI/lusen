@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lusen\Emit;
 
+use Lusen\Diff\Change;
+use Lusen\Diff\Severity;
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\ApiVersion;
 use Lusen\Ir\Endpoint;
@@ -37,6 +39,8 @@ final class Markdown
      *
      * @param  Endpoint|null  $successor  the newer edition of this operation
      * @param  string|null  $successorUrl  where that edition is documented
+     * @param  list<Change>  $changes  what changed since the previous version
+     * @param  string|null  $changedFrom  the version those changes are measured from
      * @return list<string>
      */
     public static function endpoint(
@@ -46,6 +50,8 @@ final class Markdown
         bool $includeSummary = true,
         ?Endpoint $successor = null,
         ?string $successorUrl = null,
+        array $changes = [],
+        ?string $changedFrom = null,
     ): array {
         $h = str_repeat('#', $level);
 
@@ -67,6 +73,7 @@ final class Markdown
         }
 
         $lines = [...$lines, ...self::supersession($successor, $successorUrl)];
+        $lines = [...$lines, ...self::changes($changes, $changedFrom)];
 
         // Repeated on every endpoint on purpose: a retrieved fragment must
         // not send the reader looking for an "authentication" section.
@@ -215,6 +222,39 @@ final class Markdown
         }
 
         return $lines;
+    }
+
+    /**
+     * What changed since the previous version of this operation.
+     *
+     * Passed in rather than derived here for the same reason the successor
+     * is: these blocks see one endpoint and never the spec around it. It
+     * earns a place beside the supersession line because the two answer
+     * halves of one question - a reader on `v1` is told `v2` exists, and a
+     * reader on `v2` is told what moved to get there.
+     *
+     * Breaking first: between two versions that grade is the migration.
+     *
+     * @param  list<Change>  $changes
+     * @return list<string>
+     */
+    private static function changes(array $changes, ?string $from): array
+    {
+        if ($changes === [] || $from === null) {
+            return [];
+        }
+
+        $lines = ["Changed since `{$from}`:", ''];
+
+        foreach (Severity::cases() as $severity) {
+            foreach ($changes as $change) {
+                if ($change->severity === $severity) {
+                    $lines[] = "- {$change->detail}";
+                }
+            }
+        }
+
+        return [...$lines, ''];
     }
 
     private static function versionStatus(ApiVersion $version): string

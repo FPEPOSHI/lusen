@@ -17,6 +17,10 @@ Part of the [Acme Commerce API](/lusen/index.html) documentation.
 
 Creates an order in `pending` state. Send the `Idempotency-Key` header so a retried request cannot double-charge.
 
+Changed since `v1`:
+
+- requires a new header parameter `Idempotency-Key`
+
 Full URL: `https://api.acme.example/api/v2/orders`
 
 API version: `v2`.
