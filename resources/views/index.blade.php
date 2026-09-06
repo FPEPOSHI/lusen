@@ -67,6 +67,25 @@
             </div>
         </dl>
 
+        @php($askLinks = \Lusen\Support\AskAi::links(
+            config('lusen.ui.ask_ai'),
+            $links->canonical(ltrim($links->llmsFull(), '/')),
+            'every endpoint',
+            $spec->title,
+        ))
+
+        @if ($askLinks)
+            {{-- Pointed at llms-full.txt rather than a page: someone asking
+                 about the API as a whole wants the model to have the whole
+                 thing, and that file exists so it can. --}}
+            <p class="mt-4 flex flex-wrap gap-x-4 text-sm">
+                @foreach ($askLinks as $askLabel => $askHref)
+                    <a href="{{ $askHref }}" target="_blank" rel="noopener noreferrer"
+                       class="text-indigo-600 underline dark:text-indigo-400">Ask {{ $askLabel }} about this API</a>
+                @endforeach
+            </p>
+        @endif
+
         <p class="mt-4 text-sm text-slate-600 dark:text-slate-400">
             @if ($links->isStatic())
                 {{-- Static files cannot content-negotiate, so the claim would

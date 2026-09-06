@@ -449,3 +449,42 @@ it('asks for nothing on an api with no authenticated endpoint', function (): voi
 
     expect($spec->page('authentication'))->toBeNull();
 });
+
+it('offers to hand a page to an assistant, with the question written', function (): void {
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    expect($html)->toContain('Ask ChatGPT')
+        ->toContain('Ask Claude')
+        // The prompt names the Markdown twin at its absolute address, because
+        // that is the file a model can actually fetch.
+        ->toContain(rawurlencode('https://example.com/docs/endpoints/users-index.md'));
+});
+
+it('points an assistant at the whole corpus from the index', function (): void {
+    expect(staticEmitter()->index(staticSpec()))
+        ->toContain('Ask ChatGPT about this API')
+        ->toContain(rawurlencode('https://example.com/docs/llms-full.txt'));
+});
+
+it('says nothing about assistants when the docs have no absolute address', function (): void {
+    // Without a canonical origin the prompt could only name a relative path,
+    // which is no use to something that has to fetch it.
+    $emitter = new HtmlEmitter(app(Renderer::class), new Links('/docs', static: true));
+
+    expect($emitter->endpoint(staticSpec()->endpoint('users.index'), staticSpec()))->not->toContain('Ask ChatGPT');
+});
+
+it('lets a site choose its own assistants and its own question', function (): void {
+    config()->set('lusen.ui.ask_ai', [
+        'providers' => ['Perplexity' => 'https://www.perplexity.ai/search?q={prompt}'],
+        'prompt' => 'Summarise {url} for me.',
+    ]);
+
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    expect($html)->toContain('Ask Perplexity')
+        ->toContain('perplexity.ai/search?q='.rawurlencode('Summarise https://example.com/docs/endpoints/users-index.md for me.'))
+        ->and($html)->not->toContain('Ask ChatGPT');
+});

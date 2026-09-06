@@ -66,6 +66,7 @@ than scraped HTML:
 | `/docs/postman.json` | A Postman collection, for poking the API before writing code |
 | `Accept: text/markdown` | Any docs URL returns Markdown instead of HTML (runtime mode) |
 | **Copy for an LLM** | A button on every page that copies its Markdown, not its HTML |
+| **Ask ChatGPT / Ask Claude** | A link that hands the page's Markdown to an assistant, question included |
 
 Two rules make those surfaces actually usable:
 
@@ -305,7 +306,9 @@ experience is a feature rather than a skin:
 - **A base URL switcher** when `servers` lists more than one, rewriting the
   host in every example so what gets copied is what was chosen.
 - **Copy for an LLM**, handing over the page's Markdown rather than its
-  markup.
+  markup — or **Ask ChatGPT / Ask Claude**, which sends them the same file with
+  the question already written. Which assistants, and what they are asked, is
+  yours to set.
 - **`ui.edit_url`** puts an *Edit this page* link on everything you wrote —
   the cheapest thing there is for keeping prose honest.
 

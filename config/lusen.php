@@ -8,6 +8,7 @@ use Lusen\Extract\ExternalAttributeExtractor;
 use Lusen\Extract\FormRequestExtractor;
 use Lusen\Extract\ResourceExtractor;
 use Lusen\Extract\RouteExtractor;
+use Lusen\Support\AskAi;
 
 return [
 
@@ -375,6 +376,34 @@ return [
          | Supported: curl, javascript.
          */
         'snippets' => ['curl', 'javascript'],
+
+        /*
+         | Buttons that hand a page to an assistant with the question already
+         | asked. The link carries the address of the page's Markdown twin, so
+         | the model reads the source rather than the rendered page.
+         |
+         | Both halves are yours. Providers change their deep-link shape
+         | without warning, and you should not have to wait for a release of
+         | this package to fix a button or to add one nobody here has heard of.
+         | `providers` is label => URL template; {prompt} is replaced with the
+         | URL-encoded question. An empty list turns the buttons off.
+         |
+         | Nothing renders unless `seo.canonical_origin` (or an absolute
+         | `output.url`) gives the page an address a model can actually fetch -
+         | a prompt pointing at /docs/endpoints/x.md helps nobody.
+         */
+        'ask_ai' => [
+            'providers' => [
+                'ChatGPT' => 'https://chatgpt.com/?q={prompt}',
+                'Claude' => 'https://claude.ai/new?q={prompt}',
+            ],
+
+            /*
+             | {url} is the page's Markdown, {subject} what it documents, and
+             | {title} your API's name.
+             */
+            'prompt' => AskAi::DEFAULT_PROMPT,
+        ],
     ],
 
     /*

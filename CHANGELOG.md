@@ -84,6 +84,20 @@ knows how to read.
   404 and a 422 used to put two bodies nobody asked for between the reader and
   the one they wanted.
 
+- **Ask an assistant, with the question already written.** Every page offers
+  *Ask ChatGPT* and *Ask Claude*; the index points them at `llms-full.txt`, so
+  a question about the API as a whole starts with the whole API. The link
+  carries a prompt naming the page's Markdown twin rather than the rendered
+  page, because that is the file a model can read without paying for markup.
+
+  Which assistants, and what they are asked, is configuration.
+  `ui.ask_ai.providers` is label => URL template with `{prompt}` in it, so a
+  provider changing its deep-link shape or a site preferring one nobody here
+  has heard of is a config edit rather than a release; `ui.ask_ai.prompt`
+  takes `{url}`, `{subject}` and `{title}`. An empty provider list turns the
+  buttons off. Nothing renders at all without `seo.canonical_origin`: the
+  prompt asks a model to fetch an address, and a relative path is not one.
+
 ### Fixed
 
 - The JavaScript request example was never highlighted. `Highlighter` knew

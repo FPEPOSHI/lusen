@@ -658,6 +658,32 @@ copied example, and a *Forget* button clears it.
 `#[ApiDoc(tryIt: false)]` withholds the form from one operation. It can only
 ever remove: an endpoint cannot opt into a playground the site has turned off.
 
+### Handing a page to an assistant
+
+```php
+'ui' => [
+    'ask_ai' => [
+        'providers' => [
+            'ChatGPT' => 'https://chatgpt.com/?q={prompt}',
+            'Claude'  => 'https://claude.ai/new?q={prompt}',
+        ],
+        'prompt' => 'Read {url} — the documentation for {subject} in the {title}. …',
+    ],
+],
+```
+
+Every page gets an *Ask …* link per provider; the index points at
+`llms-full.txt` instead of a single page. `{prompt}` is the URL-encoded
+question, and the question itself takes `{url}` (the page's Markdown),
+`{subject}` (the endpoint or page) and `{title}` (your API).
+
+Both halves are configuration on purpose — a provider that changes its
+deep-link shape, or one you prefer, should not need a release of this package.
+An empty `providers` list removes the buttons.
+
+The links only appear when `seo.canonical_origin` is set. Without it the prompt
+could only name a relative path, and a model cannot fetch one.
+
 `edit_url` puts an *Edit this page* link beside every page somebody wrote.
 `{path}` is replaced with the file's path relative to your project root, so
 `resources/docs/guides/webhooks.md` lands on the right file in your code host.

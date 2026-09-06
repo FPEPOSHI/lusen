@@ -43,6 +43,11 @@
                 class="underline hover:text-slate-900 dark:hover:text-white">
             Copy for an LLM
         </button>
+
+        @include('lusen::partials.ask-ai', [
+            'askUrl' => $links->canonical(ltrim($markdownHref, '/')),
+            'askSubject' => $endpoint->method->value.' '.$endpoint->path(),
+        ])
     </p>
 
 @endsection

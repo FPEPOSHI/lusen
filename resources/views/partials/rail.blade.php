@@ -40,6 +40,22 @@
                         OpenAPI
                     </a>
                 </li>
+                @php($askLinks = \Lusen\Support\AskAi::links(
+                    config('lusen.ui.ask_ai'),
+                    $links->canonical(ltrim($markdownHref, '/')),
+                    ($page ?? null)?->title ?? '',
+                    $spec->title,
+                ))
+
+                @foreach ($askLinks as $askLabel => $askHref)
+                    <li>
+                        <a href="{{ $askHref }}" target="_blank" rel="noopener noreferrer"
+                           class="block py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                            Ask {{ $askLabel }}
+                        </a>
+                    </li>
+                @endforeach
+
                 @if ($editHref)
                     {{-- Only ever shown for a page somebody wrote: a derived
                          page has no file behind it to open. --}}
