@@ -20,6 +20,7 @@ use Lusen\Console\McpCommand;
 use Lusen\Emit\BladeRenderer;
 use Lusen\Emit\Contracts\Renderer;
 use Lusen\Emit\EmitterRegistry;
+use Lusen\Extract\AttributeExtractor;
 use Lusen\Extract\Contracts\Extractor;
 use Lusen\Extract\ExternalAttributeExtractor;
 use Lusen\Extract\ExtractionPipeline;
@@ -159,7 +160,48 @@ final class LusenServiceProvider extends ServiceProvider
             }
         }
 
-        return $extractors;
+        return $this->withExternalAttributes($extractors);
+    }
+
+    /**
+     * Puts the foreign-attribute reader back if the configured list is missing
+     * it.
+     *
+     * A published `extractors` array is a snapshot of the pipeline as it was
+     * the day somebody ran `vendor:publish`, and Laravel merges it over ours
+     * whole. Every extractor added since is absent from it, which for this one
+     * means an application arriving from another tool quietly gets none of its
+     * existing annotations - a support question, not an error. `read_external`
+     * is the switch for anyone who genuinely wants them ignored.
+     *
+     * Inserted before AttributeExtractor, never after: Lusen's own attributes
+     * are the last word, and that ordering is an invariant.
+     *
+     * @param  list<Extractor>  $extractors
+     * @return list<Extractor>
+     */
+    private function withExternalAttributes(array $extractors): array
+    {
+        if (! $this->readsExternalAttributes()) {
+            return $extractors;
+        }
+
+        foreach ($extractors as $extractor) {
+            if ($extractor instanceof ExternalAttributeExtractor) {
+                return $extractors;
+            }
+        }
+
+        $external = $this->app->make(ExternalAttributeExtractor::class);
+        $last = end($extractors);
+
+        if ($last instanceof AttributeExtractor) {
+            array_splice($extractors, count($extractors) - 1, 0, [$external]);
+
+            return $extractors;
+        }
+
+        return [...$extractors, $external];
     }
 
     /**
@@ -283,14 +325,38 @@ final class LusenServiceProvider extends ServiceProvider
      */
     private function externalAttributeNamespaces(): array
     {
-        $attributes = Data::map($this->section('lusen'), 'attributes');
-        $external = $attributes['external'] ?? [];
-
-        if (! is_array($external)) {
+        if (! $this->readsExternalAttributes()) {
             return [];
         }
 
-        return array_values(array_filter($external, static fn (mixed $v): bool => is_string($v) && $v !== ''));
+        $attributes = Data::map($this->section('lusen'), 'attributes');
+        $external = $attributes['external'] ?? [];
+
+        $configured = is_array($external)
+            ? array_filter($external, static fn (mixed $v): bool => is_string($v) && $v !== '')
+            : [];
+
+        // Built-ins first and config on top of them, never instead of them.
+        // Laravel merges a published config shallowly, so an application that
+        // set `external` to its own namespace - or published this file before
+        // Lusen knew Scramble - would otherwise lose every vendor Lusen ships
+        // support for, and the loss would look like the feature not working.
+        return array_values(array_unique([...ExternalAttributeExtractor::VENDORS, ...$configured]));
+    }
+
+    /**
+     * Whether foreign attributes are read at all.
+     *
+     * A missing key means yes. That is the whole point: the applications this
+     * matters most to are the ones with a `config/lusen.php` published before
+     * any of this existed, and a default of "off when unstated" would leave
+     * exactly them unsupported.
+     */
+    private function readsExternalAttributes(): bool
+    {
+        $attributes = Data::map($this->section('lusen'), 'attributes');
+
+        return ! isset($attributes['read_external']) || $attributes['read_external'] !== false;
     }
 
     private function cacheKey(): string

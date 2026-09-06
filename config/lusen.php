@@ -139,9 +139,11 @@ return [
         ResourceExtractor::class,
 
         /*
-         | Reads documentation attributes left by another tool, listed under
-         | `attributes.external` below. Harmless if there are none, and safe
-         | to remove if you would rather Lusen ignored them.
+         | Reads documentation attributes left by another tool - Scramble's,
+         | out of the box. Removing it from this list does not switch it off,
+         | because a published config that predates it would then silently
+         | drop support somebody upgraded for; `attributes.read_external`
+         | below is the switch.
          */
         ExternalAttributeExtractor::class,
 
@@ -153,10 +155,11 @@ return [
     | Attributes from another documentation tool
     |--------------------------------------------------------------------------
     |
-    | Namespaces whose attributes Lusen should read, so a codebase that has
-    | been documented once keeps what it wrote when it changes tools. Groups,
-    | responses and parameters are recognised by their short names within
-    | these namespaces.
+    | A codebase documented once should not have to be documented again to
+    | change tools, so Lusen reads the attributes another tool left behind.
+    | Scramble is supported out of the box and needs nothing here. Groups,
+    | responses and parameters are recognised by their short names within a
+    | known namespace.
     |
     | Nothing needs to be installed: the attributes are read by name without
     | being instantiated, so this keeps working after the package they came
@@ -165,9 +168,19 @@ return [
     */
 
     'attributes' => [
-        'external' => [
-            'Dedoc\\Scramble\\Attributes\\',
-        ],
+        /*
+         | Set false to ignore another tool's attributes entirely.
+         */
+        'read_external' => true,
+
+        /*
+         | Extra namespaces to read, added to the ones Lusen already knows -
+         | never instead of them, so listing your own here cannot switch
+         | Scramble support off by accident.
+         |
+         |     'external' => ['Acme\Docs\Attributes\'],
+         */
+        'external' => [],
     ],
 
     /*

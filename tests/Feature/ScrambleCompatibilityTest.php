@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Lusen\Extract\AttributeExtractor;
+use Lusen\Extract\ControllerExtractor;
+use Lusen\Extract\FormRequestExtractor;
+use Lusen\Extract\ResourceExtractor;
+use Lusen\Extract\RouteExtractor;
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Enums\ParameterLocation;
 use Lusen\Ir\Enums\SchemaType;
@@ -100,4 +105,56 @@ it('generates an example from the declared type when none is written', function 
     $example = scrambledSpec()->endpoint('clients.ours')?->responses[0]->examples[0] ?? null;
 
     expect($example?->value)->toHaveKey('ok')->toHaveKey('items');
+});
+
+it('reads scramble attributes with nothing configured at all', function (): void {
+    // The whole `attributes` section gone, as it is in an application that
+    // never published the config - and as it effectively is in one that
+    // published it before this support existed, since Laravel merges a
+    // published file over ours whole rather than key by key.
+    config()->set('lusen.attributes', null);
+
+    expect(scrambledSpec()->endpoint('clients.index')?->group)->toBe('Klienti');
+});
+
+it('cannot lose scramble because an app listed its own namespace', function (): void {
+    // The failure this is here to stop: `external` used to be the entire
+    // list, so adding one namespace to it removed every namespace Lusen
+    // ships. Config adds to the built-ins now, never replaces them.
+    config()->set('lusen.attributes.external', ['Acme\\Docs\\Attributes\\']);
+
+    expect(scrambledSpec()->endpoint('clients.index')?->group)->toBe('Klienti');
+});
+
+it('reads them even when a published extractor list has never heard of the reader', function (): void {
+    // A published `extractors` array is a snapshot of the pipeline the day
+    // somebody ran vendor:publish. This is that array from before the foreign
+    // attribute reader existed.
+    config()->set('lusen.extractors', [
+        RouteExtractor::class,
+        ControllerExtractor::class,
+        FormRequestExtractor::class,
+        ResourceExtractor::class,
+        AttributeExtractor::class,
+    ]);
+
+    expect(scrambledSpec()->endpoint('clients.index')?->group)->toBe('Klienti');
+});
+
+it('still lets Lusen own attributes win when the reader was put back', function (): void {
+    // Restoring it must not cost the ordering invariant: it goes in before
+    // AttributeExtractor, so an #[ApiDoc] still overrules a foreign group.
+    config()->set('lusen.extractors', [
+        RouteExtractor::class,
+        ControllerExtractor::class,
+        AttributeExtractor::class,
+    ]);
+
+    expect(scrambledSpec()->endpoint('clients.ours')?->group)->toBe('Lusen has the last word');
+});
+
+it('ignores them all when the application says so', function (): void {
+    config()->set('lusen.attributes.read_external', false);
+
+    expect(scrambledSpec()->endpoint('clients.index')?->group)->not->toBe('Klienti');
 });

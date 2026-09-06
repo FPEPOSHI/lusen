@@ -28,9 +28,13 @@ use Throwable;
  * often the richest thing an application has: responses by status, group names
  * in the team's own language, and parameters with descriptions and examples.
  *
- * Which namespaces to read is configuration, not something baked in here, so a
- * codebase can point this at whatever it used without waiting for Lusen to
- * learn the name. Matching on the full namespace rather than the short name is
+ * The namespaces of the tools Lusen already knows are built in, and
+ * configuration adds to that list rather than replacing it. Making the whole
+ * list configuration was the earlier design and it put the burden in the wrong
+ * place: somebody arriving from Scramble had to read the config reference to
+ * discover that their existing annotations would be honoured, and anybody who
+ * had published `config/lusen.php` before this class existed silently got none
+ * of it. Matching on the full namespace rather than the short name stays
  * deliberate: an unrelated `#[Response]` would otherwise be silently
  * misdocumented.
  *
@@ -44,6 +48,18 @@ use Throwable;
  */
 final readonly class ExternalAttributeExtractor implements Extractor
 {
+    /**
+     * Tools whose attributes Lusen reads without being asked.
+     *
+     * Only what is actually exercised by the suite belongs here. Scramble's
+     * `Group`, `Response`, `QueryParameter` and `PathParameter` are covered by
+     * ScrambleCompatibilityTest; listing a vendor whose attributes nobody has
+     * tested against would be a promise the extractor cannot keep.
+     */
+    public const VENDORS = [
+        'Dedoc\\Scramble\\Attributes\\',
+    ];
+
     /**
      * @param  list<string>  $namespaces  attribute namespaces to read, each ending in a separator
      */
