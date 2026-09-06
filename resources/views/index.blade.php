@@ -81,7 +81,7 @@
             <p class="mt-4 flex flex-wrap gap-x-4 text-sm">
                 @foreach ($askLinks as $askLabel => $askHref)
                     <a href="{{ $askHref }}" target="_blank" rel="noopener noreferrer"
-                       class="text-indigo-600 underline dark:text-indigo-400">Ask {{ $askLabel }} about this API</a>
+                       class="inline-flex items-center gap-1.5 text-indigo-600 underline dark:text-indigo-400">@include('lusen::partials.icon', ['name' => 'ask'])Ask {{ $askLabel }} about this API</a>
                 @endforeach
             </p>
         @endif

@@ -23,7 +23,8 @@
                  opening sentence down for no reason. --}}
             <ul class="mt-3 flex flex-wrap gap-x-5 text-sm xl:block xl:space-y-1">
                 <li>
-                    <a href="{{ $markdownHref }}" class="block py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                    <a href="{{ $markdownHref }}" class="flex items-center gap-2 py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                        @include('lusen::partials.icon', ['name' => 'markdown'])
                         Markdown
                     </a>
                 </li>
@@ -31,12 +32,14 @@
                     {{-- Copies the Markdown twin rather than the rendered page:
                          hidden until the script can actually do it. --}}
                     <button type="button" data-lusen-copy-page="{{ $markdownHref }}" hidden
-                            class="block py-1 text-left text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                            class="flex items-center gap-2 py-1 text-left text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                        @include('lusen::partials.icon', ['name' => 'copy'])
                         Copy for an LLM
                     </button>
                 </li>
                 <li>
-                    <a href="{{ $links->openapi() }}" class="block py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                    <a href="{{ $links->openapi() }}" class="flex items-center gap-2 py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                        @include('lusen::partials.icon', ['name' => 'openapi'])
                         OpenAPI
                     </a>
                 </li>
@@ -50,7 +53,8 @@
                 @foreach ($askLinks as $askLabel => $askHref)
                     <li>
                         <a href="{{ $askHref }}" target="_blank" rel="noopener noreferrer"
-                           class="block py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                           class="flex items-center gap-2 py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                            @include('lusen::partials.icon', ['name' => 'ask'])
                             Ask {{ $askLabel }}
                         </a>
                     </li>
@@ -60,7 +64,8 @@
                     {{-- Only ever shown for a page somebody wrote: a derived
                          page has no file behind it to open. --}}
                     <li>
-                        <a href="{{ $editHref }}" class="block py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                        <a href="{{ $editHref }}" class="flex items-center gap-2 py-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                            @include('lusen::partials.icon', ['name' => 'edit'])
                             Edit this page
                         </a>
                     </li>

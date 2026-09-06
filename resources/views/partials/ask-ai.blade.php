@@ -9,7 +9,8 @@
 
 @foreach ($askLinks as $askLabel => $askHref)
     <a href="{{ $askHref }}" target="_blank" rel="noopener noreferrer"
-       class="{{ $askClass ?? 'underline hover:text-slate-900 dark:hover:text-white' }}">
+       class="{{ $askClass ?? 'inline-flex items-center gap-1.5 underline hover:text-slate-900 dark:hover:text-white' }}">
+        @include('lusen::partials.icon', ['name' => 'ask'])
         Ask {{ $askLabel }}
     </a>
 @endforeach
