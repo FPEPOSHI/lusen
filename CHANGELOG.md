@@ -2,6 +2,39 @@
 
 All notable changes to this project are documented here.
 
+## Unreleased
+
+### Added
+
+- **`php artisan lusen:diff`.** Compares this build against a recorded baseline
+  and reports what changed — and which of it breaks a client. The docs already
+  hold every parameter, every response field and every validation rule, which
+  makes them the one artefact in a repository that can answer that question
+  before a consumer does. Record a baseline with `--save`, commit it, run
+  `--strict` on pull requests.
+
+  Changes come back graded. **Breaking** is a removed endpoint or response
+  field, a new required parameter, a changed type, a tightened bound, a newly
+  required scope, or an operation id that moved — an id change is reported as
+  a rename rather than as a removal beside an unrelated addition, because the
+  thing that broke is the anchor and the `operationId`, not the request.
+  **Added** is new surface. **Notice** is everything that cannot break a
+  working client.
+
+  The grading is the feature. A field the extractors could not type before and
+  can type now is a better docs build, not an API change, so any transition to
+  or from `any` is a Notice — without that, adding a cast to a model would
+  fail CI on endpoints nobody touched. Losing a documented error status is
+  docs drift; losing a documented success status is a contract change. An
+  endpoint that stops requiring authentication breaks no client and cannot
+  fail a build, but it is the last change that should go out unnoticed, so it
+  is reported in those words.
+
+  The baseline is the IR itself, pretty-printed, so it reads as a diff in a
+  pull request. `sourceFiles` is stripped: those are absolute paths kept for
+  the incremental cache, and in a committed file they are one developer's home
+  directory and a spurious diff on every other machine.
+
 ## 0.5.0 — 2026-09-05
 
 Sending the request, and the two-column reference every developer already

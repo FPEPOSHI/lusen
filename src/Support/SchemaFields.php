@@ -30,6 +30,32 @@ final class SchemaFields
      */
     public static function flatten(Schema $schema, string $prefix = '', int $depth = 0): array
     {
+        $rows = [];
+
+        foreach (self::paths($schema, $prefix, $depth) as $path => $field) {
+            $rows[] = [
+                'name' => $path,
+                'type' => $field['schema']->label(),
+                'required' => $field['required'],
+                'description' => $field['schema']->description ?? '',
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * The same walk, keyed by path and keeping the schema itself.
+     *
+     * A table only needs the rendered label. Anything comparing two builds of
+     * a response needs the schema behind it, so that `integer` becoming
+     * `string` can be told apart from a field whose type nobody knew before -
+     * one is a broken client, the other is a better docs build.
+     *
+     * @return array<string, array{schema: Schema, required: bool}>
+     */
+    public static function paths(Schema $schema, string $prefix = '', int $depth = 0): array
+    {
         if ($depth > self::MAX_DEPTH) {
             return [];
         }
@@ -37,25 +63,23 @@ final class SchemaFields
         // A top-level array unwraps to its element shape, since the caller
         // already knows it is a list.
         if ($schema->type === SchemaType::Array && $schema->items !== null && $prefix === '') {
-            return self::flatten($schema->items, '[]', $depth);
+            return self::paths($schema->items, '[]', $depth);
         }
 
-        $rows = [];
+        $paths = [];
 
         foreach ($schema->properties as $name => $property) {
             $path = $prefix === '' ? (string) $name : $prefix.'.'.$name;
 
-            $rows[] = [
-                'name' => $path,
-                'type' => $property->label(),
+            $paths[$path] = [
+                'schema' => $property,
                 'required' => in_array((string) $name, $schema->required, true),
-                'description' => $property->description ?? '',
             ];
 
-            $rows = [...$rows, ...self::children($property, $path, $depth)];
+            $paths = [...$paths, ...self::children($property, $path, $depth)];
         }
 
-        return $rows;
+        return $paths;
     }
 
     public static function hasFields(?Schema $schema): bool
@@ -64,16 +88,16 @@ final class SchemaFields
     }
 
     /**
-     * @return list<array{name: string, type: string, required: bool, description: string}>
+     * @return array<string, array{schema: Schema, required: bool}>
      */
     private static function children(Schema $schema, string $path, int $depth): array
     {
         if ($schema->type === SchemaType::Object && $schema->properties !== []) {
-            return self::flatten($schema, $path, $depth + 1);
+            return self::paths($schema, $path, $depth + 1);
         }
 
         if ($schema->type === SchemaType::Array && $schema->items !== null) {
-            return self::flatten($schema->items, $path.'[]', $depth + 1);
+            return self::paths($schema->items, $path.'[]', $depth + 1);
         }
 
         return [];

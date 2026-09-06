@@ -378,12 +378,42 @@ php artisan lusen:build --fresh              # ignore the incremental cache
 php artisan lusen:check                      # report endpoints missing documentation
 php artisan lusen:check --strict             # ...and fail CI when any are
 php artisan lusen:check --json               # the same findings, for a script
+php artisan lusen:diff --save                # record this build as the baseline
+php artisan lusen:diff                       # what changed since, and what of it breaks
+php artisan lusen:diff --strict              # ...and fail CI on the breaking ones
+php artisan lusen:diff --json                # the same changes, for a script
 ```
 
 Builds are incremental. An endpoint is re-analysed only when its route or one
 of the files behind it actually changed — comparing contents, not timestamps,
 so a fresh checkout or a CI runner still gets the benefit. Add `.lusen` to your
 `.gitignore`.
+
+## Does this branch break somebody's client?
+
+The docs already know every parameter, every response field and every
+validation rule, which makes them the one thing in the repository that can
+answer that before a customer does.
+
+```bash
+php artisan lusen:diff --save    # on main, once. Commit .lusen-baseline.json
+php artisan lusen:diff --strict  # on every pull request
+```
+
+Changes come back in three grades, and only one of them fails a build:
+
+| | |
+| --- | --- |
+| **Breaking** | A removed endpoint or response field, a new required parameter, a type change, a tightened `max`, a newly required scope, an operation id that moved |
+| **Added** | New endpoints, optional parameters, extra enum members, relaxed rules |
+| **Notice** | Deprecations, reworded summaries, and a field the extractors have only now managed to type |
+
+That last row is the reason this is usable. Adding a cast to a model turns
+`any` into `integer` on every endpoint that returns the field, and a gate that
+went red for it would be switched off in a week — so a type arriving or
+departing is never counted as breaking. An endpoint that *stops* requiring
+authentication is the mirror image: it breaks nobody, so it cannot fail the
+build, but it is reported in the words it deserves.
 
 ## Contributing
 

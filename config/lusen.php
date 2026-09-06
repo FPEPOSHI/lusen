@@ -322,6 +322,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Contract diff
+    |--------------------------------------------------------------------------
+    |
+    | `php artisan lusen:diff` compares this build against a recorded
+    | baseline and reports what changed - and which of it breaks a client.
+    | Record one with `--save`, commit it, and run `--strict` in CI.
+    |
+    */
+
+    'diff' => [
+        /*
+         | Where the recorded baseline lives, relative to the project root.
+         | It is the spec itself, so it diffs readably in a pull request.
+         |
+         | Deliberately not inside `.lusen/`: that directory holds the build
+         | cache and is meant to be gitignored, and a baseline nobody commits
+         | compares every run against nothing.
+         */
+        'baseline' => '.lusen-baseline.json',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Docs UI
     |--------------------------------------------------------------------------
     */

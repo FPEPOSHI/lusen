@@ -15,6 +15,7 @@ use Lusen\Collect\PageCollector;
 use Lusen\Collect\RouteCollector;
 use Lusen\Console\BuildCommand;
 use Lusen\Console\CheckCommand;
+use Lusen\Console\DiffCommand;
 use Lusen\Console\McpCommand;
 use Lusen\Emit\BladeRenderer;
 use Lusen\Emit\Contracts\Renderer;
@@ -111,6 +112,7 @@ final class LusenServiceProvider extends ServiceProvider
             $this->commands([
                 BuildCommand::class,
                 CheckCommand::class,
+                DiffCommand::class,
                 McpCommand::class,
             ]);
 
