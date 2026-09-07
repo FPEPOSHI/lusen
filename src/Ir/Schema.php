@@ -20,6 +20,9 @@ final readonly class Schema
      * @param  array<string, Schema>  $properties
      * @param  list<string>  $required  names of required properties, for object schemas
      * @param  array<string, string|int|float|bool>  $constraints  min, max, minLength, maxLength, pattern
+     * @param  string|null  $title  the name this shape is known by - a resource's own,
+     *                              minus the `Resource` suffix. Emitters that can name a
+     *                              type use it; everything else ignores it.
      */
     public function __construct(
         public SchemaType $type = SchemaType::String,
@@ -32,6 +35,7 @@ final readonly class Schema
         public array $constraints = [],
         public mixed $example = null,
         public ?string $description = null,
+        public ?string $title = null,
     ) {}
 
     public static function string(?string $format = null): self
@@ -97,6 +101,7 @@ final readonly class Schema
             constraints: Data::scalarMap($data, 'constraints'),
             example: $data['example'] ?? null,
             description: Data::nullableString($data, 'description'),
+            title: Data::nullableString($data, 'title'),
         );
     }
 
@@ -113,6 +118,31 @@ final readonly class Schema
             constraints: $this->constraints,
             example: $example,
             description: $this->description,
+            title: $this->title,
+        );
+    }
+
+    /**
+     * Names this shape.
+     *
+     * Only a resource has a name worth carrying: it is what a generated
+     * client will call the type, so it comes from the class the shape was
+     * read out of rather than from anything an emitter invents.
+     */
+    public function titled(?string $title): self
+    {
+        return new self(
+            type: $this->type,
+            format: $this->format,
+            nullable: $this->nullable,
+            enum: $this->enum,
+            items: $this->items,
+            properties: $this->properties,
+            required: $this->required,
+            constraints: $this->constraints,
+            example: $this->example,
+            description: $this->description,
+            title: $title,
         );
     }
 
@@ -129,6 +159,7 @@ final readonly class Schema
             constraints: $this->constraints,
             example: $this->example,
             description: $this->description,
+            title: $this->title,
         );
     }
 
@@ -153,6 +184,7 @@ final readonly class Schema
             constraints: $this->constraints,
             example: $this->example,
             description: $description,
+            title: $this->title,
         );
     }
 
@@ -211,6 +243,7 @@ final readonly class Schema
             'constraints' => $this->constraints ?: null,
             'example' => $this->example,
             'description' => $this->description,
+            'title' => $this->title,
         ], static fn (mixed $v): bool => $v !== null);
     }
 }

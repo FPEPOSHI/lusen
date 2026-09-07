@@ -46,6 +46,12 @@ final readonly class OpenApiEmitter implements Emitter
      */
     public function document(ApiSpec $spec): array
     {
+        // Built before the paths, because emitting one is what decides
+        // whether a shape is written out or referenced. Passed down rather
+        // than kept on the emitter, which is readonly and has to stay so:
+        // two documents from one instance must not see each other's names.
+        $components = SchemaComponents::of($spec);
+
         $document = [
             'openapi' => '3.1.0',
             'info' => array_filter([
@@ -55,13 +61,16 @@ final readonly class OpenApiEmitter implements Emitter
             ], static fn (mixed $v): bool => $v !== null),
             'servers' => $this->servers($spec),
             'tags' => $this->tags($spec),
-            'paths' => $this->paths($spec),
+            'paths' => $this->paths($spec, $components),
         ];
 
-        $schemes = $this->securitySchemes($spec);
+        $components = array_filter([
+            'schemas' => $this->namedSchemas($components),
+            'securitySchemes' => $this->securitySchemes($spec),
+        ], static fn (array $section): bool => $section !== []);
 
-        if ($schemes !== []) {
-            $document['components'] = ['securitySchemes' => $schemes];
+        if ($components !== []) {
+            $document['components'] = $components;
         }
 
         return $document;
@@ -105,14 +114,14 @@ final readonly class OpenApiEmitter implements Emitter
     /**
      * @return array<string, array<string, mixed>>
      */
-    private function paths(ApiSpec $spec): array
+    private function paths(ApiSpec $spec, SchemaComponents $components): array
     {
         $paths = [];
 
         foreach ($spec->groups as $group) {
             foreach ($group->endpoints as $endpoint) {
                 $path = $this->templatePath($endpoint);
-                $paths[$path][strtolower($endpoint->method->value)] = $this->operation($endpoint, $group);
+                $paths[$path][strtolower($endpoint->method->value)] = $this->operation($endpoint, $group, $components);
             }
         }
 
@@ -134,7 +143,7 @@ final readonly class OpenApiEmitter implements Emitter
     /**
      * @return array<string, mixed>
      */
-    private function operation(Endpoint $endpoint, Group $group): array
+    private function operation(Endpoint $endpoint, Group $group, SchemaComponents $components): array
     {
         $operation = array_filter([
             'operationId' => $endpoint->id,
@@ -142,9 +151,9 @@ final readonly class OpenApiEmitter implements Emitter
             'description' => $endpoint->description,
             'tags' => $endpoint->group === null ? null : [$group->displayName()],
             'deprecated' => $endpoint->deprecated ?: null,
-            'parameters' => $this->parameters($endpoint) ?: null,
-            'requestBody' => $this->requestBody($endpoint),
-            'responses' => $this->responses($endpoint),
+            'parameters' => $this->parameters($endpoint, $components) ?: null,
+            'requestBody' => $this->requestBody($endpoint, $components),
+            'responses' => $this->responses($endpoint, $components),
         ], static fn (mixed $v): bool => $v !== null);
 
         $scheme = $endpoint->securityScheme();
@@ -167,7 +176,7 @@ final readonly class OpenApiEmitter implements Emitter
     /**
      * @return list<array<string, mixed>>
      */
-    private function parameters(Endpoint $endpoint): array
+    private function parameters(Endpoint $endpoint, SchemaComponents $components): array
     {
         $parameters = [];
 
@@ -182,7 +191,7 @@ final readonly class OpenApiEmitter implements Emitter
                 'required' => $parameter->in === ParameterLocation::Path ? true : ($parameter->required ?: null),
                 'description' => $parameter->description,
                 'deprecated' => $parameter->deprecated ?: null,
-                'schema' => $this->schemaValue($parameter->schema),
+                'schema' => $this->schemaValue($parameter->schema, $components),
             ], static fn (mixed $v): bool => $v !== null);
         }
 
@@ -192,7 +201,7 @@ final readonly class OpenApiEmitter implements Emitter
     /**
      * @return array<string, mixed>|null
      */
-    private function requestBody(Endpoint $endpoint): ?array
+    private function requestBody(Endpoint $endpoint, SchemaComponents $components): ?array
     {
         $body = $endpoint->parametersIn(ParameterLocation::Body);
 
@@ -204,7 +213,7 @@ final readonly class OpenApiEmitter implements Emitter
         $required = [];
 
         foreach ($body as $parameter) {
-            $properties[$parameter->name] = $this->schemaValue($parameter->schema, $parameter->description);
+            $properties[$parameter->name] = $this->schemaValue($parameter->schema, $components, $parameter->description);
 
             if ($parameter->required) {
                 $required[] = $parameter->name;
@@ -234,7 +243,7 @@ final readonly class OpenApiEmitter implements Emitter
      *
      * @return array<int|string, array<string, mixed>>
      */
-    private function responses(Endpoint $endpoint): array
+    private function responses(Endpoint $endpoint, SchemaComponents $components): array
     {
         if ($endpoint->responses === []) {
             // A missing responses object is invalid OpenAPI. Emit the honest
@@ -245,7 +254,7 @@ final readonly class OpenApiEmitter implements Emitter
         $responses = [];
 
         foreach ($endpoint->responses as $response) {
-            $responses[(string) $response->status] = $this->response($response);
+            $responses[(string) $response->status] = $this->response($response, $components);
         }
 
         return $responses;
@@ -254,10 +263,10 @@ final readonly class OpenApiEmitter implements Emitter
     /**
      * @return array<string, mixed>
      */
-    private function response(Response $response): array
+    private function response(Response $response, SchemaComponents $components): array
     {
         $body = array_filter([
-            'schema' => $response->schema === null ? null : $this->schemaValue($response->schema),
+            'schema' => $response->schema === null ? null : $this->schemaValue($response->schema, $components),
             'examples' => $this->examples($response),
         ], static fn (mixed $v): bool => $v !== null);
 
@@ -270,7 +279,7 @@ final readonly class OpenApiEmitter implements Emitter
                         type: $header->type,
                         format: $header->format,
                         enum: $header->enum,
-                    )),
+                    ), $components),
                 ], static fn (mixed $v): bool => $v !== null),
                 $response->headers,
             ),
@@ -311,17 +320,46 @@ final readonly class OpenApiEmitter implements Emitter
      *
      * @return array<string, mixed>|stdClass
      */
-    private function schemaValue(Schema $schema, ?string $description = null): array|stdClass
+    private function schemaValue(Schema $schema, SchemaComponents $components, ?string $description = null): array|stdClass
     {
-        $output = $this->schema($schema, $description);
+        $name = $components->nameFor($schema);
+
+        if ($name !== null) {
+            // A description belonging to this use of the shape rather than to
+            // the shape itself sits beside the reference: 3.1 allows keywords
+            // alongside `$ref`, and putting it inside the definition would
+            // describe the type everywhere it is used.
+            return array_filter([
+                '$ref' => '#/components/schemas/'.$name,
+                'description' => $description,
+            ], static fn (mixed $v): bool => $v !== null);
+        }
+
+        $output = $this->schema($schema, $components, $description);
 
         return $output === [] ? new stdClass : $output;
     }
 
     /**
+     * The definitions themselves, written out in full.
+     *
+     * `schema()` rather than `schemaValue()` at the top level, or a definition
+     * would be a reference to itself.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function namedSchemas(SchemaComponents $components): array
+    {
+        return array_map(
+            fn (Schema $schema): array => $this->schema($schema, $components),
+            $components->all(),
+        );
+    }
+
+    /**
      * @return array<string, mixed>
      */
-    private function schema(Schema $schema, ?string $description = null): array
+    private function schema(Schema $schema, SchemaComponents $components, ?string $description = null): array
     {
         // An unknown type is expressed by omitting `type`, which is what JSON
         // Schema means by "any". Emitting a guess would be worse than silence.
@@ -340,12 +378,12 @@ final readonly class OpenApiEmitter implements Emitter
         ], static fn (mixed $v): bool => $v !== null);
 
         if ($schema->type === SchemaType::Array && $schema->items !== null) {
-            $output['items'] = $this->schemaValue($schema->items);
+            $output['items'] = $this->schemaValue($schema->items, $components);
         }
 
         if ($schema->type === SchemaType::Object && $schema->properties !== []) {
             $output['properties'] = array_map(
-                fn (Schema $s): array|stdClass => $this->schemaValue($s),
+                fn (Schema $s): array|stdClass => $this->schemaValue($s, $components),
                 $schema->properties,
             );
 

@@ -92,7 +92,9 @@ final class ResourceReader
         // Reserve the slot before recursing so a cyclic resource terminates.
         self::$cache[$key] = Schema::any();
 
-        return self::$cache[$key] = self::analyse($class, $depth);
+        $schema = self::analyse($class, $depth);
+
+        return self::$cache[$key] = $schema?->titled(self::title($class));
     }
 
     /**
@@ -122,6 +124,25 @@ final class ResourceReader
     public static function literalToSchema(Array_ $array): Schema
     {
         return self::arrayToSchema($array, 0, null);
+    }
+
+    /**
+     * What a generated client should call this shape.
+     *
+     * `CustomerResource` is a Laravel naming convention, not part of the API,
+     * so the type is `Customer`. Anything that does not follow the convention
+     * keeps its own short name rather than being renamed by guesswork.
+     */
+    private static function title(string $class): ?string
+    {
+        $position = strrpos($class, '\\');
+        $short = $position === false ? $class : substr($class, $position + 1);
+
+        if (str_ends_with($short, 'Resource') && $short !== 'Resource') {
+            $short = substr($short, 0, -strlen('Resource'));
+        }
+
+        return preg_match('/^[A-Za-z][A-Za-z0-9]*$/', $short) === 1 ? $short : null;
     }
 
     /**

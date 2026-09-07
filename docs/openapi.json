@@ -212,31 +212,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "email": {
-                                                        "type": "string",
-                                                        "format": "email"
-                                                    },
-                                                    "name": {
-                                                        "type": "string"
-                                                    },
-                                                    "status": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "active",
-                                                            "invited",
-                                                            "archived"
-                                                        ]
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    }
-                                                }
+                                                "$ref": "#/components/schemas/Customer"
                                             }
                                         }
                                     }
@@ -335,31 +311,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "email": {
-                                            "type": "string",
-                                            "format": "email"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "enum": [
-                                                "active",
-                                                "invited",
-                                                "archived"
-                                            ]
-                                        },
-                                        "created_at": {
-                                            "type": "string",
-                                            "format": "date-time"
-                                        }
-                                    }
+                                    "$ref": "#/components/schemas/Customer"
                                 },
                                 "examples": {
                                     "created": {
@@ -441,31 +393,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "email": {
-                                            "type": "string",
-                                            "format": "email"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "enum": [
-                                                "active",
-                                                "invited",
-                                                "archived"
-                                            ]
-                                        },
-                                        "created_at": {
-                                            "type": "string",
-                                            "format": "date-time"
-                                        }
-                                    }
+                                    "$ref": "#/components/schemas/Customer"
                                 }
                             }
                         }
@@ -935,31 +863,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "email": {
-                                                        "type": "string",
-                                                        "format": "email"
-                                                    },
-                                                    "name": {
-                                                        "type": "string"
-                                                    },
-                                                    "status": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "active",
-                                                            "invited",
-                                                            "archived"
-                                                        ]
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    }
-                                                }
+                                                "$ref": "#/components/schemas/Customer"
                                             }
                                         }
                                     }
@@ -1057,31 +961,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "email": {
-                                            "type": "string",
-                                            "format": "email"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "enum": [
-                                                "active",
-                                                "invited",
-                                                "archived"
-                                            ]
-                                        },
-                                        "created_at": {
-                                            "type": "string",
-                                            "format": "date-time"
-                                        }
-                                    }
+                                    "$ref": "#/components/schemas/Customer"
                                 },
                                 "examples": {
                                     "created": {
@@ -1162,31 +1042,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "email": {
-                                            "type": "string",
-                                            "format": "email"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "enum": [
-                                                "active",
-                                                "invited",
-                                                "archived"
-                                            ]
-                                        },
-                                        "created_at": {
-                                            "type": "string",
-                                            "format": "date-time"
-                                        }
-                                    }
+                                    "$ref": "#/components/schemas/Customer"
                                 }
                             }
                         }
@@ -1249,31 +1105,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "email": {
-                                            "type": "string",
-                                            "format": "email"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "enum": [
-                                                "active",
-                                                "invited",
-                                                "archived"
-                                            ]
-                                        },
-                                        "created_at": {
-                                            "type": "string",
-                                            "format": "date-time"
-                                        }
-                                    }
+                                    "$ref": "#/components/schemas/Customer"
                                 }
                             }
                         }
@@ -1537,58 +1369,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "customer_id": {
-                                                    "type": "integer"
-                                                },
-                                                "status": {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "pending",
-                                                        "paid",
-                                                        "shipped",
-                                                        "refunded"
-                                                    ]
-                                                },
-                                                "total": {
-                                                    "type": "integer"
-                                                },
-                                                "currency": {
-                                                    "type": "string"
-                                                },
-                                                "items": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "object",
-                                                        "properties": {
-                                                            "product_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "quantity": {
-                                                                "type": "integer"
-                                                            },
-                                                            "unit_price": {
-                                                                "type": "integer"
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                "placed_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "refunded_at": {
-                                                    "type": [
-                                                        "string",
-                                                        "null"
-                                                    ],
-                                                    "format": "date-time"
-                                                }
-                                            }
+                                            "$ref": "#/components/schemas/Order"
                                         }
                                     }
                                 }
@@ -1881,6 +1662,92 @@
         }
     },
     "components": {
+        "schemas": {
+            "Customer": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "invited",
+                            "archived"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "Order": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "customer_id": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "paid",
+                            "shipped",
+                            "refunded"
+                        ]
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "currency": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderLine"
+                        }
+                    },
+                    "placed_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "refunded_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                }
+            },
+            "OrderLine": {
+                "type": "object",
+                "properties": {
+                    "product_id": {
+                        "type": "integer"
+                    },
+                    "quantity": {
+                        "type": "integer"
+                    },
+                    "unit_price": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",

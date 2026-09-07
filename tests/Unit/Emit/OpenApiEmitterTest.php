@@ -10,6 +10,7 @@ use Lusen\Ir\Enums\ParameterLocation;
 use Lusen\Ir\Enums\SchemaType;
 use Lusen\Ir\Group;
 use Lusen\Ir\Parameter;
+use Lusen\Ir\Response;
 use Lusen\Ir\Schema;
 
 it('emits a single openapi.json', function (): void {
@@ -136,4 +137,42 @@ it('translates ir constraint names to json schema keywords', function (): void {
 it('produces byte-identical output for an unchanged spec', function (): void {
     expect((new OpenApiEmitter)->emit(fixtureSpec())[0]->contents)
         ->toBe((new OpenApiEmitter)->emit(fixtureSpec())[0]->contents);
+});
+
+it('defines a named shape once and references it everywhere', function (): void {
+    $customer = Schema::object([
+        'id' => Schema::integer(),
+        'email' => Schema::string('email'),
+    ])->titled('Customer');
+
+    $spec = new ApiSpec(title: 'Test API', groups: [
+        new Group('Customers', [
+            Endpoint::make(HttpMethod::Get, 'api/customers', 'index')
+                ->with(responses: [new Response(200, schema: Schema::object([
+                    'data' => Schema::arrayOf($customer),
+                ]))]),
+            Endpoint::make(HttpMethod::Get, 'api/customers/{id}', 'show')
+                ->with(responses: [new Response(200, schema: Schema::object([
+                    'data' => $customer,
+                ]))]),
+        ]),
+    ]);
+
+    $document = (new OpenApiEmitter)->document($spec);
+
+    // Without this a generated client emits one Customer type per endpoint
+    // and nothing tells it they are the same thing.
+    expect($document['components']['schemas'])->toHaveKey('Customer')
+        ->and($document['components']['schemas']['Customer']['properties'])->toHaveKeys(['id', 'email'])
+        ->and($document['paths']['/api/customers/{id}']['get']['responses']['200']['content']['application/json']['schema']['properties']['data'])
+        ->toBe(['$ref' => '#/components/schemas/Customer']);
+});
+
+it('leaves securitySchemes alone while adding schemas beside them', function (): void {
+    $document = (new OpenApiEmitter)->document(fixtureSpec());
+
+    // The fixture's shapes are unnamed, so there is nothing to hoist and the
+    // components block must not grow an empty `schemas` key.
+    expect($document['components'])->toHaveKey('securitySchemes')
+        ->and($document['components'])->not->toHaveKey('schemas');
 });

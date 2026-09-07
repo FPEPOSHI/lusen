@@ -10,6 +10,7 @@ use Lusen\Ir\Schema;
 use Lusen\SpecBuilder;
 use Lusen\Support\Ast;
 use Lusen\Tests\Fixtures\ProfileController;
+use Lusen\Tests\Fixtures\Resources\UserResource;
 
 function resourceSpec()
 {
@@ -189,4 +190,23 @@ it('emits an untyped field as a valid empty schema object, not an array', functi
 
     expect($json)->toContain('"postcode":{}')
         ->and($json)->not->toContain('"postcode":[]');
+});
+
+it('names a resource shape after the resource, minus the suffix', function (): void {
+    // The name becomes a type name in somebody's generated client, so it comes
+    // from the class rather than from anything an emitter invents.
+    $schema = ResourceReader::read(UserResource::class);
+
+    expect($schema?->title)->toBe('User');
+});
+
+it('carries that name into the openapi document as a component', function (): void {
+    // Four of the routes above return a UserResource. Inline, that is the
+    // same object written out four times and four types in a generated
+    // client; named, it is one definition and four references to it.
+    $document = (new OpenApiEmitter)->document(resourceSpec());
+
+    expect($document['components']['schemas'] ?? [])->toHaveKey('User')
+        ->and($document['paths']['/api/profiles/{profile}']['get']['responses']['200']['content']['application/json']['schema']['properties']['data'])
+        ->toBe(['$ref' => '#/components/schemas/User']);
 });

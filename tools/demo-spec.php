@@ -89,7 +89,7 @@ $customerShape = Schema::object([
     'name' => Schema::string(),
     'status' => Schema::enum(['active', 'invited', 'archived']),
     'created_at' => Schema::string('date-time'),
-]);
+])->titled('Customer');
 
 $listCustomers = Endpoint::make(HttpMethod::Get, 'api/v2/customers', 'v2.customers.index')->with(
     summary: 'List customers',
@@ -250,10 +250,10 @@ $orderShape = Schema::object([
         'product_id' => Schema::integer(),
         'quantity' => Schema::integer(),
         'unit_price' => Schema::integer(),
-    ])),
+    ])->titled('OrderLine')),
     'placed_at' => Schema::string('date-time'),
     'refunded_at' => new Schema(format: 'date-time', nullable: true),
-]);
+])->titled('Order');
 
 $showOrder = Endpoint::make(HttpMethod::Get, 'api/v2/orders/{order}', 'v2.orders.show')->with(
     summary: 'Retrieve an order',
