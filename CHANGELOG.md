@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented here.
 
+## 0.5.3 — 2026-09-07
+
+### Fixed
+
+- **A site with a logo configured said its own name twice.** The logo carried
+  the API's title as its `alt` text and the title was printed again directly
+  after it, so the name appeared twice stacked the moment the image failed to
+  load, and was read out twice to a screen reader every time. An image sitting
+  beside its own name in text is decorative, so the `alt` is empty now and the
+  two sit on one row — 24px against 14px text, with the name truncating rather
+  than squashing the logo.
+
+### Added
+
+- Lusen has a mark. It is the profile of the plateau it is named after: high
+  ground above Kukës, an undercut face, the valley far below. It inherits
+  `currentColor` for use beside text, and there is a badge form for a favicon.
+  Both are export-ignored — a consumer installs a documentation generator, not
+  its logo.
+
 ## 0.5.2 — 2026-09-07
 
 ### Added
