@@ -268,6 +268,19 @@ it('renders a configured logo and favicon', function (): void {
         ->toContain('<link rel="icon" href="https://example.com/icon.png">');
 });
 
+it('puts the logo beside the name, and says the name once', function (): void {
+    config()->set('lusen.ui.logo', 'https://example.com/logo.svg');
+
+    $html = staticEmitter()->index(staticSpec());
+
+    // The alt used to be the title, printed again immediately underneath: two
+    // stacked copies of the name to anybody whose image did not load, and the
+    // same words twice to a screen reader.
+    expect($html)->toContain('alt="" class="h-6 w-auto shrink-0"')
+        ->not->toContain('alt="Test API"')
+        ->and(substr_count($html, 'Test API</span>'))->toBe(1);
+});
+
 it('omits them when unset', function (): void {
     expect(staticEmitter()->index(staticSpec()))->not->toContain('rel="icon"');
 });

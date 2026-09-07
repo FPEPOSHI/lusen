@@ -29,11 +29,15 @@
     {{-- The API's name leads the sidebar. It is the one thing on the page that
          says which documentation this is, so it belongs above the controls
          rather than under them. --}}
-    <a href="{{ $links->index() }}" class="block text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
+    <a href="{{ $links->index() }}" class="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
         @if (config('lusen.ui.logo'))
-            <img src="{{ config('lusen.ui.logo') }}" alt="{{ $spec->title }}" class="mb-2 h-8 w-auto">
+            {{-- Decorative, and empty alt on purpose: the name is right beside
+                 it in text, so alt text would say the same thing twice - out
+                 loud to a screen reader, and visibly to everybody the moment
+                 the image failed to load. --}}
+            <img src="{{ config('lusen.ui.logo') }}" alt="" class="h-6 w-auto shrink-0">
         @endif
-        {{ $spec->title }}
+        <span class="min-w-0 truncate">{{ $spec->title }}</span>
     </a>
     <p class="mt-1 mb-4 font-mono text-xs text-slate-500">v{{ $spec->version }}</p>
 
