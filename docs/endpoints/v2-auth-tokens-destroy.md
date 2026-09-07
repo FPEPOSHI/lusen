@@ -6,12 +6,12 @@ path: "/api/v2/auth/tokens/current"
 group: "Authentication"
 api_version: "v2"
 authenticated: true
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v2-auth-tokens-destroy.html"
+canonical: "https://lusen.oda.al/endpoints/v2-auth-tokens-destroy.html"
 ---
 
 # Revoke the current token
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## DELETE /api/v2/auth/tokens/current
 

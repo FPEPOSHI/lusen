@@ -4,6 +4,9 @@
 
 Fast, SEO and AI-agent-friendly API documentation for Laravel.
 
+**[See a live example →](https://lusen.oda.al)** — a fictional commerce API
+serving two versions at once, built by the package's own emitters.
+
 Lusen reads your application's routes, form requests and resources, and emits
 documentation as **static files** — HTML for people, OpenAPI and Markdown for
 machines. There is no build step for consumers, no database, and no JavaScript
@@ -81,10 +84,24 @@ Two rules make those surfaces actually usable:
 
 ## See it
 
-`docs/` is a showcase built from a fictional commerce API that serves two
-versions at once — 24 endpoints across 9 groups, `v2` current and `v1`
-deprecated with a retirement date. It is produced by running the package's real
-emitters, so it is exactly what `lusen:build` writes, not a mockup:
+**[lusen.oda.al](https://lusen.oda.al)** — a fictional commerce API serving two
+versions at once, 24 endpoints across 9 groups, `v2` current and `v1`
+deprecated with a retirement date. Nothing there is a mockup: it is produced by
+running the package's real emitters, so it is exactly what `lusen:build` writes.
+
+[![An endpoint page](art/screenshots/endpoint.png)](https://lusen.oda.al/endpoints/v2-orders-store.html)
+
+An endpoint page: the reference on the left, the call on the right. Note what
+is derived rather than written — the rate limit and the scopes off middleware,
+`Changed since v1` from comparing the two editions of the operation, and
+`items[].product_id` from a `items.*.product_id` validation rule.
+
+[![The index](art/screenshots/index.png)](https://lusen.oda.al)
+
+The index. Every page is also a Markdown twin, an OpenAPI operation and a line
+in `llms.txt` — swap `.html` for `.md` on any URL and see for yourself.
+
+Build it yourself in one command:
 
 ```bash
 php tools/build-showcase.php   # 7 prose pages, 24 endpoint pages, Markdown mirrors, OpenAPI, llms.txt, sitemap, search index

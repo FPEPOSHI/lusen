@@ -25,7 +25,7 @@ final class JsonLd
             '@type' => 'WebSite',
             'name' => $spec->title,
             'description' => $spec->description,
-            'url' => $docsUrl,
+            'url' => self::site($docsUrl),
             'version' => $spec->version,
         ]);
     }
@@ -37,7 +37,7 @@ final class JsonLd
      */
     public static function forPage(Page $page, ApiSpec $spec, string $docsUrl): string
     {
-        $url = rtrim($docsUrl, '/').'/pages/'.$page->slug();
+        $url = self::base($docsUrl).'/pages/'.$page->slug();
 
         return self::encode([
             '@context' => 'https://schema.org',
@@ -48,7 +48,7 @@ final class JsonLd
             'isPartOf' => [
                 '@type' => 'WebSite',
                 'name' => $spec->title,
-                'url' => $docsUrl,
+                'url' => self::site($docsUrl),
             ],
             'breadcrumb' => [
                 '@type' => 'BreadcrumbList',
@@ -63,7 +63,7 @@ final class JsonLd
 
     public static function forEndpoint(Endpoint $endpoint, ApiSpec $spec, string $docsUrl): string
     {
-        $url = rtrim($docsUrl, '/').'/endpoints/'.$endpoint->slug();
+        $url = self::base($docsUrl).'/endpoints/'.$endpoint->slug();
 
         return self::encode([
             '@context' => 'https://schema.org',
@@ -74,7 +74,7 @@ final class JsonLd
             'isPartOf' => [
                 '@type' => 'WebSite',
                 'name' => $spec->title,
-                'url' => $docsUrl,
+                'url' => self::site($docsUrl),
             ],
             'breadcrumb' => [
                 '@type' => 'BreadcrumbList',
@@ -89,6 +89,29 @@ final class JsonLd
                 ])),
             ],
         ]);
+    }
+
+    /**
+     * The documentation's own address, never the empty string.
+     *
+     * `Links::base()` is empty when the docs are served from the root of a
+     * host, which is what path building wants - `''.'/assets/x'` is
+     * `/assets/x`. As a value in structured data it is nothing at all, and
+     * `"url": ""` is worse than saying nothing: it is a claim about the site
+     * that no consumer can use.
+     */
+    /**
+     * The prefix a page URL is built on: empty at a host's root, so the path
+     * that follows it starts with its own slash.
+     */
+    private static function base(string $docsUrl): string
+    {
+        return rtrim($docsUrl, '/');
+    }
+
+    private static function site(string $docsUrl): string
+    {
+        return rtrim($docsUrl, '/') === '' ? '/' : rtrim($docsUrl, '/');
     }
 
     /**

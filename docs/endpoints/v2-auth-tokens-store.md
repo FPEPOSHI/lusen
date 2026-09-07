@@ -6,12 +6,12 @@ path: "/api/v2/auth/tokens"
 group: "Authentication"
 api_version: "v2"
 authenticated: false
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v2-auth-tokens-store.html"
+canonical: "https://lusen.oda.al/endpoints/v2-auth-tokens-store.html"
 ---
 
 # Issue an access token
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## POST /api/v2/auth/tokens
 

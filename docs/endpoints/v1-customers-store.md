@@ -8,12 +8,12 @@ api_version: "v1"
 authenticated: true
 deprecated: true
 superseded_by: "v2.customers.store"
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v1-customers-store.html"
+canonical: "https://lusen.oda.al/endpoints/v1-customers-store.html"
 ---
 
 # Create a customer
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## POST /api/v1/customers
 
@@ -21,7 +21,7 @@ Creates a customer and, unless `send_invite` is false, emails them an invitation
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`POST /api/v2/customers`](/lusen/endpoints/v2-customers-store.md).
+**A newer version of this operation exists**: [`POST /api/v2/customers`](/endpoints/v2-customers-store.md).
 
 Full URL: `https://api.acme.example/api/v1/customers`
 

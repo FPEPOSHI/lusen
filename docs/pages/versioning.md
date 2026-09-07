@@ -2,12 +2,12 @@
 title: "Versioning"
 page_id: "versioning"
 section: "Getting started"
-canonical: "https://fpeposhi.github.io/lusen/pages/versioning.html"
+canonical: "https://lusen.oda.al/pages/versioning.html"
 ---
 
 # Versioning
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 This API serves 2 versions at once. The version is part of the path, so a request names the version it wants.
 

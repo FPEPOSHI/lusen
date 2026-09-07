@@ -2,12 +2,12 @@
 title: "Authentication"
 page_id: "authentication"
 section: "Getting started"
-canonical: "https://fpeposhi.github.io/lusen/pages/authentication.html"
+canonical: "https://lusen.oda.al/pages/authentication.html"
 ---
 
 # Authentication
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 Authenticated endpoints expect a bearer token.
 

@@ -8,12 +8,12 @@ api_version: "v1"
 authenticated: false
 deprecated: true
 superseded_by: "v2.auth.tokens.store"
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v1-auth-tokens-store.html"
+canonical: "https://lusen.oda.al/endpoints/v1-auth-tokens-store.html"
 ---
 
 # Issue an access token
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## POST /api/v1/auth/tokens
 
@@ -21,7 +21,7 @@ Exchanges an API key pair for a short-lived bearer token. Tokens expire after on
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`POST /api/v2/auth/tokens`](/lusen/endpoints/v2-auth-tokens-store.md).
+**A newer version of this operation exists**: [`POST /api/v2/auth/tokens`](/endpoints/v2-auth-tokens-store.md).
 
 Full URL: `https://api.acme.example/api/v1/auth/tokens`
 

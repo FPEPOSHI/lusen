@@ -7,12 +7,12 @@ group: "Products"
 api_version: "v1"
 authenticated: false
 deprecated: true
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v1-products-search.html"
+canonical: "https://lusen.oda.al/endpoints/v1-products-search.html"
 ---
 
 # Search products
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## GET /api/v1/products/search
 

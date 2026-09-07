@@ -2,12 +2,12 @@
 title: "Introduction"
 page_id: "introduction"
 section: "Getting started"
-canonical: "https://fpeposhi.github.io/lusen/pages/introduction.html"
+canonical: "https://lusen.oda.al/pages/introduction.html"
 ---
 
 # Introduction
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 Everything you need to sell: customers, orders, refunds, the product catalogue and webhooks. REST over HTTPS, JSON in and out, bearer-token authenticated.
 

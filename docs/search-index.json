@@ -3,56 +3,56 @@
     "items": [
         {
             "title": "Introduction",
-            "url": "/lusen/pages/introduction.html",
+            "url": "/pages/introduction.html",
             "kind": "page",
             "context": "Getting started",
             "text": "Everything you need to sell: customers, orders, refunds, the product catalogue and webhooks. REST over HTTPS, JSON in and out, bearer-token authenticated. At a glance What you can do Making a request Reading this documentation"
         },
         {
             "title": "Use cases",
-            "url": "/lusen/pages/use-cases.html",
+            "url": "/pages/use-cases.html",
             "kind": "page",
             "context": "Getting started",
             "text": "Three things teams build with the Acme Commerce API, in the order people usually build them. Syncing customers from your CRM Taking an order and refunding it Reacting to events instead of polling"
         },
         {
             "title": "Versioning",
-            "url": "/lusen/pages/versioning.html",
+            "url": "/pages/versioning.html",
             "kind": "page",
             "context": "Getting started",
             "text": "This API serves 2 versions at once. The version is part of the path, so a request names the version it wants. Versions v2 compared with v1"
         },
         {
             "title": "Authentication",
-            "url": "/lusen/pages/authentication.html",
+            "url": "/pages/authentication.html",
             "kind": "page",
             "context": "Getting started",
             "text": "Authenticated endpoints expect a bearer token. Which endpoints need it A complete request"
         },
         {
             "title": "Errors",
-            "url": "/lusen/pages/errors.html",
+            "url": "/pages/errors.html",
             "kind": "page",
             "context": "Getting started",
             "text": "Errors are returned with a conventional HTTP status and a JSON body. Status codes used by this API Error body"
         },
         {
             "title": "Rate limiting",
-            "url": "/lusen/pages/rate-limiting.html",
+            "url": "/pages/rate-limiting.html",
             "kind": "page",
             "context": "Getting started",
             "text": "Requests are rate limited per client. Exceeding a limit returns 429 Too Many Requests. Limits Staying within the limit"
         },
         {
             "title": "Pagination",
-            "url": "/lusen/pages/pagination.html",
+            "url": "/pages/pagination.html",
             "kind": "page",
             "context": "Guides",
             "text": "Every list endpoint pages the same way, so this is documented once here rather than repeated on each one. Requesting a page Reading the response Iterating safely"
         },
         {
             "title": "Issue an access token",
-            "url": "/lusen/endpoints/v2-auth-tokens-store.html",
+            "url": "/endpoints/v2-auth-tokens-store.html",
             "kind": "endpoint",
             "method": "POST",
             "path": "/api/v2/auth/tokens",
@@ -61,7 +61,7 @@
         },
         {
             "title": "Revoke the current token",
-            "url": "/lusen/endpoints/v2-auth-tokens-destroy.html",
+            "url": "/endpoints/v2-auth-tokens-destroy.html",
             "kind": "endpoint",
             "method": "DELETE",
             "path": "/api/v2/auth/tokens/current",
@@ -70,7 +70,7 @@
         },
         {
             "title": "List customers",
-            "url": "/lusen/endpoints/v2-customers-index.html",
+            "url": "/endpoints/v2-customers-index.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v2/customers",
@@ -79,7 +79,7 @@
         },
         {
             "title": "Create a customer",
-            "url": "/lusen/endpoints/v2-customers-store.html",
+            "url": "/endpoints/v2-customers-store.html",
             "kind": "endpoint",
             "method": "POST",
             "path": "/api/v2/customers",
@@ -88,7 +88,7 @@
         },
         {
             "title": "Retrieve a customer",
-            "url": "/lusen/endpoints/v2-customers-show.html",
+            "url": "/endpoints/v2-customers-show.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v2/customers/{customer}",
@@ -97,7 +97,7 @@
         },
         {
             "title": "Update a customer",
-            "url": "/lusen/endpoints/v2-customers-update.html",
+            "url": "/endpoints/v2-customers-update.html",
             "kind": "endpoint",
             "method": "PATCH",
             "path": "/api/v2/customers/{customer}",
@@ -106,7 +106,7 @@
         },
         {
             "title": "Delete a customer",
-            "url": "/lusen/endpoints/v2-customers-destroy.html",
+            "url": "/endpoints/v2-customers-destroy.html",
             "kind": "endpoint",
             "method": "DELETE",
             "path": "/api/v2/customers/{customer}",
@@ -115,7 +115,7 @@
         },
         {
             "title": "List orders",
-            "url": "/lusen/endpoints/v2-orders-index.html",
+            "url": "/endpoints/v2-orders-index.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v2/orders",
@@ -124,7 +124,7 @@
         },
         {
             "title": "Create an order",
-            "url": "/lusen/endpoints/v2-orders-store.html",
+            "url": "/endpoints/v2-orders-store.html",
             "kind": "endpoint",
             "method": "POST",
             "path": "/api/v2/orders",
@@ -133,7 +133,7 @@
         },
         {
             "title": "Retrieve an order",
-            "url": "/lusen/endpoints/v2-orders-show.html",
+            "url": "/endpoints/v2-orders-show.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v2/orders/{order}",
@@ -142,7 +142,7 @@
         },
         {
             "title": "Refund an order",
-            "url": "/lusen/endpoints/v2-orders-refunds-store.html",
+            "url": "/endpoints/v2-orders-refunds-store.html",
             "kind": "endpoint",
             "method": "POST",
             "path": "/api/v2/orders/{order}/refunds",
@@ -151,7 +151,7 @@
         },
         {
             "title": "List products",
-            "url": "/lusen/endpoints/v2-products-index.html",
+            "url": "/endpoints/v2-products-index.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v2/products",
@@ -160,7 +160,7 @@
         },
         {
             "title": "Retrieve a product",
-            "url": "/lusen/endpoints/v2-products-show.html",
+            "url": "/endpoints/v2-products-show.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v2/products/{product}",
@@ -169,7 +169,7 @@
         },
         {
             "title": "List webhook endpoints",
-            "url": "/lusen/endpoints/v2-webhooks-index.html",
+            "url": "/endpoints/v2-webhooks-index.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v2/webhooks",
@@ -178,7 +178,7 @@
         },
         {
             "title": "Register a webhook endpoint",
-            "url": "/lusen/endpoints/v2-webhooks-store.html",
+            "url": "/endpoints/v2-webhooks-store.html",
             "kind": "endpoint",
             "method": "POST",
             "path": "/api/v2/webhooks",
@@ -187,7 +187,7 @@
         },
         {
             "title": "Issue an access token",
-            "url": "/lusen/endpoints/v1-auth-tokens-store.html",
+            "url": "/endpoints/v1-auth-tokens-store.html",
             "kind": "endpoint",
             "method": "POST",
             "path": "/api/v1/auth/tokens",
@@ -196,7 +196,7 @@
         },
         {
             "title": "Revoke the current token",
-            "url": "/lusen/endpoints/v1-auth-tokens-destroy.html",
+            "url": "/endpoints/v1-auth-tokens-destroy.html",
             "kind": "endpoint",
             "method": "DELETE",
             "path": "/api/v1/auth/tokens/current",
@@ -205,7 +205,7 @@
         },
         {
             "title": "List customers",
-            "url": "/lusen/endpoints/v1-customers-index.html",
+            "url": "/endpoints/v1-customers-index.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v1/customers",
@@ -214,7 +214,7 @@
         },
         {
             "title": "Create a customer",
-            "url": "/lusen/endpoints/v1-customers-store.html",
+            "url": "/endpoints/v1-customers-store.html",
             "kind": "endpoint",
             "method": "POST",
             "path": "/api/v1/customers",
@@ -223,7 +223,7 @@
         },
         {
             "title": "Retrieve a customer",
-            "url": "/lusen/endpoints/v1-customers-show.html",
+            "url": "/endpoints/v1-customers-show.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v1/customers/{customer}",
@@ -232,7 +232,7 @@
         },
         {
             "title": "List orders",
-            "url": "/lusen/endpoints/v1-orders-index.html",
+            "url": "/endpoints/v1-orders-index.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v1/orders",
@@ -241,7 +241,7 @@
         },
         {
             "title": "Create an order",
-            "url": "/lusen/endpoints/v1-orders-store.html",
+            "url": "/endpoints/v1-orders-store.html",
             "kind": "endpoint",
             "method": "POST",
             "path": "/api/v1/orders",
@@ -250,7 +250,7 @@
         },
         {
             "title": "List products",
-            "url": "/lusen/endpoints/v1-products-index.html",
+            "url": "/endpoints/v1-products-index.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v1/products",
@@ -259,7 +259,7 @@
         },
         {
             "title": "Search products",
-            "url": "/lusen/endpoints/v1-products-search.html",
+            "url": "/endpoints/v1-products-search.html",
             "kind": "endpoint",
             "method": "GET",
             "path": "/api/v1/products/search",

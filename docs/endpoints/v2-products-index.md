@@ -6,12 +6,12 @@ path: "/api/v2/products"
 group: "Products"
 api_version: "v2"
 authenticated: false
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v2-products-index.html"
+canonical: "https://lusen.oda.al/endpoints/v2-products-index.html"
 ---
 
 # List products
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## GET /api/v2/products
 

@@ -1031,7 +1031,7 @@ Exchanges an API key pair for a short-lived bearer token. Tokens expire after on
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`POST /api/v2/auth/tokens`](/lusen/endpoints/v2-auth-tokens-store.md).
+**A newer version of this operation exists**: [`POST /api/v2/auth/tokens`](/endpoints/v2-auth-tokens-store.md).
 
 Full URL: `https://api.acme.example/api/v1/auth/tokens`
 
@@ -1094,7 +1094,7 @@ Invalidates the token used to make this call. Idempotent — revoking an already
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`DELETE /api/v2/auth/tokens/current`](/lusen/endpoints/v2-auth-tokens-destroy.md).
+**A newer version of this operation exists**: [`DELETE /api/v2/auth/tokens/current`](/endpoints/v2-auth-tokens-destroy.md).
 
 Full URL: `https://api.acme.example/api/v1/auth/tokens/current`
 
@@ -1126,7 +1126,7 @@ Returns a paginated list of customers, newest first. Use `status` to narrow the 
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`GET /api/v2/customers`](/lusen/endpoints/v2-customers-index.md).
+**A newer version of this operation exists**: [`GET /api/v2/customers`](/endpoints/v2-customers-index.md).
 
 Full URL: `https://api.acme.example/api/v1/customers`
 
@@ -1199,7 +1199,7 @@ Creates a customer and, unless `send_invite` is false, emails them an invitation
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`POST /api/v2/customers`](/lusen/endpoints/v2-customers-store.md).
+**A newer version of this operation exists**: [`POST /api/v2/customers`](/endpoints/v2-customers-store.md).
 
 Full URL: `https://api.acme.example/api/v1/customers`
 
@@ -1275,7 +1275,7 @@ Retrieve a customer
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`GET /api/v2/customers/{customer}`](/lusen/endpoints/v2-customers-show.md).
+**A newer version of this operation exists**: [`GET /api/v2/customers/{customer}`](/endpoints/v2-customers-show.md).
 
 Full URL: `https://api.acme.example/api/v1/customers/{customer}`
 
@@ -1327,7 +1327,7 @@ List orders
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`GET /api/v2/orders`](/lusen/endpoints/v2-orders-index.md).
+**A newer version of this operation exists**: [`GET /api/v2/orders`](/endpoints/v2-orders-index.md).
 
 Full URL: `https://api.acme.example/api/v1/orders`
 
@@ -1384,7 +1384,7 @@ Creates an order in `pending` state. A retried request creates a second order; v
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`POST /api/v2/orders`](/lusen/endpoints/v2-orders-store.md).
+**A newer version of this operation exists**: [`POST /api/v2/orders`](/endpoints/v2-orders-store.md).
 
 Full URL: `https://api.acme.example/api/v1/orders`
 
@@ -1457,7 +1457,7 @@ Public catalogue. No credentials required, so this endpoint is safe to call from
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`GET /api/v2/products`](/lusen/endpoints/v2-products-index.md).
+**A newer version of this operation exists**: [`GET /api/v2/products`](/endpoints/v2-products-index.md).
 
 Full URL: `https://api.acme.example/api/v1/products`
 

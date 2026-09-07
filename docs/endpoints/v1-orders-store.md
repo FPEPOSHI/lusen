@@ -8,12 +8,12 @@ api_version: "v1"
 authenticated: true
 deprecated: true
 superseded_by: "v2.orders.store"
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v1-orders-store.html"
+canonical: "https://lusen.oda.al/endpoints/v1-orders-store.html"
 ---
 
 # Create an order
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## POST /api/v1/orders
 
@@ -21,7 +21,7 @@ Creates an order in `pending` state. A retried request creates a second order; v
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`POST /api/v2/orders`](/lusen/endpoints/v2-orders-store.md).
+**A newer version of this operation exists**: [`POST /api/v2/orders`](/endpoints/v2-orders-store.md).
 
 Full URL: `https://api.acme.example/api/v1/orders`
 

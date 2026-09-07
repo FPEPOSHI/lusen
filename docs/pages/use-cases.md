@@ -2,12 +2,12 @@
 title: "Use cases"
 page_id: "use-cases"
 section: "Getting started"
-canonical: "https://fpeposhi.github.io/lusen/pages/use-cases.html"
+canonical: "https://lusen.oda.al/pages/use-cases.html"
 ---
 
 # Use cases
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 Three things teams build with the Acme Commerce API, in the order people
 usually build them.

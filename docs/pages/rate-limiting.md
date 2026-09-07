@@ -2,12 +2,12 @@
 title: "Rate limiting"
 page_id: "rate-limiting"
 section: "Getting started"
-canonical: "https://fpeposhi.github.io/lusen/pages/rate-limiting.html"
+canonical: "https://lusen.oda.al/pages/rate-limiting.html"
 ---
 
 # Rate limiting
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 Requests are rate limited per client. Exceeding a limit returns `429 Too Many Requests`.
 

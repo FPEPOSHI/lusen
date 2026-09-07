@@ -34,7 +34,7 @@ require __DIR__.'/../vendor/autoload.php';
 $root = dirname(__DIR__);
 $out = $root.'/docs';
 // Scheme and host only - the docs path comes from the output url below.
-$origin = 'https://fpeposhi.github.io';
+$origin = 'https://lusen.oda.al';
 
 /** @var ApiSpec $spec */
 $spec = require __DIR__.'/demo-spec.php';
@@ -59,7 +59,7 @@ $app['config']->set('lusen.product', [
     'banner' => [
         'text' => 'v2 is generally available.',
         'label' => 'See what changed',
-        'url' => '/lusen/pages/versioning.html',
+        'url' => '/pages/versioning.html',
     ],
     'action' => [
         'label' => 'Get an API key',
@@ -73,7 +73,7 @@ $app->register(LusenServiceProvider::class);
 $renderer = new BladeRenderer($app['view']);
 
 $registry = new EmitterRegistry(
-    output: ['url' => '/lusen', 'emitters' => ['html', 'markdown', 'openapi', 'llms', 'sitemap', 'search', 'postman', 'discovery']],
+    output: ['url' => '/', 'emitters' => ['html', 'markdown', 'openapi', 'llms', 'sitemap', 'search', 'postman', 'discovery']],
     renderer: $renderer,
     canonicalOrigin: $origin,
 );
@@ -89,6 +89,11 @@ foreach ($registry->enabled() as $emitter) {
 // GitHub Pages runs Jekyll by default, which skips directories it does not
 // recognise and would drop files beginning with an underscore.
 $files[] = new EmittedFile('.nojekyll', '');
+
+// The custom domain, emitted rather than dropped in by hand: this directory is
+// build output, and a CNAME that only exists because somebody once created it
+// is a custom domain that disappears the first time the output is cleaned.
+$files[] = new EmittedFile('CNAME', "lusen.oda.al\n");
 
 $result = (new Writer($out))->writeAll($files);
 

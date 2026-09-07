@@ -8,18 +8,18 @@ api_version: "v1"
 authenticated: true
 deprecated: true
 superseded_by: "v2.orders.index"
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v1-orders-index.html"
+canonical: "https://lusen.oda.al/endpoints/v1-orders-index.html"
 ---
 
 # List orders
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## GET /api/v1/orders
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`GET /api/v2/orders`](/lusen/endpoints/v2-orders-index.md).
+**A newer version of this operation exists**: [`GET /api/v2/orders`](/endpoints/v2-orders-index.md).
 
 Full URL: `https://api.acme.example/api/v1/orders`
 

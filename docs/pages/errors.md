@@ -2,12 +2,12 @@
 title: "Errors"
 page_id: "errors"
 section: "Getting started"
-canonical: "https://fpeposhi.github.io/lusen/pages/errors.html"
+canonical: "https://lusen.oda.al/pages/errors.html"
 ---
 
 # Errors
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 Errors are returned with a conventional HTTP status and a JSON body.
 

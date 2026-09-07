@@ -2,12 +2,12 @@
 title: "Pagination"
 page_id: "pagination"
 section: "Guides"
-canonical: "https://fpeposhi.github.io/lusen/pages/pagination.html"
+canonical: "https://lusen.oda.al/pages/pagination.html"
 ---
 
 # Pagination
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 Every list endpoint pages the same way, so this is documented once here rather
 than repeated on each one.

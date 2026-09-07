@@ -6,12 +6,12 @@ path: "/api/v2/orders/{order}"
 group: "Orders"
 api_version: "v2"
 authenticated: true
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v2-orders-show.html"
+canonical: "https://lusen.oda.al/endpoints/v2-orders-show.html"
 ---
 
 # Retrieve an order
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## GET /api/v2/orders/{order}
 

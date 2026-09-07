@@ -8,12 +8,12 @@ api_version: "v1"
 authenticated: true
 deprecated: true
 superseded_by: "v2.auth.tokens.destroy"
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v1-auth-tokens-destroy.html"
+canonical: "https://lusen.oda.al/endpoints/v1-auth-tokens-destroy.html"
 ---
 
 # Revoke the current token
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## DELETE /api/v1/auth/tokens/current
 
@@ -21,7 +21,7 @@ Invalidates the token used to make this call. Idempotent — revoking an already
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`DELETE /api/v2/auth/tokens/current`](/lusen/endpoints/v2-auth-tokens-destroy.md).
+**A newer version of this operation exists**: [`DELETE /api/v2/auth/tokens/current`](/endpoints/v2-auth-tokens-destroy.md).
 
 Full URL: `https://api.acme.example/api/v1/auth/tokens/current`
 

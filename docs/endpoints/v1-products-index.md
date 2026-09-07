@@ -8,12 +8,12 @@ api_version: "v1"
 authenticated: false
 deprecated: true
 superseded_by: "v2.products.index"
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v1-products-index.html"
+canonical: "https://lusen.oda.al/endpoints/v1-products-index.html"
 ---
 
 # List products
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## GET /api/v1/products
 
@@ -21,7 +21,7 @@ Public catalogue. No credentials required, so this endpoint is safe to call from
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`GET /api/v2/products`](/lusen/endpoints/v2-products-index.md).
+**A newer version of this operation exists**: [`GET /api/v2/products`](/endpoints/v2-products-index.md).
 
 Full URL: `https://api.acme.example/api/v1/products`
 

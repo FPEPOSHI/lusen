@@ -8,18 +8,18 @@ api_version: "v1"
 authenticated: true
 deprecated: true
 superseded_by: "v2.customers.show"
-canonical: "https://fpeposhi.github.io/lusen/endpoints/v1-customers-show.html"
+canonical: "https://lusen.oda.al/endpoints/v1-customers-show.html"
 ---
 
 # Retrieve a customer
 
-Part of the [Acme Commerce API](/lusen/index.html) documentation.
+Part of the [Acme Commerce API](/index.html) documentation.
 
 ## GET /api/v1/customers/{customer}
 
 **Deprecated.**
 
-**A newer version of this operation exists**: [`GET /api/v2/customers/{customer}`](/lusen/endpoints/v2-customers-show.md).
+**A newer version of this operation exists**: [`GET /api/v2/customers/{customer}`](/endpoints/v2-customers-show.md).
 
 Full URL: `https://api.acme.example/api/v1/customers/{customer}`
 
