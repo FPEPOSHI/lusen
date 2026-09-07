@@ -31,6 +31,22 @@
     </head>
 <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-200">
 
+<div data-lusen-banner class="relative z-40 bg-indigo-600 px-4 py-2 text-center text-sm text-white sm:px-6">
+        <span>v2 is generally available.</span>
+
+                    <a href="/lusen/pages/versioning.html" class="ml-2 inline-block font-semibold underline underline-offset-2 hover:text-indigo-100">
+                See what changed
+            </a>
+        
+                    <button type="button" data-lusen-banner-close hidden aria-label="Dismiss announcement"
+                    class="absolute top-1/2 right-3 -translate-y-1/2 rounded p-1 text-indigo-100 hover:bg-indigo-500 hover:text-white">
+                <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+            </button>
+            </div>
+
 <a href="#content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-indigo-600 focus:px-3 focus:py-2 focus:text-white">
     Skip to content
 </a>
@@ -62,6 +78,16 @@
     </a>
     <p class="mt-1 mb-4 font-mono text-xs text-slate-500">v2.4.1</p>
 
+    
+            
+        <a href="https://github.com/fpeposhi/lusen" class="mb-4 flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white">
+            <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6" />
+            </svg>
+            Acme
+        </a>
+    
     <form class="lusen-search" role="search" hidden data-lusen-search>
     <label class="sr-only" for="lusen-search-input">Search the documentation</label>
 
@@ -84,6 +110,7 @@
     <ul id="lusen-search-results" class="lusen-search-results" role="listbox" aria-label="Search results" hidden></ul>
     <p class="lusen-search-empty" hidden>No matches.</p>
 </form>
+
 
             
         <label class="sr-only" for="lusen-server">Base URL</label>
@@ -716,6 +743,17 @@
             </a>
             </nav>
 
+
+    
+    <div class="mt-6 flex flex-wrap items-center justify-end gap-4 rounded-lg border border-slate-200 p-4 dark:border-slate-800">
+                    <p class="min-w-0 flex-1 text-sm text-slate-600 dark:text-slate-400">Free while you are building.</p>
+        
+        <a href="https://github.com/fpeposhi/lusen" class="shrink-0 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500">
+        Get an API key
+    </a>
+
+        </div>
+
     <p class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
         <span>
             This page as
@@ -760,7 +798,11 @@
         Machine-readable:
         <a href="/lusen/openapi.json" class="underline hover:text-slate-900 dark:hover:text-white">OpenAPI</a>,
         <a href="/lusen/llms.txt" class="underline hover:text-slate-900 dark:hover:text-white">llms.txt</a>.
-    </p>
+
+        
+                    
+            <a href="https://github.com/fpeposhi/lusen" class="underline hover:text-slate-900 dark:hover:text-white">Acme</a>.
+            </p>
 
             
         <button type="button" data-lusen-theme hidden

@@ -1700,6 +1700,54 @@
         }
     }
 
+    /**
+     * The announcement strip.
+     *
+     * The close button starts hidden and is revealed here, because dismissing
+     * only means something once the choice can be remembered - a banner that
+     * closes and comes back on the next page is worse than one that stays.
+     * The key carries the text, so changing the announcement shows it again
+     * to somebody who dismissed the last one.
+     */
+    function initBanner() {
+        var banner = document.querySelector('[data-lusen-banner]');
+
+        if (!banner) return;
+
+        var close = banner.querySelector('[data-lusen-banner-close]');
+
+        if (!close) return;
+
+        var key = 'lusen-banner:' + hash(banner.textContent || '');
+
+        try {
+            if (localStorage.getItem(key)) {
+                banner.hidden = true;
+                return;
+            }
+        } catch (e) {}
+
+        close.hidden = false;
+
+        close.addEventListener('click', function () {
+            banner.hidden = true;
+
+            try {
+                localStorage.setItem(key, '1');
+            } catch (e) {}
+        });
+    }
+
+    function hash(value) {
+        var h = 0;
+
+        for (var i = 0; i < value.length; i++) {
+            h = (h * 31 + value.charCodeAt(i)) | 0;
+        }
+
+        return String(h);
+    }
+
     function init() {
         initCopy();
         initCopyPage();
@@ -1711,6 +1759,7 @@
         initServers();
         initTheme();
         initSidebar();
+        initBanner();
     }
 
     if (document.readyState === 'loading') {

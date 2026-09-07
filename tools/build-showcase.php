@@ -50,6 +50,24 @@ $app['config']->set('lusen.seo.json_ld', true);
 // feature is not showing the product. api.acme.example does not exist, so
 // pressing Send here demonstrates the failure path rather than a call.
 $app['config']->set('lusen.try_it', ['enabled' => true, 'methods' => ['GET'], 'persist_token' => 'session', 'credentials' => false]);
+// The showcase is a fictional company's docs, so it demonstrates the lead
+// surfaces the way a real one would use them: an announcement, a way back to
+// the site, and one button worth pressing.
+$app['config']->set('lusen.product', [
+    'name' => 'Acme',
+    'url' => 'https://github.com/fpeposhi/lusen',
+    'banner' => [
+        'text' => 'v2 is generally available.',
+        'label' => 'See what changed',
+        'url' => '/lusen/pages/versioning.html',
+    ],
+    'action' => [
+        'label' => 'Get an API key',
+        'url' => 'https://github.com/fpeposhi/lusen',
+        'note' => 'Free while you are building.',
+    ],
+]);
+
 $app->register(LusenServiceProvider::class);
 
 $renderer = new BladeRenderer($app['view']);

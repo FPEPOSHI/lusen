@@ -19,7 +19,23 @@
     </a>
     <p class="mt-1 mb-4 font-mono text-xs text-slate-500">v{{ $spec->version }}</p>
 
+    @php($navSite = \Lusen\Support\Product::site(config('lusen.product')))
+
+    @if ($navSite)
+        {{-- Above the search rather than beside the footer link: somebody who
+             arrived from a search engine landed in the middle of a product
+             they may not have seen the front of. --}}
+        <a href="{{ $navSite['url'] }}" class="mb-4 flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white">
+            <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6" />
+            </svg>
+            {{ $navSite['name'] }}
+        </a>
+    @endif
+
     @include('lusen::partials.search')
+
 
     @if ($spec->servers && $spec->baseUrl)
         {{-- An API with a sandbox is two base URLs, and a reader who copies an

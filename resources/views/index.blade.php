@@ -177,4 +177,10 @@
         </section>
     @endforeach
 
+    {{-- The index has no previous/next to sit under, and it is the page most
+         readers arrive on, so the action goes at the end of it - still where
+         somebody finishes reading rather than where they are looking
+         something up. --}}
+    @include('lusen::partials.pager', ['pager' => []])
+
 @endsection

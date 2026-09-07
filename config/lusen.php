@@ -359,6 +359,70 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | The product these docs are for
+    |--------------------------------------------------------------------------
+    |
+    | API documentation is often the most-read thing a company publishes and
+    | the only page a technical evaluator opens before deciding. Without any of
+    | this it is a dead end: no way back to your site, and nothing to press
+    | when somebody finishes reading and wants an account.
+    |
+    | Everything here is off until you fill it in, and none of it reaches
+    | llms.txt, the Markdown mirrors or the OpenAPI document. Those exist so a
+    | model can learn how your API works, and a call to action retrieved as
+    | though it were part of the reference is noise in somebody's context
+    | window at best.
+    |
+    */
+
+    'product' => [
+        /*
+         | A link back to your site, in the sidebar and the footer. The label
+         | falls back to the host, so `name` is only worth setting when your
+         | product is not called what your domain is.
+         */
+        'name' => env('LUSEN_PRODUCT_NAME'),
+        'url' => env('LUSEN_PRODUCT_URL'),
+
+        /*
+         | A strip across the top of every page. `text` alone is an
+         | announcement; add `label` and `url` and it carries a link too.
+         |
+         |     'text' => 'v2 is live.',
+         |     'label' => 'See what changed',
+         |     'url' => 'https://example.com/blog/v2',
+         */
+        'banner' => [
+            'text' => null,
+            'label' => null,
+            'url' => null,
+
+            /*
+             | A banner nobody can put away is one every reader scrolls past
+             | on every page until you next deploy.
+             */
+            'dismissible' => true,
+        ],
+
+        /*
+         | The button that turns a reader into a user. It sits under the
+         | previous/next links, where somebody who has read to the bottom of a
+         | page is the most likely reader on the site to want it - and not in
+         | the sidebar, which is how people get around rather than out.
+         |
+         |     'label' => 'Get an API key',
+         |     'url' => 'https://example.com/register',
+         |     'note' => 'Free while you are building.',
+         */
+        'action' => [
+            'label' => null,
+            'url' => null,
+            'note' => null,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Docs UI
     |--------------------------------------------------------------------------
     */

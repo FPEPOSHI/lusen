@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Lusen\Emit\Contracts\Renderer;
 use Lusen\Emit\HtmlEmitter;
+use Lusen\Emit\MarkdownEmitter;
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Page;
 use Lusen\SpecBuilder;
@@ -491,4 +492,79 @@ it('lets a site choose its own assistants and its own question', function (): vo
     expect($html)->toContain('Ask Perplexity')
         ->toContain('perplexity.ai/search?q='.rawurlencode('Summarise https://example.com/docs/endpoints/users-index.md for me.'))
         ->and($html)->not->toContain('Ask ChatGPT');
+});
+
+it('shows nothing about the product until a site configures it', function (): void {
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    expect($html)->not->toContain('data-lusen-banner')
+        ->not->toContain('bg-indigo-600 px-3 py-2');
+});
+
+it('puts an announcement above everything on the page', function (): void {
+    config()->set('lusen.product.banner', [
+        'text' => 'v2 is live.',
+        'label' => 'See what changed',
+        'url' => 'https://acme.example/blog/v2',
+    ]);
+
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    expect($html)->toContain('data-lusen-banner')
+        ->toContain('v2 is live.')
+        ->toContain('https://acme.example/blog/v2')
+        // Above the skip link, so a reader scrolling past it once does not
+        // meet it again halfway down.
+        ->and(strpos($html, 'data-lusen-banner'))->toBeLessThan(strpos($html, 'Skip to content'));
+});
+
+it('offers the call to action where a reader finishes, and nowhere else', function (): void {
+    config()->set('lusen.product.action', [
+        'label' => 'Get an API key',
+        'url' => 'https://acme.example/register',
+        'note' => 'Free while you are building.',
+    ]);
+
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    // Once, under the pager. Not in the sidebar: that column is how a reader
+    // gets between pages, and a coloured button in it competes with the
+    // navigation on every screen of every page.
+    expect(substr_count($html, 'https://acme.example/register'))->toBe(1)
+        ->and($html)->toContain('Free while you are building.')
+        ->and(strpos($html, 'https://acme.example/register'))->toBeGreaterThan(strpos($html, 'aria-label="Pagination"'));
+});
+
+it('links back to the site the docs belong to', function (): void {
+    config()->set('lusen.product.url', 'https://www.acme.example');
+
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    // Labelled with the host, which says where it goes.
+    expect(substr_count($html, 'https://www.acme.example'))->toBe(2)
+        ->and($html)->toContain('acme.example');
+});
+
+it('keeps all of it out of what a model retrieves', function (): void {
+    config()->set('lusen.product', [
+        'name' => 'Acme',
+        'url' => 'https://acme.example',
+        'banner' => ['text' => 'v2 is live.'],
+        'action' => ['label' => 'Get an API key', 'url' => 'https://acme.example/register'],
+    ]);
+
+    $spec = staticSpec();
+    $files = (new MarkdownEmitter(new Links('/docs', static: true, canonicalOrigin: 'https://example.com')))->emit($spec);
+    $markdown = implode("\n", array_map(static fn ($file): string => $file->contents, $files));
+
+    // llms.txt and the Markdown mirrors exist so a model can learn how the API
+    // works. A call to action retrieved as though it were part of the
+    // reference is noise in somebody's context window at best.
+    expect($markdown)->not->toContain('Get an API key')
+        ->not->toContain('v2 is live.')
+        ->not->toContain('acme.example/register');
 });

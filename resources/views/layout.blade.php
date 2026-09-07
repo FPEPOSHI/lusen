@@ -71,6 +71,8 @@
 </head>
 <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-200">
 
+@include('lusen::partials.banner')
+
 <a href="#content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-indigo-600 focus:px-3 focus:py-2 focus:text-white">
     Skip to content
 </a>
@@ -125,6 +127,14 @@
         Machine-readable:
         <a href="{{ $links->openapi() }}" class="underline hover:text-slate-900 dark:hover:text-white">OpenAPI</a>,
         <a href="{{ $links->llms() }}" class="underline hover:text-slate-900 dark:hover:text-white">llms.txt</a>.
+
+        @php($site = \Lusen\Support\Product::site(config('lusen.product')))
+
+        @if ($site)
+            {{-- Documentation is often the only page a technical evaluator
+                 reads, and without this it is a dead end. --}}
+            <a href="{{ $site['url'] }}" class="underline hover:text-slate-900 dark:hover:text-white">{{ $site['name'] }}</a>.
+        @endif
     </p>
 
     @if (config('lusen.ui.dark_mode', true))
