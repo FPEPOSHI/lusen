@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-labelledby="lusen-mark-title">
+  <title id="lusen-mark-title">Lusen</title>
+  <!--
+    Lusen stands on a high plateau in Kukës, over a sheer drop, and that is the
+    whole mark: high ground on the left, an undercut face, the valley far below
+    on the right. The overhang is what makes it rock rather than a ramp - and
+    the profile of the cliff turns out to be the letter the name starts with.
+
+    currentColor on purpose: it sits beside text in a sidebar, in either theme,
+    and should be whatever colour that text is.
+  -->
+  <path fill="currentColor" d="M2 5.5 L15 5.5 L11.5 18.5 L22 18.5 L22 21.5 L2 21.5 Z"/>
+</svg>

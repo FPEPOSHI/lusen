@@ -3,6 +3,7 @@
 /tests            export-ignore
 /tools            export-ignore
 /docs             export-ignore
+/art              export-ignore
 /.github          export-ignore
 /resources/css    export-ignore
 .gitattributes    export-ignore

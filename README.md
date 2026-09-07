@@ -1,3 +1,5 @@
+<img src="art/lusen-mark.svg" alt="" width="44" height="44">
+
 # Lusen
 
 Fast, SEO and AI-agent-friendly API documentation for Laravel.
@@ -429,6 +431,15 @@ composer check       # Pint, PHPStan at level max, then the suite
 The docs UI is Tailwind v4. `dist/lusen.css` is committed so installing Lusen
 never requires Node — if you change classes in `resources/views`, run
 `npm install && npm run build` and commit the CSS in the same change.
+
+## The name
+
+Lusen is a high plateau above Kukës, in northern Albania, that ends in a sheer
+drop. The mark is its profile: high ground, an undercut face, the valley far
+below — which turns out to be the letter the name starts with.
+
+`art/lusen-mark.svg` inherits `currentColor` for use beside text;
+`art/lusen-icon.svg` is the badge form, for a favicon or an avatar.
 
 ## Licence
 
