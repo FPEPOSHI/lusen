@@ -551,43 +551,47 @@
                     </h2>
 
                     <div class="mt-2 overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
-                                    <th scope="col" class="py-2 pr-4 font-medium">Name</th>
-                                    <th scope="col" class="py-2 pr-4 font-medium">Type</th>
-                                    <th scope="col" class="py-2 pr-4 font-medium">Required</th>
-                                    <th scope="col" class="py-2 font-medium">Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">per_page</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">no</td>
-                                        <td class="py-2 text-slate-600 dark:text-slate-400">Results per page, 1–100.</td>
-                                    </tr>
-                                                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">page</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">no</td>
-                                        <td class="py-2 text-slate-600 dark:text-slate-400">Page number, 1-indexed.</td>
-                                    </tr>
-                                                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">status</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">string, one of pending, paid, shipped, refunded</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">no</td>
-                                        <td class="py-2 text-slate-600 dark:text-slate-400">Only orders in this state.</td>
-                                    </tr>
-                                                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">customer_id</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">no</td>
-                                        <td class="py-2 text-slate-600 dark:text-slate-400">Only orders belonging to this customer.</td>
-                                    </tr>
-                                                            </tbody>
-                        </table>
-                    </div>
+        <table class="w-full text-left text-sm">
+            <thead>
+                <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
+                    <th scope="col" class="py-2 pr-4 font-medium">Name</th>
+                    <th scope="col" class="py-2 pr-4 font-medium">Type</th>
+                                            <th scope="col" class="py-2 pr-4 font-medium">Required</th>
+                                        <th scope="col" class="py-2 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400"></span><span class="text-slate-900 dark:text-white">per_page</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">no</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400">Results per page, 1–100.</td>
+                    </tr>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400"></span><span class="text-slate-900 dark:text-white">page</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">no</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400">Page number, 1-indexed.</td>
+                    </tr>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400"></span><span class="text-slate-900 dark:text-white">status</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">string, one of pending, paid, shipped, refunded</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">no</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400">Only orders in this state.</td>
+                    </tr>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400"></span><span class="text-slate-900 dark:text-white">customer_id</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">no</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400">Only orders belonging to this customer.</td>
+                    </tr>
+                            </tbody>
+        </table>
+    </div>
                                             
                                             
                             

@@ -119,20 +119,18 @@ final class Markdown
             '| --- | --- | --- | --- |',
         ];
 
-        foreach ($parameters as $parameter) {
+        // The same walk the HTML table runs. Nested objects and arrays would
+        // otherwise be a bare "object" - useless to somebody building the
+        // request body - and having each surface do its own descent is how
+        // the two came to disagree about it in the first place.
+        foreach (SchemaFields::forParameters($parameters) as $row) {
             $lines[] = sprintf(
                 '| `%s` | %s | %s | %s |',
-                $parameter->name,
-                self::cell($parameter->schema->label()),
-                $parameter->required ? 'yes' : 'no',
-                self::cell($parameter->description ?? ''),
+                $row['name'],
+                self::cell($row['type']),
+                $row['required'] ? 'yes' : 'no',
+                self::cell($row['description']),
             );
-
-            // Nested objects and arrays would otherwise be a bare "object" -
-            // useless to someone building the request body.
-            foreach (self::nested($parameter->schema, $parameter->name) as $row) {
-                $lines[] = $row;
-            }
         }
 
         $lines[] = '';
@@ -311,41 +309,6 @@ final class Markdown
         $lines[] = '';
 
         return $lines;
-    }
-
-    /**
-     * Flattens a nested schema into extra `parent.child` rows, so a table row
-     * for an object is followed by its fields.
-     *
-     * @return list<string>
-     */
-    private static function nested(Schema $schema, string $prefix, int $depth = 0): array
-    {
-        if ($depth > 3) {
-            return [];
-        }
-
-        $rows = [];
-
-        if ($schema->items !== null) {
-            $rows = [...$rows, ...self::nested($schema->items, $prefix.'[]', $depth + 1)];
-        }
-
-        foreach ($schema->properties as $name => $property) {
-            $path = $prefix.'.'.$name;
-
-            $rows[] = sprintf(
-                '| `%s` | %s | %s | %s |',
-                $path,
-                self::cell($property->label()),
-                in_array($name, $schema->required, true) ? 'yes' : 'no',
-                self::cell($property->description ?? ''),
-            );
-
-            $rows = [...$rows, ...self::nested($property, $path, $depth + 1)];
-        }
-
-        return $rows;
     }
 
     /**

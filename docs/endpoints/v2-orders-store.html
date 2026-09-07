@@ -567,62 +567,80 @@
                     </h2>
 
                     <div class="mt-2 overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
-                                    <th scope="col" class="py-2 pr-4 font-medium">Name</th>
-                                    <th scope="col" class="py-2 pr-4 font-medium">Type</th>
-                                    <th scope="col" class="py-2 pr-4 font-medium">Required</th>
-                                    <th scope="col" class="py-2 font-medium">Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">Idempotency-Key</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">string&lt;uuid&gt;</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
-                                        <td class="py-2 text-slate-600 dark:text-slate-400">A unique key per logical order. Replays return the original order.</td>
-                                    </tr>
-                                                            </tbody>
-                        </table>
-                    </div>
+        <table class="w-full text-left text-sm">
+            <thead>
+                <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
+                    <th scope="col" class="py-2 pr-4 font-medium">Name</th>
+                    <th scope="col" class="py-2 pr-4 font-medium">Type</th>
+                                            <th scope="col" class="py-2 pr-4 font-medium">Required</th>
+                                        <th scope="col" class="py-2 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400"></span><span class="text-slate-900 dark:text-white">Idempotency-Key</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">string&lt;uuid&gt;</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400">A unique key per logical order. Replays return the original order.</td>
+                    </tr>
+                            </tbody>
+        </table>
+    </div>
                                             
                                                         <h2 id="v2-orders-store-body-parameters" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">
                         Body parameters
                     </h2>
 
                     <div class="mt-2 overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
-                                    <th scope="col" class="py-2 pr-4 font-medium">Name</th>
-                                    <th scope="col" class="py-2 pr-4 font-medium">Type</th>
-                                    <th scope="col" class="py-2 pr-4 font-medium">Required</th>
-                                    <th scope="col" class="py-2 font-medium">Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">customer_id</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
-                                        <td class="py-2 text-slate-600 dark:text-slate-400">Who the order is for.</td>
-                                    </tr>
-                                                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">currency</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">string, one of USD, EUR, GBP</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
-                                        <td class="py-2 text-slate-600 dark:text-slate-400"></td>
-                                    </tr>
-                                                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">items</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">array</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
-                                        <td class="py-2 text-slate-600 dark:text-slate-400">At least one line item.</td>
-                                    </tr>
-                                                            </tbody>
-                        </table>
-                    </div>
+        <table class="w-full text-left text-sm">
+            <thead>
+                <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
+                    <th scope="col" class="py-2 pr-4 font-medium">Name</th>
+                    <th scope="col" class="py-2 pr-4 font-medium">Type</th>
+                                            <th scope="col" class="py-2 pr-4 font-medium">Required</th>
+                                        <th scope="col" class="py-2 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400"></span><span class="text-slate-900 dark:text-white">customer_id</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400">Who the order is for.</td>
+                    </tr>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400"></span><span class="text-slate-900 dark:text-white">currency</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">string, one of USD, EUR, GBP</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400"></td>
+                    </tr>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400"></span><span class="text-slate-900 dark:text-white">items</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">array</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400">At least one line item.</td>
+                    </tr>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400">items[].</span><span class="text-slate-900 dark:text-white">product_id</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">no</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400"></td>
+                    </tr>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400">items[].</span><span class="text-slate-900 dark:text-white">quantity</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">no</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400"></td>
+                    </tr>
+                            </tbody>
+        </table>
+    </div>
                             
                             
                 <h2 id="v2-orders-store-responses" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Responses</h2>

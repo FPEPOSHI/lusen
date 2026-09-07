@@ -607,3 +607,23 @@ it('offers to copy the full url, once the script can', function (): void {
         ->toContain('<button type="button" data-lusen-copy-url hidden')
         ->and(strpos($html, 'data-lusen-copy-url'))->toBeGreaterThan(strpos($html, 'Full URL:'));
 });
+
+it('documents what goes inside a nested request body, not just its type', function (): void {
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('orders.store'), $spec);
+
+    // "items — array" is not documentation: somebody building the request has
+    // to know what goes in it. The Markdown mirror already said this; the
+    // HTML stopped at the top level, so the two disagreed.
+    //
+    // The parent is muted and the leaf is not, with nothing between them, so
+    // the whole path is still one string to search for and to copy - and the
+    // column keeps the aligned left edge that makes it scannable.
+    expect($html)->toContain(
+        '<span class="text-slate-500 dark:text-slate-400">items[].</span>'
+        .'<span class="text-slate-900 dark:text-white">product_id</span>',
+    )
+        // Scoped to the cell: pl-3 is the contents list and the search box,
+        // and asserting on it page-wide would pass for the wrong reason.
+        ->and($html)->not->toContain('font-mono pl-');
+});

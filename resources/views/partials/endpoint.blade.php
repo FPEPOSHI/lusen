@@ -156,28 +156,11 @@
                         {{ $heading }}
                     </h{{ $sectionLevel }}>
 
-                    <div class="mt-2 overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
-                                    <th scope="col" class="py-2 pr-4 font-medium">Name</th>
-                                    <th scope="col" class="py-2 pr-4 font-medium">Type</th>
-                                    <th scope="col" class="py-2 pr-4 font-medium">Required</th>
-                                    <th scope="col" class="py-2 font-medium">Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($parameters as $parameter)
-                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
-                                        <td class="py-2 pr-4 font-mono text-slate-900 dark:text-white">{{ $parameter->name }}</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">{{ $parameter->schema->label() }}</td>
-                                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">{{ $parameter->required ? 'yes' : 'no' }}</td>
-                                        <td class="py-2 text-slate-600 dark:text-slate-400">{{ $parameter->description }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                    @include('lusen::partials.schema-table', [
+                        'rows' => \Lusen\Support\SchemaFields::forParameters($parameters),
+                        'nameHeading' => 'Name',
+                        'showRequired' => true,
+                    ])
                 @endif
             @endforeach
 
@@ -198,7 +181,7 @@
                             </p>
 
                             @if ($response->schema)
-                                @include('lusen::partials.schema-table', ['schema' => $response->schema])
+                                @include('lusen::partials.schema-table', ['rows' => \Lusen\Support\SchemaFields::flatten($response->schema)])
                             @endif
 
                             @if ($response->examples === [] && $response->status === 204)
