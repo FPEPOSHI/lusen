@@ -2,6 +2,79 @@
 
 All notable changes to this project are documented here.
 
+## 0.6.0 — 2026-09-07
+
+### Added
+
+- **`php artisan lusen:record`.** A generated example satisfies the schema and
+  nothing else: it says `"status": "string"` where your API says `"paid"`, and
+  a reader who copies one into a client has learned the shape without ever
+  seeing the thing. Your test suite is already producing real responses, so
+  this borrows them — it runs your suite with capture switched on, writes what
+  came back to `.lusen-recordings.json`, and the build uses those bodies.
+
+  Recording happens during your tests because they have already booted the
+  application, which a docs build never does. The build only ever reads the
+  file, so `lusen:build` still runs against a checkout with no `.env`.
+
+  The first recording of an operation wins, so a suite with random fixtures
+  does not rewrite the file on every CI run — `--fresh` asks for all of them
+  again. Fields named in `record.redact` have their values replaced wherever
+  they appear, because a suite that mints a real-looking token would otherwise
+  mint it into a file you commit. An `#[ApiResponse(example: …)]` still wins: it
+  was written on purpose.
+- **Python and Go request examples.** `python` (requests) and `go` (net/http)
+  join cURL, JavaScript and the two PHP clients. Supported and off by default:
+  six tabs is a strip nobody reads, and which two your readers actually write
+  is a question only you can answer. All of them render the same assembled
+  request, so no tab can drift from another or from the playground.
+
+### Fixed
+
+- **A nested request body documented nothing about its contents.** A body with
+  an `items` array rendered as `items · array · yes` and stopped. The fields
+  inside were in the spec the whole time — `RuleTree` exists to turn
+  `items.*.product_id` into an array of objects — and the HTML table iterated
+  top-level parameters and never descended, so nobody could build the request
+  from the page. The Markdown mirror already got this right, which was the real
+  defect: two implementations of one walk, and only one of them wired into both
+  surfaces. There is one now, and the request and response tables are the same
+  table.
+- **The second tab of a code block sat flush against its heading.** Blocks
+  carry a top margin that separates the first one from "Example request", and a
+  rule zeroed it on every block after the first so stacked blocks would not
+  double-space. They never stack in tabbed mode, so the rule did nothing until
+  somebody clicked the second tab.
+- **The full URL's host failed contrast in both themes**, at 2.6:1 on white and
+  4.2:1 on slate-950, against the 4.5:1 small text needs.
+
+### Changed
+
+- **The line under an operation.** Whether a call needs a token now sits
+  directly under the method and path rather than trailing the URL — it is part
+  of what the operation is, not a footnote to where it lives. The host and the
+  path are no longer one undifferentiated string: the host says which
+  environment the call goes to, the path is what the page is about, and reading
+  them apart is what stops somebody firing a documented call at production
+  because they never noticed the word "sandbox". There is a copy button, which
+  reads the URL from the page rather than an attribute so switching the base URL
+  changes what it copies. And the full stop after the URL is gone, because a
+  period pressed against the last character of a URL comes along with a
+  drag-select.
+- **Field tables mute the parent path.** `items[].product_id` renders with
+  `items[].` in the muted colour and `product_id` at full strength, aligned
+  rather than indented — the path already says where a field lives, and an
+  indent says it a second time at the cost of the aligned left edge that makes
+  a column scannable. The whole path stays one string to search for and to copy.
+
+### Upgrading
+
+If you have published the views (`vendor:publish --tag=lusen-views`), your copy
+of `partials/schema-table.blade.php` and `partials/endpoint.blade.php` shadows
+the package's, so **the nested request body fix will not reach you**. The table
+partial now takes `rows` rather than a `schema`. Re-publish, or delete the two
+files if you never customised them.
+
 ## 0.5.3 — 2026-09-07
 
 ### Fixed
