@@ -2,6 +2,74 @@
 
 All notable changes to this project are documented here.
 
+## 0.5.2 — 2026-09-07
+
+### Added
+
+- **What changed inside an operation between two versions.** The versioning
+  page could already name the operations `v2` added and the ones `v1` had that
+  it dropped, and then stopped at "the other eight exist in both versions at
+  the same path" — the sentence a reader migrating has the most questions
+  about. Both editions of all eight are in the spec, so the answer was
+  derivable and simply never asked for.
+
+  `Diff\VersionDiff` pairs the two editions on the operation key — method plus
+  the version-free path — which is the same key supersession uses, so "changed
+  since v1" and "superseded by v2" cannot disagree about which two endpoints
+  are the same operation. It appears on the versioning page, above the
+  parameter table on an endpoint page, and in the Markdown mirror and
+  `llms-full.txt`. An operation that changed in no way is left out: a migration
+  list naming forty untouched endpoints buries the three that moved.
+- **Somewhere for a site to point its documentation back at its product.** API
+  documentation is often the most-read thing a company publishes and the only
+  page a technical evaluator opens before deciding, and it was a dead end.
+  Three surfaces under a new `product` config section, all off until
+  configured: an announcement strip above everything on the page, a link back
+  to the site in the sidebar and the footer, and one button under the
+  previous/next links and at the end of the index.
+
+  Not in the sidebar. That column is how a reader gets between pages, and a
+  coloured button in it competes with the navigation on every screen of every
+  page. And none of it reaches `llms.txt`, the Markdown mirrors or the OpenAPI
+  document — those exist so a model can learn how the API works, and a call to
+  action retrieved as though it were part of the reference is noise in
+  somebody's context window at best.
+
+### Changed
+
+- **Shared response shapes are defined once and referenced.** Every endpoint
+  returning a customer wrote the whole customer out again, so a generated
+  client emitted six near-identical `Customer` types with nothing to tell it
+  they were the same thing. `components/schemas` is what definitions are for,
+  and 3.1 schemas are real JSON Schema, so a `$ref` costs no fidelity. The
+  showcase document drops from 83 KB to 73 KB, nested shapes included:
+  `Order.items` points at `OrderLine`.
+
+  The name comes from the class the shape was read out of, because it becomes
+  a type name in somebody's generated client and is therefore a stability
+  contract like an endpoint id. Two versions of one resource that have since
+  diverged are qualified — `V1Customer`, `V2Customer` — and anything that
+  cannot be named honestly stays inline. A long document beats a wrong type
+  name.
+- **Scramble is supported without anybody configuring it.** Reading another
+  tool's attributes was configuration, and Laravel merges a published config
+  over the package's one key at a time: an application adding its own
+  namespace to `attributes.external` replaced the list rather than extending
+  it, and any application that published `config/lusen.php` before 0.3.0 has an
+  `extractors` array without the reader in it and got no foreign attributes at
+  all. Neither failed; both looked like the feature not working. The
+  namespaces Lusen knows are a constant now, config adds to them, and a
+  configured pipeline missing the reader gets it back.
+  `attributes.read_external` is the switch for anyone who wants them ignored.
+- Response bodies are tabbed by status code alone — `201`, `422` — rather than
+  by code and reason phrase. A tab strip reading "201 Created" and "422
+  Unprocessable Entity" spends its width on words every reader already knows,
+  and the phrase is still on the status table directly above.
+- The rail's links to a page's other representations each carry an icon, and
+  the footer sentence does not: five pieces of small grey text in a vertical
+  list are scanned, while a glyph wedged into "This page as Markdown, or the
+  whole API as OpenAPI" interrupts a sentence.
+
 ## 0.5.1 — 2026-09-06
 
 ### Added
