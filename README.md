@@ -1,4 +1,4 @@
-<img src="art/lusen-mark.svg" alt="" width="44" height="44">
+<img src="art/lusen-icon.svg" alt="" width="56" height="56">
 
 # Lusen
 
@@ -438,8 +438,10 @@ Lusen is a high plateau above Kukës, in northern Albania, that ends in a sheer
 drop. The mark is its profile: high ground, an undercut face, the valley far
 below — which turns out to be the letter the name starts with.
 
-`art/lusen-mark.svg` inherits `currentColor` for use beside text;
-`art/lusen-icon.svg` is the badge form, for a favicon or an avatar.
+`art/lusen-mark.svg` inherits `currentColor`, so beside text it is whatever
+colour that text is. `art/lusen-icon.svg` is the badge form, carrying its own
+colours — which is the one to use anywhere the surrounding theme is unknown, a
+README on a site with a dark mode included.
 
 ## Licence
 
