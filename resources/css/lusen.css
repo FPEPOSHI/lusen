@@ -434,8 +434,15 @@
      | script runs. The strip is built into each block's own head, and only one
      | block is ever visible, so the result reads as a single bar - languages
      | on the left, copy on the right.
+     |
+     | Note what is deliberately absent: there is no `.lusen-code + .lusen-code
+     | { margin-top: 0 }` here. Blocks never stack in tabbed mode - all but one
+     | are hidden - so zeroing the margin on the later ones did nothing until
+     | somebody clicked the second tab, at which point the block that appeared
+     | was a later sibling and sat flush against the heading above it. Every
+     | block keeps the 0.75rem it has anywhere else, and whichever one is
+     | showing is spaced the same as the first.
      */
-    .lusen-snippets.is-tabbed .lusen-code + .lusen-code { margin-top: 0; }
     .lusen-snippets.is-tabbed .lusen-code-head { padding-top: 0.25rem; padding-bottom: 0.25rem; }
     .lusen-snippets.is-tabbed .lusen-code-label { display: none; }
 
