@@ -522,6 +522,11 @@
             </div>
 
     
+    <p class="mt-2 text-sm text-slate-500">
+        Send a bearer token in the Authorization header.
+    </p>
+
+    
     
     
     
@@ -529,11 +534,14 @@
         <div class="lusen-prose mt-2 max-w-2xl text-sm"><p>Creates an order in <code>pending</code> state. Send the <code>Idempotency-Key</code> header so a retried request cannot double-charge.</p>
 </div>
     
-    <p class="mt-3 text-sm text-slate-500">
-                    Full URL: <code class="font-mono text-slate-700 dark:text-slate-300">https://api.acme.example/api/v2/orders</code>.
-                Send a bearer token in the Authorization header.
-    </p>
-
+            
+        <p class="mt-3 text-sm text-slate-500">
+            Full URL: <code class="font-mono"><span class="text-slate-500 dark:text-slate-400">https://api.acme.example</span><span class="font-semibold text-slate-700 dark:text-slate-300">/api/v2/orders</span></code>
+            
+            <button type="button" data-lusen-copy-url hidden
+                    class="ml-1 text-xs underline hover:text-slate-900 dark:hover:text-white">Copy</button>
+        </p>
+    
     
     
             <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800/50">

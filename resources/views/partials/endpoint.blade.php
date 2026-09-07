@@ -58,6 +58,15 @@
         @endif
     </div>
 
+    {{-- Directly under the operation, because whether a call needs a token is
+         part of what the operation is - not a footnote to the URL, which is
+         where it used to sit. --}}
+    <p class="mt-2 text-sm text-slate-500">
+        {{ $endpoint->authenticated
+            ? 'Send a bearer token in the Authorization header.'
+            : 'No authentication required.' }}
+    </p>
+
     {{-- Above everything else on purpose. Somebody reading v1 has to learn
          that v2 exists before they finish copying the example, not after. --}}
     @php($successor = $spec->endpoint($endpoint->supersededBy))
@@ -82,14 +91,31 @@
         <div class="lusen-prose mt-2 max-w-2xl text-sm">{!! \Lusen\Support\MarkdownDocument::render($endpoint->description)->html !!}</div>
     @endif
 
-    <p class="mt-3 text-sm text-slate-500">
-        @if ($spec->baseUrl)
-            Full URL: <code class="font-mono text-slate-700 dark:text-slate-300">{{ rtrim($spec->baseUrl, '/') }}{{ $endpoint->path() }}</code>.
-        @endif
-        {{ $endpoint->authenticated
-            ? 'Send a bearer token in the Authorization header.'
-            : 'No authentication required.' }}
-    </p>
+    @if ($spec->baseUrl)
+        {{-- The host is the part a reader swaps per environment and the path
+             is the part they are here for, so they are not the same weight.
+             One <code> still, because it has to copy as one URL.
+
+             slate-500 light and slate-400 dark rather than the other way
+             round: reversed, the host measures 2.6:1 on white and 4.2:1 on
+             slate-950, both under the 4.5:1 that small text needs, and a base
+             URL is the last thing on the page worth making hard to read.
+
+             No full stop after it. A sentence ending in a URL puts a period
+             against the last character of the thing people are about to
+             select, and it comes along with the copy. --}}
+        <p class="mt-3 text-sm text-slate-500">
+            Full URL: <code class="font-mono"><span class="text-slate-500 dark:text-slate-400">{{ rtrim($spec->baseUrl, '/') }}</span><span class="font-semibold text-slate-700 dark:text-slate-300">{{ $endpoint->path() }}</span></code>
+            {{-- Hidden until the script can actually copy, like every other
+                 copy control here. It reads the URL out of the element beside
+                 it rather than from an attribute, so switching the base URL
+                 changes what gets copied - a button that quietly hands over
+                 production while the page says sandbox is worse than no
+                 button. --}}
+            <button type="button" data-lusen-copy-url hidden
+                    class="ml-1 text-xs underline hover:text-slate-900 dark:hover:text-white">Copy</button>
+        </p>
+    @endif
 
     {{-- What a reader arriving from the previous version has to change.
          Above the parameter table rather than below it: somebody migrating

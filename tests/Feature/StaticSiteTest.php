@@ -581,3 +581,29 @@ it('keeps all of it out of what a model retrieves', function (): void {
         ->not->toContain('v2 is live.')
         ->not->toContain('acme.example/register');
 });
+
+it('reads the host and the path as two things in one url', function (): void {
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    // The host says which environment the call goes to and is the same on
+    // every page; the path is what this page is about. Nothing between the
+    // spans, because a newline in the markup is a space in the middle of a
+    // URL, and it stays one <code> so it copies as one URL.
+    expect($html)->toContain(
+        '<code class="font-mono"><span class="text-slate-500 dark:text-slate-400">https://api.test</span>'
+        .'<span class="font-semibold text-slate-700 dark:text-slate-300">/api/users</span></code>',
+    );
+});
+
+it('offers to copy the full url, once the script can', function (): void {
+    $spec = staticSpec();
+    $html = staticEmitter()->endpoint($spec->endpoint('users.index'), $spec);
+
+    // Hidden until JavaScript reveals it: a copy button that cannot copy is
+    // worse than none. It sits immediately after the <code> it copies, which
+    // is how the script finds the live URL rather than a stale attribute.
+    expect($html)->toContain('</code>')
+        ->toContain('<button type="button" data-lusen-copy-url hidden')
+        ->and(strpos($html, 'data-lusen-copy-url'))->toBeGreaterThan(strpos($html, 'Full URL:'));
+});

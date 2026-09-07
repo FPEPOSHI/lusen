@@ -115,6 +115,31 @@
         document.body.classList.add('lusen-locked');
     }
 
+    /**
+     * The copy button beside a full URL.
+     *
+     * Reads the element before it rather than an attribute of its own: the
+     * base-URL switcher rewrites text nodes, so the live text is the only
+     * copy of the URL that is guaranteed to say what the page currently says.
+     */
+    function initCopyUrl() {
+        if (!navigator.clipboard) return;
+
+        document.querySelectorAll('[data-lusen-copy-url]').forEach(function (button) {
+            var source = button.previousElementSibling;
+
+            if (!source) return;
+
+            button.hidden = false;
+
+            button.addEventListener('click', function () {
+                navigator.clipboard.writeText(source.textContent.trim()).then(function () {
+                    flash(button, 'Copied');
+                });
+            });
+        });
+    }
+
     function initMenu() {
         var toggle = document.querySelector('[data-lusen-menu]');
         var nav = document.querySelector('.lusen-nav');
@@ -1751,6 +1776,7 @@
     function init() {
         initCopy();
         initCopyPage();
+        initCopyUrl();
         initMenu();
         initSearch();
         initTabs();
