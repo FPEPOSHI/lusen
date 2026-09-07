@@ -6,6 +6,7 @@ use Lusen\Extract\AttributeExtractor;
 use Lusen\Extract\ControllerExtractor;
 use Lusen\Extract\ExternalAttributeExtractor;
 use Lusen\Extract\FormRequestExtractor;
+use Lusen\Extract\RecordedExampleExtractor;
 use Lusen\Extract\ResourceExtractor;
 use Lusen\Extract\RouteExtractor;
 use Lusen\Support\AskAi;
@@ -137,6 +138,14 @@ return [
         ControllerExtractor::class,
         FormRequestExtractor::class,
         ResourceExtractor::class,
+
+        /*
+         | Replaces generated example bodies with real ones captured by
+         | `lusen:record`. A recording beats a guess because it is what
+         | happened; an attribute below still beats a recording, because
+         | somebody wrote that down on purpose.
+         */
+        RecordedExampleExtractor::class,
 
         /*
          | Reads documentation attributes left by another tool - Scramble's,
@@ -331,6 +340,54 @@ return [
             'search',
             'postman',
             'discovery',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Recorded examples
+    |--------------------------------------------------------------------------
+    |
+    | A generated example satisfies the schema and nothing else: it says
+    | "status": "string" where your API says "paid". `php artisan lusen:record`
+    | runs your test suite with capture switched on and writes what your API
+    | actually returned, and the build uses those bodies instead.
+    |
+    | Recording borrows your tests because they have already booted the
+    | application, which a docs build never does. The build only ever reads the
+    | file, so `lusen:build` still runs against a checkout with no .env.
+    |
+    | Entirely optional. With no file, examples are generated as before.
+    |
+    */
+
+    'record' => [
+        /*
+         | Where recordings are written, relative to the project root. Commit
+         | it: that is the point. It sorts and pretty-prints, so it diffs.
+         */
+        'path' => '.lusen-recordings.json',
+
+        /*
+         | What `lusen:record` runs.
+         */
+        'command' => env('LUSEN_RECORD_COMMAND', 'vendor/bin/pest'),
+
+        /*
+         | Fields whose values are replaced wherever they appear, at any depth.
+         | A recorded response is committed to your repository, and a suite
+         | that mints a real-looking token would otherwise mint it into this
+         | file. The field, its name and its position are kept - the shape is
+         | what documents the API.
+         */
+        'redact' => [
+            'token',
+            'access_token',
+            'refresh_token',
+            'password',
+            'secret',
+            'api_key',
+            'authorization',
         ],
     ],
 

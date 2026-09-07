@@ -7,7 +7,9 @@ namespace Lusen;
 use Composer\InstalledVersions;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Lusen\Build\BuildCache;
@@ -17,6 +19,7 @@ use Lusen\Console\BuildCommand;
 use Lusen\Console\CheckCommand;
 use Lusen\Console\DiffCommand;
 use Lusen\Console\McpCommand;
+use Lusen\Console\RecordCommand;
 use Lusen\Emit\BladeRenderer;
 use Lusen\Emit\Contracts\Renderer;
 use Lusen\Emit\EmitterRegistry;
@@ -27,8 +30,11 @@ use Lusen\Extract\ExtractionPipeline;
 use Lusen\Extract\Models\MigrationReader;
 use Lusen\Extract\Models\ModelLocator;
 use Lusen\Extract\Models\ModelSchema;
+use Lusen\Extract\RecordedExampleExtractor;
 use Lusen\Extract\Resources\ResourceReader;
 use Lusen\Extract\RouteExtractor;
+use Lusen\Record\Recorder;
+use Lusen\Record\Recordings;
 use Lusen\Support\Data;
 use OutOfBoundsException;
 
@@ -85,6 +91,10 @@ final class LusenServiceProvider extends ServiceProvider
             $this->externalAttributeNamespaces(),
         ));
 
+        $this->app->bind(RecordedExampleExtractor::class, fn (): RecordedExampleExtractor => new RecordedExampleExtractor(
+            Recordings::read($this->recordingPath()),
+        ));
+
         $this->app->bind(ModelSchema::class, fn (): ModelSchema => new ModelSchema(
             new MigrationReader($this->migrationPaths()),
         ));
@@ -109,12 +119,15 @@ final class LusenServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'lusen');
 
+        $this->bootRecorder();
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 BuildCommand::class,
                 CheckCommand::class,
                 DiffCommand::class,
                 McpCommand::class,
+                RecordCommand::class,
             ]);
 
             $this->publishes([
@@ -135,6 +148,80 @@ final class LusenServiceProvider extends ServiceProvider
         if ($this->runtimeEnabled()) {
             $this->loadRoutesFrom(__DIR__.'/../routes/lusen.php');
         }
+    }
+
+    /**
+     * Switches capture on for a test run, and writes what it caught at the end
+     * of the process.
+     *
+     * Driven by an environment variable rather than a config flag, so it is on
+     * for exactly one command's child process and cannot be left on by an
+     * edit to a config file that somebody then commits.
+     *
+     * The write happens on shutdown rather than per response: a test suite
+     * rebuilds the container between tests, so per-response writes would be
+     * hundreds of read-modify-write cycles on the same file to end up where
+     * one write at the end lands anyway.
+     */
+    private function bootRecorder(): void
+    {
+        if (getenv('LUSEN_RECORD') !== '1') {
+            return;
+        }
+
+        $path = $this->recordingPath();
+
+        if (! Recorder::started()) {
+            Recorder::start(Recordings::read($path));
+
+            register_shutdown_function(static function () use ($path): void {
+                $recordings = Recorder::recordings();
+
+                if ($recordings->isEmpty()) {
+                    return;
+                }
+
+                $directory = dirname($path);
+
+                if (is_dir($directory) || mkdir($directory, 0755, true) || is_dir($directory)) {
+                    file_put_contents($path, $recordings->toJson());
+                }
+            });
+        }
+
+        $redact = $this->recordRedactions();
+
+        $this->app->make(Dispatcher::class)->listen(
+            RequestHandled::class,
+            static function (RequestHandled $event) use ($redact): void {
+                Recorder::capture($event->request, $event->response, $redact);
+            },
+        );
+    }
+
+    /**
+     * Where recordings live, relative to the project root. The environment
+     * wins, because the command sets it for its own child process.
+     */
+    private function recordingPath(): string
+    {
+        $fromEnv = getenv('LUSEN_RECORD_PATH');
+
+        if (is_string($fromEnv) && $fromEnv !== '') {
+            return $fromEnv;
+        }
+
+        $configured = Data::string(Data::map($this->section('lusen'), 'record'), 'path', '.lusen-recordings.json');
+
+        return str_starts_with($configured, '/') ? $configured : $this->app->basePath($configured);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function recordRedactions(): array
+    {
+        return Data::strings(Data::map($this->section('lusen'), 'record'), 'redact');
     }
 
     /**

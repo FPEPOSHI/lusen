@@ -387,12 +387,43 @@ php artisan lusen:diff --save                # record this build as the baseline
 php artisan lusen:diff                       # what changed since, and what of it breaks
 php artisan lusen:diff --strict              # ...and fail CI on the breaking ones
 php artisan lusen:diff --json                # the same changes, for a script
+php artisan lusen:record                     # capture real responses from your test suite
+php artisan lusen:record --fresh             # re-record everything
+php artisan lusen:record --clear             # delete them; examples fall back to the schema
 ```
 
 Builds are incremental. An endpoint is re-analysed only when its route or one
 of the files behind it actually changed — comparing contents, not timestamps,
 so a fresh checkout or a CI runner still gets the benefit. Add `.lusen` to your
 `.gitignore`.
+
+## Real examples, not plausible ones
+
+A generated example satisfies the schema and nothing else. It says
+`"status": "string"` where your API says `"paid"`, and a reader who copies one
+into a client has learned the shape without ever seeing the thing.
+
+Your test suite is already producing real responses. Borrow them:
+
+```bash
+php artisan lusen:record   # runs your suite with capture on
+```
+
+Every response it saw is written to `.lusen-recordings.json` — commit it — and
+the build uses those bodies instead of inventing them.
+
+Recording borrows the tests because they have already booted the application,
+which a docs build never does. The build only ever reads the file, so
+`lusen:build` still runs against a checkout with no `.env` and no database.
+
+Three things worth knowing. **The first recording of an operation wins**, so a
+suite with random fixtures does not rewrite the file with fresh names on every
+CI run; `--fresh` is how you ask for all of them again. **Fields you name in
+`record.redact` are replaced wherever they appear** — the field, its name and
+its position are kept, because the shape is what documents the API and the
+value is the part nobody should be reading in a pull request. And **an
+`#[ApiResponse(example: …)]` still wins**, because somebody wrote that down on
+purpose.
 
 ## Does this branch break somebody's client?
 
