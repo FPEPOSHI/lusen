@@ -100,3 +100,29 @@ it('escapes php it does not tokenise', function (): void {
         ->toContain('&gt;')
         ->toContain('&amp;&amp;');
 });
+
+it('colours python, keyword arguments included', function (): void {
+    $html = Highlighter::highlight("import requests\n\nresponse = requests.post(\n    headers={\"Accept\": \"application/json\"},\n    json={\"active\": True},\n)", 'python');
+
+    expect($html)->toContain('<span class="tok-lit">import</span>')
+        ->toContain('<span class="tok-cmd">post</span>')
+        ->toContain('<span class="tok-key">headers</span>')
+        ->toContain('<span class="tok-key">&quot;Accept&quot;</span>')
+        ->toContain('<span class="tok-lit">True</span>');
+});
+
+it('colours go, and treats a raw literal as the one string it is', function (): void {
+    $html = Highlighter::highlight("body := []byte(`{\n  \"name\": \"Ada\"\n}`)\n\nif err != nil {\n\tlog.Fatal(err)\n}", 'go');
+
+    // Picking the JSON inside a raw literal apart would look livelier and
+    // would be saying something untrue about the language.
+    expect($html)->toContain('<span class="tok-lit">if</span>')
+        ->toContain('<span class="tok-lit">nil</span>')
+        ->toContain('<span class="tok-cmd">Fatal</span>')
+        ->and(substr_count($html, 'tok-str'))->toBe(1);
+});
+
+it('escapes python and go it does not tokenise', function (): void {
+    expect(Highlighter::highlight('a = b < c and d > e', 'python'))->toContain('&lt;')->toContain('&gt;')
+        ->and(Highlighter::highlight('if a < b && c > d {', 'go'))->toContain('&amp;&amp;');
+});

@@ -38,6 +38,8 @@ final class Snippets
             'javascript' => 'JavaScript',
             'laravel' => 'PHP (Laravel)',
             'guzzle' => 'PHP (Guzzle)',
+            'python' => 'Python',
+            'go' => 'Go',
         ];
 
         if (! is_array($configured) || $configured === []) {
@@ -68,6 +70,8 @@ final class Snippets
         return match ($language) {
             'javascript' => 'javascript',
             'laravel', 'guzzle' => 'php',
+            'python' => 'python',
+            'go' => 'go',
             default => 'bash',
         };
     }
@@ -78,6 +82,8 @@ final class Snippets
             'javascript' => self::javascript($endpoint, $baseUrl),
             'laravel' => self::laravel($endpoint, $baseUrl),
             'guzzle' => self::guzzle($endpoint, $baseUrl),
+            'python' => self::python($endpoint, $baseUrl),
+            'go' => self::go($endpoint, $baseUrl),
             default => self::curl($endpoint, $baseUrl),
         };
     }
@@ -198,6 +204,145 @@ final class Snippets
             .'$client = new Client();'."\n\n"
             .'$response = $client->request('.$arguments.');'."\n\n"
             .'$data = json_decode((string) $response->getBody(), true);';
+    }
+
+    /**
+     * Python, through `requests`.
+     *
+     * `json=` rather than `data=json.dumps(...)`: it sets the content type,
+     * serialises the body, and is what anybody writing Python against a JSON
+     * API actually types.
+     */
+    public static function python(Endpoint $endpoint, ?string $baseUrl = null): string
+    {
+        $request = RequestModel::for($endpoint, $baseUrl);
+
+        $arguments = ['    "'.self::escapeDouble($request['url']).'",'];
+        $headers = [];
+
+        foreach ($request['headers'] as $name => $value) {
+            $headers[] = '        "'.self::escapeDouble((string) $name).'": "'.self::escapeDouble((string) $value).'",';
+        }
+
+        if ($headers !== []) {
+            $arguments[] = "    headers={\n".implode("\n", $headers)."\n    },";
+        }
+
+        $body = $request['body'];
+
+        if ($body !== null && $body !== []) {
+            $arguments[] = '    json='.self::pythonValue($body, '    ').',';
+        }
+
+        return "import requests\n\n"
+            .'response = requests.'.strtolower($request['method'])."(\n"
+            .implode("\n", $arguments)
+            ."\n)\n\ndata = response.json()";
+    }
+
+    /**
+     * Go, through `net/http`.
+     *
+     * No `package main` and no `func main`, which would be four lines of
+     * ceremony before the first line that says anything about this endpoint.
+     * The body is a raw string literal so the JSON reads as JSON rather than
+     * as a wall of escaped quotes - unless it contains a backtick, which a raw
+     * literal cannot hold, and then it is quoted the long way instead.
+     */
+    public static function go(Endpoint $endpoint, ?string $baseUrl = null): string
+    {
+        $request = RequestModel::for($endpoint, $baseUrl);
+        $body = self::bodyJson($request['body']);
+        $url = '"'.self::escapeDouble($request['url']).'"';
+
+        $lines = [];
+
+        if ($body !== null) {
+            $lines[] = 'body := []byte('.self::goString($body).')';
+            $lines[] = '';
+        }
+
+        $lines[] = 'req, _ := http.NewRequest("'.$request['method'].'", '.$url.', '
+            .($body === null ? 'nil' : 'bytes.NewBuffer(body)').')';
+
+        foreach ($request['headers'] as $name => $value) {
+            $lines[] = 'req.Header.Set("'.self::escapeDouble((string) $name).'", "'.self::escapeDouble((string) $value).'")';
+        }
+
+        return implode("\n", [
+            ...$lines,
+            '',
+            'res, err := http.DefaultClient.Do(req)',
+            'if err != nil {',
+            "\tlog.Fatal(err)",
+            '}',
+            'defer res.Body.Close()',
+            '',
+            'var data map[string]any',
+            'json.NewDecoder(res.Body).Decode(&data)',
+        ]);
+    }
+
+    /**
+     * A Python literal for one value.
+     */
+    private static function pythonValue(mixed $value, string $indent): string
+    {
+        if (is_array($value)) {
+            // `[]` for both, because PHP cannot tell them apart: an empty
+            // JSON object decodes to exactly the same value as an empty
+            // array, and guessing `{}` would be wrong just as often.
+            if ($value === []) {
+                return '[]';
+            }
+
+            $isList = array_is_list($value);
+            $inner = $indent.'    ';
+            $lines = [];
+
+            foreach ($value as $key => $item) {
+                $lines[] = $isList
+                    ? $inner.self::pythonValue($item, $inner).','
+                    : $inner.'"'.self::escapeDouble((string) $key).'": '.self::pythonValue($item, $inner).',';
+            }
+
+            return ($isList ? "[\n" : "{\n").implode("\n", $lines)."\n".$indent.($isList ? ']' : '}');
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'True' : 'False';
+        }
+
+        if ($value === null) {
+            return 'None';
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+
+        return '"'.self::escapeDouble(is_scalar($value) ? (string) $value : '').'"';
+    }
+
+    /**
+     * A Go string holding a JSON body: raw where it can be, quoted where a
+     * backtick makes a raw literal impossible.
+     */
+    private static function goString(string $json): string
+    {
+        if (! str_contains($json, '`')) {
+            return '`'.$json.'`';
+        }
+
+        return '"'.str_replace(['\\', '"', "\n"], ['\\\\', '\"', '\n'], $json).'"';
+    }
+
+    /**
+     * For a double-quoted string in Python, Go or JSON.
+     */
+    private static function escapeDouble(string $value): string
+    {
+        return str_replace(['\\', '"'], ['\\\\', '\"'], $value);
     }
 
     /**

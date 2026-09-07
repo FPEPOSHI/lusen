@@ -397,6 +397,23 @@ of the files behind it actually changed — comparing contents, not timestamps,
 so a fresh checkout or a CI runner still gets the benefit. Add `.lusen` to your
 `.gitignore`.
 
+## Request examples
+
+Every endpoint page carries the same request in several languages, tabbed
+where the script runs and stacked where it does not:
+
+| | |
+| --- | --- |
+| On by default | `curl`, `javascript`, `laravel`, `guzzle` |
+| Available | `python` (requests), `go` (net/http) |
+
+Set `ui.snippets` to the ones your readers actually write. Python and Go are
+off by default because six tabs is a strip nobody reads, and which two your
+readers want is a question only you can answer.
+
+All of them render the same assembled request, so no tab can drift from
+another or from the request the playground sends.
+
 ## Real examples, not plausible ones
 
 A generated example satisfies the schema and nothing else. It says

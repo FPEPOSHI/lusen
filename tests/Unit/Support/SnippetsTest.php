@@ -105,7 +105,7 @@ it('url-encodes example values in the path', function (): void {
 
 it('only offers languages it can actually produce', function (): void {
     // The config must not be able to promise a snippet that does not exist.
-    expect(Snippets::languages(['curl', 'javascript', 'python', 'cobol']))
+    expect(Snippets::languages(['curl', 'javascript', 'cobol', 'ruby']))
         ->toBe(['curl' => 'cURL', 'javascript' => 'JavaScript']);
 });
 
@@ -116,7 +116,7 @@ it('keeps the configured order', function (): void {
 it('falls back to curl for nonsense configuration', function (): void {
     expect(Snippets::languages([]))->toBe(['curl' => 'cURL'])
         ->and(Snippets::languages('nope'))->toBe(['curl' => 'cURL'])
-        ->and(Snippets::languages(['python']))->toBe(['curl' => 'cURL']);
+        ->and(Snippets::languages(['cobol']))->toBe(['curl' => 'cURL']);
 });
 
 it('renders the language it is asked for', function (): void {
@@ -192,4 +192,66 @@ it('escapes a quote in an example rather than breaking the snippet', function ()
     // A snippet that will not parse is worse than no snippet at all.
     expect(Snippets::laravel($endpoint))->toContain("'name' => 'O\\'Brien',")
         ->and(Snippets::guzzle($endpoint))->toContain("'name' => 'O\\'Brien',");
+});
+
+it('writes python through requests, with the body as a keyword argument', function (): void {
+    $endpoint = Endpoint::make(HttpMethod::Post, 'api/users', 'users.store')->with(
+        authenticated: true,
+        parameters: [
+            new Parameter('name', ParameterLocation::Body, Schema::string()->withExample('Ada'), required: true),
+            new Parameter('active', ParameterLocation::Body, Schema::boolean()->withExample(true)),
+        ],
+    );
+
+    $python = Snippets::python($endpoint, 'https://api.test');
+
+    // json= rather than data=json.dumps(...): it sets the content type,
+    // serialises the body, and is what anybody actually types.
+    expect($python)->toContain('import requests')
+        ->toContain('response = requests.post(')
+        ->toContain('"Authorization": "Bearer YOUR_TOKEN",')
+        ->toContain('json={')
+        ->toContain('"name": "Ada",')
+        ->toContain('"active": True,')
+        ->toContain('data = response.json()');
+});
+
+it('leaves the body out of a python call that has none', function (): void {
+    expect(Snippets::python(Endpoint::make(HttpMethod::Get, 'api/users'), 'https://api.test'))
+        ->toContain('requests.get(')
+        ->not->toContain('json=');
+});
+
+it('writes go through net/http, with the body as a raw literal', function (): void {
+    $endpoint = Endpoint::make(HttpMethod::Post, 'api/users', 'users.store')->withParameters([
+        new Parameter('name', ParameterLocation::Body, Schema::string()->withExample('Ada'), required: true),
+    ]);
+
+    $go = Snippets::go($endpoint, 'https://api.test');
+
+    // A raw literal so the JSON reads as JSON rather than a wall of escaped
+    // quotes, and no package/func ceremony before the first useful line.
+    expect($go)->toContain('body := []byte(`{')
+        ->toContain('req, _ := http.NewRequest("POST", "https://api.test/api/users", bytes.NewBuffer(body))')
+        ->toContain('res, err := http.DefaultClient.Do(req)')
+        ->toContain('defer res.Body.Close()')
+        ->not->toContain('package main');
+});
+
+it('passes nil to go rather than an empty buffer when there is no body', function (): void {
+    expect(Snippets::go(Endpoint::make(HttpMethod::Get, 'api/users'), 'https://api.test'))
+        ->toContain('http.NewRequest("GET", "https://api.test/api/users", nil)')
+        ->not->toContain('bytes.NewBuffer');
+});
+
+it('quotes a go body the long way when a raw literal cannot hold it', function (): void {
+    // A backtick cannot appear inside a Go raw string literal at all.
+    $endpoint = Endpoint::make(HttpMethod::Post, 'api/users')->withParameters([
+        new Parameter('note', ParameterLocation::Body, Schema::string()->withExample('use `code` here'), required: true),
+    ]);
+
+    $go = Snippets::go($endpoint, 'https://api.test');
+
+    expect($go)->not->toContain('[]byte(`')
+        ->toContain('\"note\"');
 });

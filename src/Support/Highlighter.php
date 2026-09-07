@@ -26,6 +26,8 @@ final class Highlighter
             'bash', 'sh', 'shell', 'curl' => self::shell($code),
             'javascript', 'js' => self::javascript($code),
             'php' => self::php($code),
+            'python' => self::python($code),
+            'go' => self::go($code),
             default => self::escape($code),
         };
     }
@@ -109,32 +111,7 @@ final class Highlighter
             .'|\b([A-Za-z_$][\w$]*)(?=\s*\()'
             .'|\b([A-Za-z_$][\w$]*)(?=\s*:)/';
 
-        $result = preg_replace_callback(
-            $pattern,
-            static function (array $match): string {
-                // A string followed by a colon is a key, exactly as in JSON.
-                if (($match[1] ?? '') !== '') {
-                    $class = ($match[2] ?? '') !== '' ? 'tok-key' : 'tok-str';
-
-                    return '<span class="'.$class.'">'.self::escape($match[1]).'</span>'
-                        .self::escape($match[2] ?? '');
-                }
-
-                // Keyword, literal, number, the name being called, a bare key.
-                $classes = [3 => 'tok-lit', 4 => 'tok-lit', 5 => 'tok-num', 6 => 'tok-cmd', 7 => 'tok-key'];
-
-                foreach ($classes as $group => $class) {
-                    if (($match[$group] ?? '') !== '') {
-                        return '<span class="'.$class.'">'.self::escape($match[$group]).'</span>';
-                    }
-                }
-
-                return self::escape($match[0]);
-            },
-            self::escapeOutsideMatches($code, $pattern),
-        );
-
-        return $result ?? self::escape($code);
+        return self::tokenize($code, $pattern, [3 => 'tok-lit', 4 => 'tok-lit', 5 => 'tok-num', 6 => 'tok-cmd', 7 => 'tok-key']);
     }
 
     /**
@@ -155,19 +132,68 @@ final class Highlighter
             .'|((?<![\w.])-?\d+(?:\.\d+)?\b)'
             .'|\b([A-Za-z_]\w*)(?=\s*\()/';
 
+        // A string followed by => is an array key, the same way a string
+        // followed by a colon is one in JSON.
+        return self::tokenize($code, $pattern, [3 => 'tok-lit', 4 => 'tok-lit', 5 => 'tok-flag', 6 => 'tok-num', 7 => 'tok-cmd']);
+    }
+
+    /**
+     * The Python snippet: strings, dict keys, keyword arguments and the call.
+     *
+     * A bare name before `=` is a keyword argument - `headers=`, `json=` - and
+     * reads as a key, which is what it is.
+     */
+    public static function python(string $code): string
+    {
+        $pattern = '/("(?:[^"\\\\]|\\\\.)*")(\s*:)?'
+            .'|\b(import|from|as)\b'
+            .'|\b(True|False|None)\b'
+            .'|((?<![\w.])-?\d+(?:\.\d+)?\b)'
+            .'|\b([A-Za-z_]\w*)(?=\s*\()'
+            .'|\b([A-Za-z_]\w*)(?=\s*=[^=])/';
+
+        return self::tokenize($code, $pattern, [3 => 'tok-lit', 4 => 'tok-lit', 5 => 'tok-num', 6 => 'tok-cmd', 7 => 'tok-key']);
+    }
+
+    /**
+     * The Go snippet.
+     *
+     * The raw literal holding the request body is coloured as one string,
+     * because that is what it is. Picking the JSON inside it apart would look
+     * livelier and would be saying something untrue about the language.
+     */
+    public static function go(string $code): string
+    {
+        $pattern = '/(`[^`]*`|"(?:[^"\\\\]|\\\\.)*")()'
+            .'|\b(var|func|if|defer|return|range|map|package|import)\b'
+            .'|\b(nil|true|false)\b'
+            .'|((?<![\w.])-?\d+(?:\.\d+)?\b)'
+            .'|\b([A-Za-z_]\w*)(?=\s*\()/';
+
+        return self::tokenize($code, $pattern, [3 => 'tok-lit', 4 => 'tok-lit', 5 => 'tok-num', 6 => 'tok-cmd']);
+    }
+
+    /**
+     * The shared pass every language tokenizer here runs.
+     *
+     * Group 1 is the string, group 2 the punctuation that turns it into a key
+     * - a colon in JSON and Python, `=>` in PHP - and the map says which class
+     * every remaining group gets. Four languages were writing the same
+     * callback with a different table in the middle.
+     *
+     * @param  array<int, string>  $classes
+     */
+    private static function tokenize(string $code, string $pattern, array $classes): string
+    {
         $result = preg_replace_callback(
             $pattern,
-            static function (array $match): string {
-                // A string followed by => is an array key, the same way a
-                // string followed by a colon is one in JSON.
+            static function (array $match) use ($classes): string {
                 if (($match[1] ?? '') !== '') {
                     $class = ($match[2] ?? '') !== '' ? 'tok-key' : 'tok-str';
 
                     return '<span class="'.$class.'">'.self::escape($match[1]).'</span>'
                         .self::escape($match[2] ?? '');
                 }
-
-                $classes = [3 => 'tok-lit', 4 => 'tok-lit', 5 => 'tok-flag', 6 => 'tok-num', 7 => 'tok-cmd'];
 
                 foreach ($classes as $group => $class) {
                     if (($match[$group] ?? '') !== '') {

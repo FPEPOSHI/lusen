@@ -507,12 +507,13 @@ return [
 
         /*
          | Request-example languages shown on each endpoint, in order.
-         | Supported: curl, javascript, laravel, guzzle.
+         | Supported: curl, javascript, laravel, guzzle, python, go.
          |
          | The two PHP flavours are on by default because the applications
          | this package documents are Laravel ones, and whoever is calling
-         | your API is usually writing PHP too. Drop either if that is not
-         | true of your readers.
+         | your API is usually writing PHP too. Python and Go are supported
+         | and off: six tabs is a strip nobody reads, and which two of them
+         | your readers want is a question only you can answer.
          */
         'snippets' => ['curl', 'javascript', 'laravel', 'guzzle'],
 
