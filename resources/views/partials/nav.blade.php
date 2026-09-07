@@ -8,6 +8,24 @@
     script happened to find first.
 --}}
 <nav id="navigation" aria-label="Documentation">
+    @php($navSite = \Lusen\Support\Product::site(config('lusen.product')))
+
+    {{-- Identity, in one block and in the order a reader needs it: where they
+         are in the wider product, which documentation this is, and which
+         version of it. The way out goes above the title rather than under the
+         version, where it interrupted the name and the number that belong
+         together - and where "Acme" under "Acme Commerce API" read as a
+         duplicate rather than as a way back. --}}
+    @if ($navSite)
+        <a href="{{ $navSite['url'] }}" class="-ml-1 mb-1 inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white">
+            <svg class="size-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6" />
+            </svg>
+            {{ $navSite['name'] }}
+        </a>
+    @endif
+
     {{-- The API's name leads the sidebar. It is the one thing on the page that
          says which documentation this is, so it belongs above the controls
          rather than under them. --}}
@@ -18,21 +36,6 @@
         {{ $spec->title }}
     </a>
     <p class="mt-1 mb-4 font-mono text-xs text-slate-500">v{{ $spec->version }}</p>
-
-    @php($navSite = \Lusen\Support\Product::site(config('lusen.product')))
-
-    @if ($navSite)
-        {{-- Above the search rather than beside the footer link: somebody who
-             arrived from a search engine landed in the middle of a product
-             they may not have seen the front of. --}}
-        <a href="{{ $navSite['url'] }}" class="mb-4 flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white">
-            <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M15 6l-6 6 6 6" />
-            </svg>
-            {{ $navSite['name'] }}
-        </a>
-    @endif
 
     @include('lusen::partials.search')
 
