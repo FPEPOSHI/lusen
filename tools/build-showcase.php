@@ -117,6 +117,9 @@ $files[] = EmittedFile::html('index.html', strtr((string) file_get_contents(__DI
     '{{groups}}' => (string) count($spec->groups),
 ]));
 $files[] = new EmittedFile('lusen-icon.svg', (string) file_get_contents($root.'/art/lusen-icon.svg'), 'image/svg+xml');
+// The front page shows the example rather than describing it; the screenshot
+// is the one in the README, so the two cannot show different things.
+$files[] = new EmittedFile('screenshot-endpoint.png', (string) file_get_contents($root.'/art/screenshots/endpoint.png'), 'image/png');
 
 // GitHub Pages runs Jekyll by default, which skips directories it does not
 // recognise and would drop files beginning with an underscore.

@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
     <title>Lusen — API documentation for Laravel that people, search engines and AI agents can read</title>
     <meta name="description" content="Lusen is a free Laravel package that documents your API as static HTML, Markdown, OpenAPI 3.1, llms.txt and an MCP server, read from your routes, form requests and resources with no configuration.">
     <link rel="canonical" href="https://lusen.oda.al/">
@@ -10,86 +11,251 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Lusen — API documentation for Laravel">
     <meta property="og:description" content="Static HTML for people, Markdown and OpenAPI for machines, llms.txt for retrieval models, an MCP server for agents. From your routes, with no configuration.">
+    <meta property="og:image" content="https://lusen.oda.al/screenshot-endpoint.png">
+    <meta name="twitter:card" content="summary_large_image">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"Lusen","description":"API documentation for Laravel that people, search engines and AI agents can read.","codeRepository":"https://github.com/fpeposhi/lusen","programmingLanguage":"PHP","license":"https://opensource.org/licenses/MIT","url":"https://lusen.oda.al/"}</script>
     <style>
-        :root { color-scheme: light dark; --bg: #fff; --fg: #1e293b; --muted: #64748b; --heading: #0f172a; --line: #e2e8f0; --accent: #4f46e5; --accent-fg: #fff; --code-bg: #f8fafc; }
-        @media (prefers-color-scheme: dark) { :root { --bg: #020617; --fg: #e2e8f0; --muted: #94a3b8; --heading: #fff; --line: #1e293b; --accent: #818cf8; --accent-fg: #0f172a; --code-bg: #0f172a; } }
+        /* Dark by design, the way a framework's front page is: the example
+           behind the button is where light and dark both live. */
+        :root {
+            --bg: #020617; --panel: rgba(15, 23, 42, .65); --line: rgba(148, 163, 184, .16); --line-strong: rgba(148, 163, 184, .32);
+            --fg: #cbd5e1; --muted: #94a3b8; --heading: #f8fafc;
+            --indigo: #6366f1; --sky: #38bdf8; --fuchsia: #e879f9;
+        }
         * { box-sizing: border-box; }
-        body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
-        main { max-width: 44rem; margin: 0 auto; padding: 4rem 1.5rem 5rem; }
-        header { display: flex; align-items: center; gap: .75rem; font-weight: 600; color: var(--heading); }
-        h1 { font-size: 2.25rem; line-height: 1.15; letter-spacing: -.02em; color: var(--heading); margin: 1.5rem 0 .75rem; }
-        h2 { font-size: 1.125rem; letter-spacing: -.01em; color: var(--heading); margin: 2.5rem 0 .5rem; }
-        p { margin: 0 0 1rem; }
-        .lead { font-size: 1.125rem; color: var(--muted); }
-        .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.5rem 0; }
-        .button { display: inline-block; padding: .6rem 1rem; border: 1px solid var(--line); border-radius: .5rem; color: var(--heading); font-weight: 600; text-decoration: none; }
-        .button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
-        a { color: var(--accent); }
-        code, pre { font: .9em/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-        pre { margin: 0 0 1rem; padding: 1rem; overflow-x: auto; background: var(--code-bg); border: 1px solid var(--line); border-radius: .5rem; }
-        ul { margin: 0 0 1rem; padding-left: 1.25rem; }
-        li { margin: .35rem 0; }
-        dl { margin: 0; }
-        dt { margin-top: 1rem; font-weight: 600; color: var(--heading); }
-        dd { margin: .25rem 0 0; }
-        footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: .875rem; color: var(--muted); }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0; background: var(--bg); color: var(--fg);
+            font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            -webkit-font-smoothing: antialiased; overflow-x: hidden;
+        }
+        a { color: inherit; text-decoration: none; }
+        code, pre { font: .92em/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+        /* The ground: a faint grid fading out below the fold, and three colour
+           glows. Fixed, so every section sits on the same sky. */
+        .ground { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+        .ground::before {
+            content: ""; position: absolute; inset: 0;
+            background-image:
+                linear-gradient(to right, rgba(148, 163, 184, .08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(148, 163, 184, .08) 1px, transparent 1px);
+            background-size: 3rem 3rem;
+            -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 100%);
+            mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 100%);
+        }
+        .ground::after {
+            content: ""; position: absolute; inset: -20% -10% auto -10%; height: 90vh;
+            background:
+                radial-gradient(40rem 26rem at 18% 20%, rgba(99, 102, 241, .38), transparent 60%),
+                radial-gradient(36rem 24rem at 82% 12%, rgba(56, 189, 248, .26), transparent 60%),
+                radial-gradient(30rem 22rem at 60% 90%, rgba(232, 121, 249, .16), transparent 60%);
+            filter: blur(10px);
+        }
+
+        .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* Top bar */
+        .nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px); background: rgba(2, 6, 23, .6); border-bottom: 1px solid var(--line); }
+        .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 3.75rem; }
+        .brand { display: flex; align-items: center; gap: .6rem; font-weight: 700; color: var(--heading); letter-spacing: -.01em; }
+        .brand svg { width: 1.6rem; height: 1.6rem; color: #a5b4fc; }
+        .nav nav { display: flex; gap: 1.5rem; font-size: .9rem; color: var(--muted); }
+        .nav nav a:hover { color: var(--heading); }
+
+        /* Hero, with the mark standing behind it like the rock the name is
+           from: big, faint, lit from the same colours as the glows. */
+        .hero { position: relative; padding: 6rem 0 3rem; }
+        .hero-mark { position: absolute; z-index: -1; right: -8rem; top: -3rem; width: 44rem; height: 44rem; opacity: .16; filter: drop-shadow(0 0 60px rgba(99, 102, 241, .55)); pointer-events: none; }
+        .eyebrow { display: inline-flex; align-items: center; gap: .5rem; padding: .3rem .8rem; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--panel); font-size: .8rem; color: var(--muted); }
+        .eyebrow b { color: #c7d2fe; font-weight: 600; }
+        h1 { margin: 1.25rem 0 1rem; max-width: 46rem; font-size: clamp(2.4rem, 6vw, 4.25rem); line-height: 1.05; letter-spacing: -.03em; font-weight: 800; color: var(--heading); }
+        .grad { background: linear-gradient(90deg, #a5b4fc, var(--sky) 45%, var(--fuchsia)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .lead { max-width: 40rem; font-size: 1.2rem; color: var(--muted); margin: 0 0 1.75rem; }
+        .actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+        .btn { display: inline-flex; align-items: center; gap: .5rem; padding: .75rem 1.25rem; border-radius: .75rem; font-weight: 600; font-size: .95rem; border: 1px solid var(--line-strong); background: var(--panel); color: var(--heading); transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+        .btn:hover { transform: translateY(-1px); border-color: rgba(165, 180, 252, .6); }
+        .btn.primary { border-color: transparent; color: #fff; background: linear-gradient(135deg, var(--indigo), #0ea5e9); box-shadow: 0 0 0 1px rgba(255, 255, 255, .08) inset, 0 12px 40px -12px rgba(99, 102, 241, .8); }
+        .btn.primary:hover { box-shadow: 0 0 0 1px rgba(255, 255, 255, .12) inset, 0 16px 48px -12px rgba(56, 189, 248, .8); }
+        .install { display: inline-flex; align-items: center; gap: .75rem; margin-top: 1.5rem; padding: .6rem .9rem; border: 1px solid var(--line); border-radius: .6rem; background: rgba(2, 6, 23, .7); color: #e2e8f0; }
+        .install span { color: var(--sky); user-select: none; }
+
+        /* The screenshot, framed and lit: proof rather than a promise. */
+        .shot { position: relative; display: block; margin: 3.5rem auto 0; max-width: 64rem; border-radius: 1rem; border: 1px solid var(--line-strong); background: #0f172a; overflow: hidden; box-shadow: 0 0 0 1px rgba(255, 255, 255, .04), 0 50px 140px -40px rgba(99, 102, 241, .7), 0 30px 80px -40px rgba(56, 189, 248, .5); }
+        .shot::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(135deg, rgba(165, 180, 252, .6), rgba(56, 189, 248, .3) 50%, rgba(232, 121, 249, .4)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+        .shot img { display: block; width: 100%; height: auto; }
+        .caption { margin: 1rem 0 0; text-align: center; font-size: .9rem; color: var(--muted); }
+
+        /* Sections */
+        section { padding: 4.5rem 0 0; }
+        h2 { margin: 0 0 .5rem; font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing: -.02em; color: var(--heading); }
+        .sub { margin: 0 0 2rem; max-width: 40rem; color: var(--muted); font-size: 1.05rem; }
+        .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+        .card { position: relative; padding: 1.5rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--panel); transition: border-color .15s ease, transform .15s ease; }
+        .card:hover { border-color: rgba(165, 180, 252, .5); transform: translateY(-2px); }
+        .card .icon { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: .75rem; background: linear-gradient(135deg, rgba(99, 102, 241, .35), rgba(56, 189, 248, .25)); border: 1px solid rgba(165, 180, 252, .35); color: #c7d2fe; }
+        .card .icon svg { width: 1.25rem; height: 1.25rem; }
+        .card h3 { margin: 1rem 0 .4rem; font-size: 1.05rem; color: var(--heading); }
+        .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+        .card code { color: #e2e8f0; }
+
+        .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem 2rem; margin: 0; padding: 0; list-style: none; }
+        .facts li { display: flex; gap: .75rem; align-items: flex-start; padding: .9rem 1rem; border: 1px solid var(--line); border-radius: .75rem; background: rgba(15, 23, 42, .45); }
+        .facts svg { flex: none; width: 1.1rem; height: 1.1rem; margin-top: .2rem; color: #67e8f9; }
+        .facts b { color: var(--heading); font-weight: 600; }
+        .facts code { color: #e2e8f0; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: .6rem; }
+        .chip { display: inline-flex; align-items: center; gap: .5rem; padding: .5rem .85rem; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--panel); font-size: .9rem; color: #e2e8f0; transition: border-color .15s ease; }
+        .chip:hover { border-color: rgba(165, 180, 252, .7); }
+        .chip code { color: #a5b4fc; }
+        .chip small { color: var(--muted); }
+
+        .cta { margin-top: 4.5rem; padding: 3rem; border: 1px solid var(--line-strong); border-radius: 1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, .18), rgba(2, 6, 23, .6) 45%, rgba(232, 121, 249, .12)); text-align: center; }
+        .cta pre { display: inline-block; text-align: left; margin: 1.25rem 0 1.5rem; padding: 1rem 1.25rem; border: 1px solid var(--line); border-radius: .75rem; background: rgba(2, 6, 23, .8); color: #e2e8f0; }
+        .cta pre span { color: var(--sky); }
+        .cta p { color: var(--muted); max-width: 38rem; margin: 0 auto; }
+
+        footer { margin-top: 4rem; padding: 2rem 0 3rem; border-top: 1px solid var(--line); font-size: .9rem; color: var(--muted); }
+        footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; }
+        footer a:hover { color: var(--heading); }
+
+        @media (max-width: 56rem) {
+            .cards, .facts { grid-template-columns: 1fr; }
+            .hero { padding-top: 4rem; }
+            .hero-mark { right: -14rem; top: -2rem; width: 32rem; height: 32rem; opacity: .12; }
+            .cta { padding: 2rem 1.25rem; }
+            .nav nav a:nth-child(2) { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) { .btn, .card { transition: none; } }
     </style>
 </head>
 <body>
-<main>
-    <header>
-        <img src="/lusen-icon.svg" alt="" width="40" height="40">
-        Lusen
-    </header>
+<div class="ground" aria-hidden="true"></div>
 
-    <h1>API documentation for Laravel that people, search engines and AI agents can all read.</h1>
+<header class="nav">
+    <div class="wrap">
+        <a class="brand" href="/">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2 5.5 L15 5.5 L11.5 18.5 L22 18.5 L22 21.5 L2 21.5 Z"/></svg>
+            Lusen
+        </a>
+        <nav aria-label="Site">
+            <a href="/example/">Example</a>
+            <a href="/example/pages/how-lusen-works.html">How it works</a>
+            <a href="https://github.com/fpeposhi/lusen">GitHub</a>
+        </nav>
+    </div>
+</header>
 
-    <p class="lead">Lusen reads your application's routes, form requests and resources and writes the documentation as static files: HTML for people, Markdown and OpenAPI for machines, <code>llms.txt</code> for retrieval models, and an MCP server for agents. No configuration, no database, and no JavaScript needed to read a page.</p>
+<main class="wrap">
+    <section class="hero">
+        <svg class="hero-mark" viewBox="0 0 24 24" aria-hidden="true">
+            <defs>
+                <linearGradient id="mark-fill" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#a5b4fc"/>
+                    <stop offset=".5" stop-color="#38bdf8"/>
+                    <stop offset="1" stop-color="#e879f9"/>
+                </linearGradient>
+            </defs>
+            <path fill="url(#mark-fill)" d="M2 5.5 L15 5.5 L11.5 18.5 L22 18.5 L22 21.5 L2 21.5 Z"/>
+        </svg>
 
-    <p class="actions">
-        <a class="button primary" href="/example/">View the example</a>
-        <a class="button" href="https://github.com/fpeposhi/lusen">GitHub</a>
-    </p>
+        <p class="eyebrow"><b>Free</b> · MIT · Laravel 12 · PHP 8.2+</p>
 
-    <h2>Install</h2>
-    <pre><code>composer require fpeposhi/lusen
-php artisan lusen:build</code></pre>
-    <p>That is the whole setup. Lusen discovers <code>api/*</code> routes and documents them with no configuration, writing to <code>public/docs</code> so your web server serves the result as flat files with no PHP on the request path.</p>
+        <h1>API documentation that <span class="grad">people, search engines and AI agents</span> can all read.</h1>
 
-    <h2>Three readers</h2>
-    <dl>
-        <dt>People</dt>
-        <dd>Server-rendered HTML, one page per endpoint and one per group, readable with JavaScript disabled. Request examples in six languages, search that needs no server, and an optional playground.</dd>
-        <dt>Search engines</dt>
-        <dd>Canonical URLs, real meta descriptions, JSON-LD and a sitemap. One page per question, so nothing competes with itself.</dd>
-        <dt>AI agents and generative search</dt>
-        <dd>A Markdown twin of every page — swap <code>.html</code> for <code>.md</code> — plus <code>llms.txt</code>, OpenAPI 3.1, a discovery document at <code>/.well-known/api-docs</code>, and an MCP server that answers with the same Markdown a person reads.</dd>
-    </dl>
+        <p class="lead">Lusen reads your routes, form requests and resources and writes static HTML for people, Markdown and OpenAPI for machines, <code>llms.txt</code> for retrieval models and an MCP server for agents. Zero configuration. No database. No JavaScript needed to read a page.</p>
 
-    <h2>The example</h2>
-    <p>Everything under <a href="/example/">/example/</a> was written by Lusen's own emitters over a fictional commerce API: 24 endpoints across 9 groups, two versions served at once with <code>v2</code> current and <code>v1</code> deprecated. Nothing there is a mockup. Some places to look:</p>
-    <ul>
-        <li><a href="/example/endpoints/v2-orders-store.html">An endpoint page</a> — the reference on the left, the call on the right, and <em>Changed since v1</em> worked out by comparing the two editions.</li>
-        <li><a href="/example/groups/v2-orders.html">A group page</a> — what can be done with orders, before any one operation.</li>
-        <li><a href="/example/pages/versioning.html">The versioning page</a> — written by Lusen from what the two versions actually expose.</li>
-        <li><a href="/example/endpoints/v2-orders-store.md">The same endpoint as Markdown</a>, <a href="/example/openapi.json">openapi.json</a> and <a href="/example/llms.txt">llms.txt</a>.</li>
-        <li><a href="/example/pages/how-lusen-works.html">How these docs are built</a> — the three stages, and the example folder that produced the site.</li>
-    </ul>
+        <p class="actions">
+            <a class="btn primary" href="/example/">View the example
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a class="btn" href="https://github.com/fpeposhi/lusen">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.4-1.1-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.2-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.2-.4-1.2.1-2.6 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.6.6.7 1 1.6 1 2.7 0 3.9-2.4 4.8-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>
+                GitHub
+            </a>
+        </p>
 
-    <h2>What it works out on its own</h2>
-    <ul>
-        <li>Request bodies from form request rules, including nested <code>items.*.product_id</code> shapes.</li>
-        <li>Response fields from API resources, typed from model casts and migrations.</li>
-        <li>Authentication and scopes from middleware, and rate limits from throttling.</li>
-        <li>API versions from URLs: which is current, which are deprecated, and which operation supersedes which.</li>
-        <li>Real response examples recorded from your test suite, and a contract diff that grades each change by what it costs a client.</li>
-    </ul>
-    <p>Where inference stops, attributes and docblocks have the last word, including the ones another tool left behind. Extraction is static analysis: a build never boots the application, so it runs in CI against a checkout with no <code>.env</code>.</p>
+        <p class="install"><span>$</span><code>composer require fpeposhi/lusen</code></p>
 
-    <footer>
-        <p>MIT licensed. <a href="https://github.com/fpeposhi/lusen">Source on GitHub</a> · <a href="https://packagist.org/packages/fpeposhi/lusen">Packagist</a> · <a href="/example/">The example</a></p>
-    </footer>
+        <a class="shot" href="/example/endpoints/v2-orders-store.html">
+            <img src="/screenshot-endpoint.png" width="1600" height="1000" alt="An endpoint page from the example: the reference on the left, the request and its responses on the right." loading="eager">
+        </a>
+        <p class="caption">An endpoint page from the example. Nothing in it is a mockup: it is the package's own output over a fictional API.</p>
+    </section>
+
+    <section>
+        <h2>Three readers, one build</h2>
+        <p class="sub">Most API docs tools write for a developer with a browser. Lusen writes for three audiences at once, from one description of your API, so none of them gets a lesser copy.</p>
+        <div class="cards">
+            <article class="card">
+                <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+                <h3>People</h3>
+                <p>Server-rendered HTML, one page per endpoint and one per group, readable with JavaScript off. Request examples in six languages, a search box that needs no server, and an optional playground.</p>
+            </article>
+            <article class="card">
+                <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+                <h3>Search engines</h3>
+                <p>Canonical URLs, real meta descriptions, JSON-LD and a sitemap. One page per question, so nothing competes with itself for a query.</p>
+            </article>
+            <article class="card">
+                <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 4.6 4.6 1.9-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/></svg></span>
+                <h3>AI agents and generative search</h3>
+                <p>A Markdown twin of every page (swap <code>.html</code> for <code>.md</code>), <code>llms.txt</code>, OpenAPI 3.1, a discovery document at <code>/.well-known/api-docs</code>, and an MCP server that answers with the same Markdown a person reads.</p>
+            </article>
+        </div>
+    </section>
+
+    <section>
+        <h2>Worked out, not written</h2>
+        <p class="sub">Extraction is static analysis of your source. A build never boots the application, so it runs in CI against a checkout with no <code>.env</code>, and it reads more than you would think to write down.</p>
+        <ul class="facts">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg><span><b>Request bodies</b> from form request rules, nested shapes like <code>items.*.product_id</code> included.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg><span><b>Response fields</b> from API resources, typed from model casts and migrations.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg><span><b>Authentication and scopes</b> from middleware, and rate limits from throttling.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg><span><b>API versions</b> from URLs: which is current, which are deprecated, and which operation supersedes which.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg><span><b>Real examples</b> recorded from your own test suite, so an example says <code>"paid"</code> rather than <code>"string"</code>.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg><span><b>A contract diff</b> that grades every change by what it costs a client, for CI.</span></li>
+        </ul>
+        <p class="sub" style="margin-top:1.5rem">Where inference stops, attributes and docblocks have the last word, including the ones another tool left behind.</p>
+    </section>
+
+    <section>
+        <h2>Every page, in every form</h2>
+        <p class="sub">The example under <a href="/example/" style="color:#a5b4fc">/example/</a> is 24 endpoints across 9 groups, two versions served at once. Everything below was written by the same build.</p>
+        <div class="chips">
+            <a class="chip" href="/example/endpoints/v2-orders-store.html">An endpoint page <small>with <em>Changed since v1</em></small></a>
+            <a class="chip" href="/example/groups/v2-orders.html">A group page</a>
+            <a class="chip" href="/example/endpoints/v2-orders-store.md"><code>.md</code> twin of that endpoint</a>
+            <a class="chip" href="/example/openapi.json"><code>openapi.json</code></a>
+            <a class="chip" href="/example/llms.txt"><code>llms.txt</code></a>
+            <a class="chip" href="/example/llms-full.txt"><code>llms-full.txt</code></a>
+            <a class="chip" href="/example/sitemap.xml"><code>sitemap.xml</code></a>
+            <a class="chip" href="/example/search-index.json"><code>search-index.json</code></a>
+            <a class="chip" href="/example/postman.json"><code>postman.json</code></a>
+            <a class="chip" href="/.well-known/api-docs"><code>/.well-known/api-docs</code></a>
+            <a class="chip" href="/example/pages/versioning.html">The versioning page <small>derived</small></a>
+            <a class="chip" href="/example/pages/how-lusen-works.html">How these docs are built</a>
+        </div>
+    </section>
+
+    <div class="cta">
+        <h2>Try it on your own application</h2>
+        <pre><code><span>composer</span> require fpeposhi/lusen
+<span>php</span> artisan lusen:build</code></pre>
+        <p>That is the whole setup. Lusen discovers <code>api/*</code> routes and documents them with no configuration, writing to <code>public/docs</code> so your web server serves flat files with no PHP on the request path.</p>
+        <p class="actions" style="justify-content:center;margin-top:1.5rem">
+            <a class="btn primary" href="https://github.com/fpeposhi/lusen#readme">Read the README</a>
+            <a class="btn" href="https://github.com/fpeposhi/lusen/blob/main/AUTHORING.md">Authoring guide</a>
+        </p>
+    </div>
 </main>
+
+<footer>
+    <div class="wrap">
+        <span>Lusen is MIT licensed. Named for the rock in Kukës the mark is drawn from.</span>
+        <span><a href="https://github.com/fpeposhi/lusen">GitHub</a> · <a href="https://packagist.org/packages/fpeposhi/lusen">Packagist</a> · <a href="/example/">The example</a></span>
+    </div>
+</footer>
 </body>
 </html>
