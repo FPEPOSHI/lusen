@@ -18,8 +18,9 @@ required to read a page.
 > surfaces all work, as does the MCP server.
 >
 > Endpoint identifiers and the emitted URLs are already treated as a stability
-> contract. Configuration keys and the IR are not yet, so pin with `^0.5` — on
-> a `0.x` version a caret pins the minor, so `^0.4` will not pick this up.
+> contract. Configuration keys and the IR are not yet, so pin to the minor you
+> installed — `^0.6` today. On a `0.x` version a caret pins the minor, so an
+> older `^0.5` will not pick this release up.
 
 ## Install
 
