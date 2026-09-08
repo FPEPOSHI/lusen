@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented here.
 
+## Unreleased
+
+### Fixed
+
+- **Runtime mode advertised URLs it did not serve.** Every runtime page told
+  the script the search index lived at `search-index.json`, and nothing
+  answered there — so the search box, which only appears once the index has
+  been fetched, never appeared at all. The discovery document named `/docs.md`
+  and `/docs/spec.json`, and nothing answered there either. And `llms.txt`
+  linked every endpoint to a `.md` twin that only static output wrote. All of
+  it is served now: the index's Markdown twin at `/docs.md`, the spec, the
+  search index, the Postman collection, and the Markdown twin of every
+  endpoint, group and page at the same path static output writes it to.
+- **The two modes built two discovery documents, and they had drifted.** One
+  named surfaces the other served; both named a sitemap whether or not one had
+  been written, which without a canonical origin it never is. There is one
+  emitter now, told which surfaces exist, and a test that fetches every URL it
+  names. A surface whose emitter is switched off is no longer listed either.
+
 ## 0.6.3 — 2026-09-08
 
 ### Fixed

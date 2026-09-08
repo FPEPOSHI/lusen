@@ -80,3 +80,50 @@ it('omits mcp from discovery when it is disabled', function (): void {
 
     $this->get('/.well-known/api-docs')->assertOk()->assertJsonMissingPath('mcp');
 });
+
+it('answers every surface the discovery document names', function (): void {
+    // The document exists so an agent need not guess. Runtime used to name
+    // two URLs nothing served, and a sitemap it does not have.
+    $surfaces = $this->get('/.well-known/api-docs')->assertOk()->json('surfaces');
+
+    expect($surfaces)->toHaveKeys(['openapi', 'llms_txt', 'llms_full', 'markdown', 'spec', 'search_index', 'postman'])
+        ->and($surfaces)->not->toHaveKey('sitemap');
+
+    foreach ($surfaces as $url) {
+        $this->get($url)->assertOk();
+    }
+});
+
+it('serves the search index, so the search box can appear', function (): void {
+    // The script reveals the box only once it has fetched this; without the
+    // route, runtime mode had a search field that never showed.
+    $items = $this->get('/docs/search-index.json')->assertOk()->json('items');
+
+    expect($items)->not->toBeEmpty()
+        ->and($items[0]['url'])->toStartWith('#');
+});
+
+it('serves the whole api as markdown at the url a model adds .md to', function (): void {
+    $response = $this->get('/docs.md')->assertOk();
+
+    expect($response->headers->get('Content-Type'))->toContain('text/markdown')
+        ->and($response->getContent())->toContain('### GET /api/users');
+});
+
+it('serves the markdown twin of every page at the path static output would write', function (): void {
+    // llms.txt and the links between pages already point here.
+    $this->get('/docs/endpoints/users-index.md')->assertOk()->assertSee('# List users');
+    $this->get('/docs/groups/users.md')->assertOk()->assertSee('# Users');
+    $this->get('/docs/pages/introduction.md')->assertOk()->assertSee('# Introduction');
+});
+
+it('answers 404 for a twin of a page that does not exist', function (): void {
+    $this->get('/docs/endpoints/nope.md')->assertNotFound();
+    $this->get('/docs/groups/nope.md')->assertNotFound();
+    $this->get('/docs/pages/nope.md')->assertNotFound();
+});
+
+it('serves the spec and the postman collection', function (): void {
+    $this->get('/docs/spec.json')->assertOk()->assertJsonPath('title', 'Test API');
+    $this->get('/docs/postman.json')->assertOk()->assertJsonStructure(['info', 'item']);
+});

@@ -73,6 +73,7 @@ final class LusenServiceProvider extends ServiceProvider
             renderer: $app->make(Renderer::class),
             canonicalOrigin: $this->canonicalOrigin(),
             lastmod: Data::nullableString(Data::map($this->section('lusen'), 'seo'), 'lastmod'),
+            mcp: (bool) $this->config()->get('lusen.agents.mcp', true),
         ));
 
         $this->app->bind(PageCollector::class, fn (): PageCollector => new PageCollector(

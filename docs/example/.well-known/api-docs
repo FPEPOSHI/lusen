@@ -18,10 +18,15 @@
         "openapi": "/example/openapi.json",
         "llms_txt": "/example/llms.txt",
         "llms_full": "/example/llms-full.txt",
+        "markdown": "/example/index.md",
         "search_index": "/example/search-index.json",
         "postman": "/example/postman.json",
         "sitemap": "/example/sitemap.xml"
     },
     "endpoints": 24,
-    "generator": "lusen"
+    "generator": "lusen",
+    "mcp": {
+        "transport": "stdio",
+        "command": "php artisan lusen:mcp"
+    }
 }

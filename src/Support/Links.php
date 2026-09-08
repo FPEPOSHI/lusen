@@ -78,6 +78,17 @@ final readonly class Links
     }
 
     /**
+     * The Markdown twin of the index. Static output has a file beside
+     * index.html; at runtime the index is the whole API on one page, so its
+     * twin is at the URL a model constructs by adding `.md` to the page it
+     * is on.
+     */
+    public function indexMarkdown(): string
+    {
+        return $this->static ? $this->base().'/index.md' : $this->base().'.md';
+    }
+
+    /**
      * A group's own page in static output. At runtime the whole API is one
      * page, so it is the group's section of that page.
      */

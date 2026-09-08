@@ -25,16 +25,22 @@ final class EmitterRegistry
     /**
      * @param  array<string, mixed>  $output  the `output` section of config/lusen.php
      * @param  Renderer|null  $renderer  required only by emitters that render Blade
+     * @param  bool  $mcp  whether the host exposes the MCP server, for the discovery document
      */
     public function __construct(
         private readonly array $output = [],
         ?Renderer $renderer = null,
         ?string $canonicalOrigin = null,
         ?string $lastmod = null,
+        bool $mcp = true,
     ) {
         // Static output addresses pages as files; the runtime renderer uses
         // anchors. Emitters only ever produce the static shape.
         $links = new Links($this->docsUrl(), static: true, canonicalOrigin: $canonicalOrigin);
+
+        // The discovery document names the other surfaces, so it is told
+        // which of them are switched on rather than assuming all of them.
+        $enabled = $this->enabledNames();
 
         $this->factories = [
             'openapi' => static fn (): Emitter => new OpenApiEmitter,
@@ -43,7 +49,7 @@ final class EmitterRegistry
             'sitemap' => static fn (): Emitter => new SitemapEmitter($links, $lastmod),
             'search' => static fn (): Emitter => new SearchIndexEmitter($links),
             'postman' => static fn (): Emitter => new PostmanEmitter,
-            'discovery' => static fn (): Emitter => new DiscoveryEmitter($links),
+            'discovery' => static fn (): Emitter => new DiscoveryEmitter($links, $enabled, $mcp),
         ];
 
         if ($renderer !== null) {
