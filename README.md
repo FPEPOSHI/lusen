@@ -90,6 +90,10 @@ Two rules make those surfaces actually usable:
 versions at once, 24 endpoints across 9 groups, `v2` current and `v1`
 deprecated with a retirement date. Nothing there is a mockup: it is produced by
 running the package's real emitters, so it is exactly what `lusen:build` writes.
+The site explains itself, too:
+[How these docs are built](https://lusen.oda.al/pages/how-lusen-works.html)
+walks through the three stages and links to the [example folder](tools/) that
+produced it.
 
 [![An endpoint page](art/screenshots/endpoint.png)](https://lusen.oda.al/endpoints/v2-orders-store.html)
 
@@ -106,7 +110,7 @@ in `llms.txt` — swap `.html` for `.md` on any URL and see for yourself.
 Build it yourself in one command:
 
 ```bash
-php tools/build-showcase.php   # 7 prose pages, 9 group pages, 24 endpoint pages, Markdown mirrors, OpenAPI, llms.txt, sitemap, search index
+php tools/build-showcase.php   # 8 prose pages, 9 group pages, 24 endpoint pages, Markdown mirrors, OpenAPI, llms.txt, sitemap, search index
 open docs/index.html
 ```
 

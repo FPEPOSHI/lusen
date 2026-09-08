@@ -27,6 +27,10 @@ Write new integrations against `v2`. Every endpoint below states the version it 
 
 - [Pagination](/pages/pagination.md) — Every list endpoint pages the same way, so this is documented once here rather than repeated on each one.
 
+## About Lusen
+
+- [How these docs are built](/pages/how-lusen-works.md) — What Lusen is, how it turns a Laravel application into a site like this one, and where the example that produced this site lives.
+
 ## [Authentication (v2)](/groups/v2-authentication.md)
 
 Exchange an API key pair for a bearer token, and revoke it when you are done.

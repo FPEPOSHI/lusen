@@ -51,6 +51,13 @@
             "text": "Every list endpoint pages the same way, so this is documented once here rather than repeated on each one. Requesting a page Reading the response Iterating safely"
         },
         {
+            "title": "How these docs are built",
+            "url": "/pages/how-lusen-works.html",
+            "kind": "page",
+            "context": "About Lusen",
+            "text": "What Lusen is, how it turns a Laravel application into a site like this one, and where the example that produced this site lives. Three stages The surfaces What is derived on this site Try it on your own application The example"
+        },
+        {
             "title": "Authentication",
             "url": "/groups/v2-authentication.html",
             "kind": "group",

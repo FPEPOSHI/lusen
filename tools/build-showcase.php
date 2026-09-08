@@ -39,9 +39,13 @@ $origin = 'https://lusen.oda.al';
 /** @var ApiSpec $spec */
 $spec = require __DIR__.'/demo-spec.php';
 
-// Authored prose, plus whichever standard pages DefaultPages fills in.
-$authored = (new PageCollector(__DIR__.'/demo-pages'))->collect();
-$spec = $spec->withSections(PageSections::build($spec, $authored));
+// Authored prose, plus whichever standard pages DefaultPages fills in. The
+// root is passed so each page records where it lives in the repository, which
+// is what the edit link below needs.
+$authored = (new PageCollector(__DIR__.'/demo-pages', $root))->collect();
+// The page about Lusen itself sits last: it is for somebody evaluating the
+// package, not somebody integrating with the fictional API.
+$spec = $spec->withSections(PageSections::build($spec, $authored, ['Getting started', 'Guides', 'About Lusen']));
 
 $app = Application::create();
 $app['config']->set('lusen.seo.json_ld', true);
@@ -69,6 +73,13 @@ $app['config']->set('lusen.product', [
 ]);
 
 $app->register(LusenServiceProvider::class);
+
+// Every written page links to its own file in the example folder, which is
+// both the feature demonstrated and the way into the example. Set after the
+// provider has merged its defaults: the merge is a top-level array_merge, so
+// a single `ui` key set before it would replace the whole `ui` array and
+// silently drop the snippets and the assistant links.
+$app['config']->set('lusen.ui.edit_url', 'https://github.com/fpeposhi/lusen/edit/main/{path}');
 
 $renderer = new BladeRenderer($app['view']);
 
