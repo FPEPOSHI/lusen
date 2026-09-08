@@ -7,6 +7,8 @@ use Lusen\Ir\Endpoint;
 use Lusen\Ir\Enums\ParameterLocation;
 use Lusen\SpecBuilder;
 use Lusen\Tests\Fixtures\HiddenController;
+use Lusen\Tests\Fixtures\LegacyOnboardingController;
+use Lusen\Tests\Fixtures\OnboardingController;
 use Lusen\Tests\Fixtures\UserController;
 
 function buildSpec()
@@ -37,6 +39,17 @@ it('takes the group description from the controller attribute', function (): voi
     }
 
     expect($descriptions)->toBe(['Orders' => null, 'Users' => 'Create and read user accounts.']);
+});
+
+it('describes a group by what most of it says, not by what sorts first', function (): void {
+    // A route reaching into another controller must not speak for the group
+    // it lands in just because its path sorts first.
+    Route::post('api/onboarding/aa-legacy', [LegacyOnboardingController::class, 'legacyRegister'])->name('onboarding.legacy');
+    Route::post('api/onboarding/register', [OnboardingController::class, 'register'])->name('onboarding.register');
+    Route::post('api/onboarding/certificate', [OnboardingController::class, 'certificate'])->name('onboarding.certificate');
+
+    expect(buildSpec()->group('onboarding')?->lede())
+        ->toBe('Everything a new company does before its first invoice.');
 });
 
 it('carries the group description on the endpoint, so a cached endpoint keeps it', function (): void {

@@ -18,6 +18,11 @@ All notable changes to this project are documented here.
   group's own page and wrong in a list of every group, where it pushes the
   next one off the screen, and wrong again in a meta description, where it is
   truncated mid-workflow.
+- **A group spanning two controllers took the description of whichever sorted
+  first.** A route reaching across into another controller brought that
+  controller's copy with it and spoke for the whole group. The description
+  most of the group carries wins now, which only decides anything in exactly
+  that case and decides it the way a reader would.
 
 ## 0.6.1 — 2026-09-08
 

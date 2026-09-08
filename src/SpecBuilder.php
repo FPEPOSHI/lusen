@@ -189,10 +189,9 @@ final readonly class SpecBuilder
             $version = $scoped ? $endpoint->version : null;
             $name = $endpoint->group ?? 'General';
 
-            $buckets[$version.'|'.$name] ??= ['version' => $version, 'name' => $name, 'order' => null, 'description' => null, 'endpoints' => []];
+            $buckets[$version.'|'.$name] ??= ['version' => $version, 'name' => $name, 'order' => null, 'endpoints' => []];
             $buckets[$version.'|'.$name]['endpoints'][] = $endpoint;
             $buckets[$version.'|'.$name]['order'] ??= $endpoint->groupOrder;
-            $buckets[$version.'|'.$name]['description'] ??= $endpoint->groupDescription;
         }
 
         uasort($buckets, static fn (array $a, array $b): int => [
@@ -205,11 +204,46 @@ final readonly class SpecBuilder
             static fn (array $bucket): Group => new Group(
                 name: $bucket['name'],
                 endpoints: self::sequence($bucket['endpoints']),
-                description: $bucket['description'],
+                description: self::describe($bucket['endpoints']),
                 version: $bucket['version'],
                 order: $bucket['order'],
             ),
             $buckets,
+        ));
+    }
+
+    /**
+     * The description of a group assembled from more than one controller.
+     *
+     * The one most of the group carries, rather than whichever happened to
+     * come first alphabetically. A group usually has a single controller
+     * behind it and every endpoint says the same thing, so this only decides
+     * anything where a route reaches across into another controller - and
+     * there, the copy describing three of a group's four operations is the
+     * copy that describes the group.
+     *
+     * @param  list<Endpoint>  $endpoints
+     */
+    private static function describe(array $endpoints): ?string
+    {
+        /** @var array<string, int> $counts */
+        $counts = [];
+
+        foreach ($endpoints as $endpoint) {
+            if ($endpoint->groupDescription !== null) {
+                $counts[$endpoint->groupDescription] = ($counts[$endpoint->groupDescription] ?? 0) + 1;
+            }
+        }
+
+        if ($counts === []) {
+            return null;
+        }
+
+        // Stable: an even split keeps the first one collection produced, so
+        // the build stays deterministic.
+        return (string) array_key_first(array_filter(
+            $counts,
+            static fn (int $count): bool => $count === max($counts),
         ));
     }
 
