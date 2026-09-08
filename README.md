@@ -4,7 +4,7 @@
 
 Fast, SEO and AI-agent-friendly API documentation for Laravel.
 
-**[See a live example →](https://lusen.oda.al)** — a fictional commerce API
+**[See a live example →](https://lusen.oda.al/example/)** — a fictional commerce API
 serving two versions at once, built by the package's own emitters.
 
 Lusen reads your application's routes, form requests and resources, and emits
@@ -86,23 +86,23 @@ Two rules make those surfaces actually usable:
 
 ## See it
 
-**[lusen.oda.al](https://lusen.oda.al)** — a fictional commerce API serving two
+**[lusen.oda.al/example](https://lusen.oda.al/example/)** — a fictional commerce API serving two
 versions at once, 24 endpoints across 9 groups, `v2` current and `v1`
 deprecated with a retirement date. Nothing there is a mockup: it is produced by
 running the package's real emitters, so it is exactly what `lusen:build` writes.
 The site explains itself, too:
-[How these docs are built](https://lusen.oda.al/pages/how-lusen-works.html)
+[How these docs are built](https://lusen.oda.al/example/pages/how-lusen-works.html)
 walks through the three stages and links to the [example folder](tools/) that
 produced it.
 
-[![An endpoint page](art/screenshots/endpoint.png)](https://lusen.oda.al/endpoints/v2-orders-store.html)
+[![An endpoint page](art/screenshots/endpoint.png)](https://lusen.oda.al/example/endpoints/v2-orders-store.html)
 
 An endpoint page: the reference on the left, the call on the right. Note what
 is derived rather than written — the rate limit and the scopes off middleware,
 `Changed since v1` from comparing the two editions of the operation, and
 `items[].product_id` from a `items.*.product_id` validation rule.
 
-[![The index](art/screenshots/index.png)](https://lusen.oda.al)
+[![The index](art/screenshots/index.png)](https://lusen.oda.al/example/)
 
 The index. Every page is also a Markdown twin, an OpenAPI operation and a line
 in `llms.txt` — swap `.html` for `.md` on any URL and see for yourself.
@@ -111,7 +111,7 @@ Build it yourself in one command:
 
 ```bash
 php tools/build-showcase.php   # 8 prose pages, 9 group pages, 24 endpoint pages, Markdown mirrors, OpenAPI, llms.txt, sitemap, search index
-open docs/index.html
+open docs/example/index.html
 ```
 
 ## Prose, not just endpoints

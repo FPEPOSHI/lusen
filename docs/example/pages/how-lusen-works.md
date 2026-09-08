@@ -1,9 +1,13 @@
 ---
-title: How these docs are built
-section: About Lusen
-order: 10
-description: What Lusen is, how it turns a Laravel application into a site like this one, and where the example that produced this site lives.
+title: "How these docs are built"
+page_id: "how-lusen-works"
+section: "About Lusen"
+canonical: "https://lusen.oda.al/example/pages/how-lusen-works.html"
 ---
+
+# How these docs are built
+
+Part of the [Acme Commerce API](/example/index.html) documentation.
 
 Everything on this site — the pages, the OpenAPI document, `llms.txt`, the
 sitemap, the search index, the Postman collection — was written by

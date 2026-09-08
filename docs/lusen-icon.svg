@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="lusen-icon-title">
+  <title id="lusen-icon-title">Lusen</title>
+  <!-- The badge form: the same mark knocked out of a rounded square, for a
+       favicon or an avatar where there is no text beside it to inherit. -->
+  <rect width="64" height="64" rx="14" fill="#4f46e5"/>
+  <g transform="translate(8, 9.5) scale(2)">
+    <path fill="#ffffff" d="M2 5.5 L15 5.5 L11.5 18.5 L22 18.5 L22 21.5 L2 21.5 Z"/>
+  </g>
+</svg>

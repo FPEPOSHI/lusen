@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Retrieve a product (v2) — Acme Commerce API</title>
+    <meta name="description" content="Retrieve a product (v2)">
+
+            <link rel="canonical" href="https://lusen.oda.al/example/endpoints/v2-products-show.html">
+    
+            <meta name="robots" content="index, follow">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Retrieve a product (v2) — Acme Commerce API">
+    <meta property="og:description" content="Retrieve a product (v2)">
+        <meta name="twitter:card" content="summary_large_image">
+
+    
+    
+    <link rel="alternate" type="application/json" href="/example/openapi.json" title="OpenAPI 3.1">
+    <link rel="alternate" type="text/markdown" href="/example/endpoints/v2-products-show.md" title="Markdown">
+    <link rel="alternate" type="application/json" href="/example/.well-known/api-docs" title="Discovery">
+
+            <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Retrieve a product","description":"Retrieve a product","url":"/example/endpoints/v2-products-show","isPartOf":{"@type":"WebSite","name":"Acme Commerce API","url":"/example"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Acme Commerce API","item":"/example"},{"@type":"ListItem","position":2,"name":"Products (v2)","item":"/example/groups/v2-products"},{"@type":"ListItem","position":3,"name":"Retrieve a product","item":"/example/endpoints/v2-products-show"}]}}</script>
+    
+            
+        <script>try{var t=localStorage.getItem('lusen-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    
+            <link rel="stylesheet" href="/example/assets/lusen.css">
+    </head>
+<body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-200">
+
+<div data-lusen-banner class="relative z-40 bg-indigo-600 px-4 py-2 text-center text-sm text-white sm:px-6">
+        <span>v2 is generally available.</span>
+
+                    <a href="/example/pages/versioning.html" class="ml-2 inline-block font-semibold underline underline-offset-2 hover:text-indigo-100">
+                See what changed
+            </a>
+        
+                    <button type="button" data-lusen-banner-close hidden aria-label="Dismiss announcement"
+                    class="absolute top-1/2 right-3 -translate-y-1/2 rounded p-1 text-indigo-100 hover:bg-indigo-500 hover:text-white">
+                <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+            </button>
+            </div>
+
+<a href="#content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-indigo-600 focus:px-3 focus:py-2 focus:text-white">
+    Skip to content
+</a>
+
+
+<div class="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur sm:px-6 lg:hidden dark:border-slate-800 dark:bg-slate-950/90">
+    <a href="/example/index.html" class="min-w-0 truncate text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
+        Acme Commerce API
+    </a>
+
+    <a href="#navigation" data-lusen-menu aria-controls="navigation"
+       class="shrink-0 rounded-md border border-slate-200 px-2.5 py-1 text-sm font-medium text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
+        Menu
+    </a>
+</div>
+
+
+<div class="mx-auto flex max-w-[96rem] flex-col gap-8 px-4 sm:px-6 lg:flex-row lg:px-8">
+
+    
+    
+    <aside class="lusen-nav order-last w-full shrink-0 border-slate-200 lg:order-first lg:w-64 lg:border-r xl:w-72 dark:border-slate-800">
+        
+        <div class="border-t border-slate-200 py-10 lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto lg:border-t-0 lg:pr-4 dark:border-slate-800">
+            <nav id="navigation" aria-label="Documentation">
+    
+    
+            <a href="https://github.com/fpeposhi/lusen" class="-ml-1 mb-1 inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white">
+            <svg class="size-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6" />
+            </svg>
+            Acme
+        </a>
+    
+    
+    <a href="/example/index.html" class="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
+                <span class="min-w-0 truncate">Acme Commerce API</span>
+    </a>
+    <p class="mt-1 mb-4 font-mono text-xs text-slate-500">v2.4.1</p>
+
+    <form class="lusen-search" role="search" hidden data-lusen-search>
+    <label class="sr-only" for="lusen-search-input">Search the documentation</label>
+
+    <div class="lusen-search-field">
+        <input id="lusen-search-input"
+               type="search"
+               autocomplete="off"
+               spellcheck="false"
+               placeholder="Search…"
+               role="combobox"
+               aria-expanded="false"
+               aria-controls="lusen-search-results"
+               aria-autocomplete="list"
+               class="w-full rounded-md border border-slate-200 bg-white py-1.5 pr-12 pl-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white">
+
+        
+        <kbd class="lusen-search-hint" data-lusen-search-hint hidden></kbd>
+    </div>
+
+    <ul id="lusen-search-results" class="lusen-search-results" role="listbox" aria-label="Search results" hidden></ul>
+    <p class="lusen-search-empty" hidden>No matches.</p>
+</form>
+
+
+            
+        <label class="sr-only" for="lusen-server">Base URL</label>
+        <select id="lusen-server" data-lusen-server hidden
+                class="mb-4 w-full rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600 hover:border-indigo-500 focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+            <option value="https://api.acme.example">api.acme.example</option>
+                            <option value="https://sandbox.acme.example">Sandbox</option>
+                    </select>
+    
+    <ul class="mt-8 space-y-6">
+                    <li>
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Getting started</span>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/pages/introduction.html"
+                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                Introduction
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/pages/use-cases.html"
+                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                Use cases
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/pages/versioning.html"
+                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                Versioning
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/pages/authentication.html"
+                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                Authentication
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/pages/errors.html"
+                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                Errors
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/pages/rate-limiting.html"
+                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                Rate limiting
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+                    <li>
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Guides</span>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/pages/pagination.html"
+                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                Pagination
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+                    <li>
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">About Lusen</span>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/pages/how-lusen-works.html"
+                                                              class="-ml-px block border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                How these docs are built
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+        
+        
+        
+                                                    <li class="border-t border-slate-200 pt-4 dark:border-slate-800">
+                    <span class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                        v2
+                    </span>
+                </li>
+            
+            <li>
+                <a href="/example/groups/v2-authentication.html"
+                                      class="text-xs font-semibold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white text-slate-500">
+                    Authentication
+                </a>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/endpoints/v2-auth-tokens-store.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                <span class="truncate">Issue an access token</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v2-auth-tokens-destroy.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/20 px-1 py-0.5 text-[10px]">
+    DELETE
+</span>
+                                <span class="truncate">Revoke the current token</span>
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+                    
+            <li>
+                <a href="/example/groups/v2-customers.html"
+                                      class="text-xs font-semibold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white text-slate-500">
+                    Customers
+                </a>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/endpoints/v2-customers-index.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">List customers</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v2-customers-store.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                <span class="truncate">Create a customer</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v2-customers-show.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">Retrieve a customer</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v2-customers-update.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20 px-1 py-0.5 text-[10px]">
+    PATCH
+</span>
+                                <span class="truncate">Update a customer</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v2-customers-destroy.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/20 px-1 py-0.5 text-[10px]">
+    DELETE
+</span>
+                                <span class="truncate">Delete a customer</span>
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+                    
+            <li>
+                <a href="/example/groups/v2-orders.html"
+                                      class="text-xs font-semibold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white text-slate-500">
+                    Orders
+                </a>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/endpoints/v2-orders-index.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">List orders</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v2-orders-store.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                <span class="truncate">Create an order</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v2-orders-show.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">Retrieve an order</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v2-orders-refunds-store.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                <span class="truncate">Refund an order</span>
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+                    
+            <li>
+                <a href="/example/groups/v2-products.html"
+                                      class="text-xs font-semibold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white text-slate-500">
+                    Products
+                </a>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/endpoints/v2-products-index.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">List products</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v2-products-show.html"
+                                aria-current="page"                                class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-indigo-500 font-medium text-slate-900 dark:text-white">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">Retrieve a product</span>
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+                    
+            <li>
+                <a href="/example/groups/v2-webhooks.html"
+                                      class="text-xs font-semibold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white text-slate-500">
+                    Webhooks
+                </a>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/endpoints/v2-webhooks-index.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">List webhook endpoints</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v2-webhooks-store.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                <span class="truncate">Register a webhook endpoint</span>
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+                                                    <li class="border-t border-slate-200 pt-4 dark:border-slate-800">
+                    <span class="font-mono text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                        v1 (deprecated)
+                    </span>
+                </li>
+            
+            <li>
+                <a href="/example/groups/v1-authentication.html"
+                                      class="text-xs font-semibold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white text-slate-500">
+                    Authentication
+                </a>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/endpoints/v1-auth-tokens-store.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                <span class="truncate">Issue an access token</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v1-auth-tokens-destroy.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/20 px-1 py-0.5 text-[10px]">
+    DELETE
+</span>
+                                <span class="truncate">Revoke the current token</span>
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+                    
+            <li>
+                <a href="/example/groups/v1-customers.html"
+                                      class="text-xs font-semibold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white text-slate-500">
+                    Customers
+                </a>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/endpoints/v1-customers-index.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">List customers</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v1-customers-store.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                <span class="truncate">Create a customer</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v1-customers-show.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">Retrieve a customer</span>
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+                    
+            <li>
+                <a href="/example/groups/v1-orders.html"
+                                      class="text-xs font-semibold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white text-slate-500">
+                    Orders
+                </a>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/endpoints/v1-orders-index.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">List orders</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v1-orders-store.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20 px-1 py-0.5 text-[10px]">
+    POST
+</span>
+                                <span class="truncate">Create an order</span>
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+                    
+            <li>
+                <a href="/example/groups/v1-products.html"
+                                      class="text-xs font-semibold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white text-slate-500">
+                    Products
+                </a>
+                <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">
+                                            <li>
+                            <a href="/example/endpoints/v1-products-index.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">List products</span>
+                            </a>
+                        </li>
+                                            <li>
+                            <a href="/example/endpoints/v1-products-search.html"
+                                                              class="-ml-px flex items-center gap-2 border-l py-1 pl-3 text-sm hover:border-indigo-500 hover:text-slate-900 dark:hover:text-white border-transparent text-slate-600 dark:text-slate-400">
+                                <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-1 py-0.5 text-[10px]">
+    GET
+</span>
+                                <span class="truncate">Search products</span>
+                            </a>
+                        </li>
+                                    </ul>
+            </li>
+            </ul>
+</nav>
+        </div>
+    </aside>
+
+    <main id="content" class="min-w-0 flex-1 py-10">
+        
+        
+    
+    <nav aria-label="Breadcrumb" class="text-sm">
+        <ol class="flex flex-wrap items-center gap-2 text-slate-500">
+            <li><a href="/example/index.html" class="hover:text-slate-900 dark:hover:text-white">Acme Commerce API</a></li>
+                                        <li aria-hidden="true">/</li>
+                <li><a href="/example/groups/v2-products.html" class="hover:text-slate-900 dark:hover:text-white">Products (v2)</a></li>
+                        <li aria-hidden="true">/</li>
+            <li aria-current="page" class="text-slate-900 dark:text-white">Retrieve a product</li>
+        </ol>
+    </nav>
+
+    <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Retrieve a product</h1>
+
+    
+    <article id="v2-products-show"
+         class="scroll-mt-8 mt-6">
+
+    <div class="flex flex-wrap items-center gap-3">
+        <span class="inline-flex shrink-0 items-center rounded font-mono font-semibold uppercase ring-1 ring-inset bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20 px-2 py-1 text-xs">
+    GET
+</span>
+
+        <code class="min-w-0 break-all font-mono text-sm text-slate-900 dark:text-white">/api/v2/products/{product}</code>
+
+        
+        
+        
+        
+                    <span class="inline-flex items-center rounded bg-slate-100 px-2 py-1 font-mono text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                v2
+            </span>
+            </div>
+
+    
+    <p class="mt-2 text-sm text-slate-500">
+        No authentication required.
+    </p>
+
+    
+    
+    
+    
+    
+            
+        <p class="mt-3 text-sm text-slate-500">
+            Full URL: <code class="font-mono"><span class="text-slate-500 dark:text-slate-400">https://api.acme.example</span><span class="font-semibold text-slate-700 dark:text-slate-300">/api/v2/products/{product}</span></code>
+            
+            <button type="button" data-lusen-copy-url hidden
+                    class="ml-1 text-xs underline hover:text-slate-900 dark:hover:text-white">Copy</button>
+        </p>
+    
+    
+    
+    
+    <div class="xl:grid xl:grid-cols-[minmax(0,1fr)_30rem] xl:items-start xl:gap-8">
+
+        
+        <div class="min-w-0">
+
+                            
+                                                        <h2 id="v2-products-show-path-parameters" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Path parameters
+                    </h2>
+
+                    <div class="mt-2 overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead>
+                <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800">
+                    <th scope="col" class="py-2 pr-4 font-medium">Name</th>
+                    <th scope="col" class="py-2 pr-4 font-medium">Type</th>
+                                            <th scope="col" class="py-2 pr-4 font-medium">Required</th>
+                                        <th scope="col" class="py-2 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                                    <tr class="border-b border-slate-100 last:border-0 dark:border-slate-800/60">
+                        
+                        <td class="py-2 pr-4 font-mono"><span class="text-slate-500 dark:text-slate-400"></span><span class="text-slate-900 dark:text-white">product</span></td>
+                        <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">integer</td>
+                                                    <td class="py-2 pr-4 text-slate-600 dark:text-slate-400">yes</td>
+                                                <td class="py-2 text-slate-600 dark:text-slate-400">The product id.</td>
+                    </tr>
+                            </tbody>
+        </table>
+    </div>
+                                            
+                                            
+                                            
+                            
+                            
+                <h2 id="v2-products-show-responses" class="mt-6 scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Responses</h2>
+
+                <div class="mt-3 space-y-5">
+                                                                    <div>
+                            <p class="flex flex-wrap items-center gap-2">
+                                <span class="lusen-status lusen-status-ok">200</span>
+                                <span class="text-sm text-slate-600 dark:text-slate-400">The product.</span>
+                            </p>
+
+                            
+                                                    </div>
+                                                                    <div>
+                            <p class="flex flex-wrap items-center gap-2">
+                                <span class="lusen-status lusen-status-warn">404</span>
+                                <span class="text-sm text-slate-600 dark:text-slate-400">No product with that id.</span>
+                            </p>
+
+                            
+                                                    </div>
+                                    </div>
+                    </div>
+
+        
+        <div class="mt-8 xl:mt-6 xl:sticky xl:top-8">
+
+            
+            <h2 id="v2-products-show-example-request" class="scroll-mt-8 text-xs font-semibold uppercase tracking-wider text-slate-500">Example request</h2>
+
+            
+            <div class="lusen-snippets" data-lusen-tabs="snippet">
+                                    <figure class="lusen-code">
+    <figcaption class="lusen-code-head">
+        <span class="lusen-code-label">cURL</span>
+        <button type="button" class="lusen-copy" data-lusen-copy hidden>Copy</button>
+    </figcaption>
+    <pre class="lusen-code-body"><code class="language-bash"><span class="tok-cmd">curl</span><span class="tok-flag"> -X</span> GET <span class="tok-str">&#039;https://api.acme.example/api/v2/products/1&#039;</span> <span class="tok-punc">\</span>
+ <span class="tok-flag"> -H</span> <span class="tok-str">&#039;Accept: application/json&#039;</span></code></pre>
+</figure>
+                                    <figure class="lusen-code">
+    <figcaption class="lusen-code-head">
+        <span class="lusen-code-label">JavaScript</span>
+        <button type="button" class="lusen-copy" data-lusen-copy hidden>Copy</button>
+    </figcaption>
+    <pre class="lusen-code-body"><code class="language-javascript"><span class="tok-lit">const</span> response = <span class="tok-lit">await</span> <span class="tok-cmd">fetch</span>(<span class="tok-str">&#039;https://api.acme.example/api/v2/products/1&#039;</span>, {
+  <span class="tok-key">method</span>: <span class="tok-str">&#039;GET&#039;</span>,
+  <span class="tok-key">headers</span>: {
+    <span class="tok-key">&#039;Accept&#039;</span>: <span class="tok-str">&#039;application/json&#039;</span>
+  }
+});
+
+<span class="tok-lit">const</span> data = <span class="tok-lit">await</span> response.<span class="tok-cmd">json</span>();</code></pre>
+</figure>
+                                    <figure class="lusen-code">
+    <figcaption class="lusen-code-head">
+        <span class="lusen-code-label">PHP (Laravel)</span>
+        <button type="button" class="lusen-copy" data-lusen-copy hidden>Copy</button>
+    </figcaption>
+    <pre class="lusen-code-body"><code class="language-php"><span class="tok-lit">use</span> Illuminate\Support\Facades\Http;
+
+<span class="tok-flag">$response</span> = Http::<span class="tok-cmd">withHeaders</span>([
+    <span class="tok-key">&#039;Accept&#039;</span> =&gt; <span class="tok-str">&#039;application/json&#039;</span>,
+])-&gt;<span class="tok-cmd">get</span>(<span class="tok-str">&#039;https://api.acme.example/api/v2/products/1&#039;</span>);
+
+<span class="tok-flag">$data</span> = <span class="tok-flag">$response</span>-&gt;<span class="tok-cmd">json</span>();</code></pre>
+</figure>
+                                    <figure class="lusen-code">
+    <figcaption class="lusen-code-head">
+        <span class="lusen-code-label">PHP (Guzzle)</span>
+        <button type="button" class="lusen-copy" data-lusen-copy hidden>Copy</button>
+    </figcaption>
+    <pre class="lusen-code-body"><code class="language-php"><span class="tok-lit">use</span> GuzzleHttp\Client;
+
+<span class="tok-flag">$client</span> = <span class="tok-lit">new</span> <span class="tok-cmd">Client</span>();
+
+<span class="tok-flag">$response</span> = <span class="tok-flag">$client</span>-&gt;<span class="tok-cmd">request</span>(<span class="tok-str">&#039;GET&#039;</span>, <span class="tok-str">&#039;https://api.acme.example/api/v2/products/1&#039;</span>, [
+    <span class="tok-key">&#039;headers&#039;</span> =&gt; [
+        <span class="tok-key">&#039;Accept&#039;</span> =&gt; <span class="tok-str">&#039;application/json&#039;</span>,
+    ],
+]);
+
+<span class="tok-flag">$data</span> = <span class="tok-cmd">json_decode</span>((string) <span class="tok-flag">$response</span>-&gt;<span class="tok-cmd">getBody</span>(), <span class="tok-lit">true</span>);</code></pre>
+</figure>
+                            </div>
+
+            <div class="lusen-try" data-lusen-try>
+        <script type="application/json" data-lusen-request>{"method":"GET","title":"Retrieve a product","baseUrl":"https:\/\/api.acme.example","path":"\/api\/v2\/products\/{product}","url":"https:\/\/api.acme.example\/api\/v2\/products\/1","headers":{"Accept":"application\/json"},"fields":[{"name":"product","in":"path","type":"integer","required":true,"description":"The product id.","value":"1","enum":[]}],"body":null,"auth":null,"rateLimit":null,"deprecated":false}</script>
+
+        <button type="button" data-lusen-try-open hidden
+                class="mt-2 w-full rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-indigo-500 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
+            Try it
+        </button>
+    </div>
+
+            
+                    </div>
+    </div>
+
+</article>
+
+    <nav aria-label="Pagination" class="mt-12 flex flex-wrap gap-4 border-t border-slate-200 pt-6 dark:border-slate-800">
+                    <a href="/example/endpoints/v2-products-index.html" rel="prev" class="group flex-1 rounded-lg border border-slate-200 p-4 hover:border-indigo-500 dark:border-slate-800">
+                <span class="text-xs uppercase tracking-wider text-slate-500">Previous</span>
+                <span class="mt-1 block text-sm font-medium text-slate-900 dark:text-white">List products</span>
+            </a>
+        
+                    <a href="/example/groups/v2-webhooks.html" rel="next" class="group flex-1 rounded-lg border border-slate-200 p-4 text-right hover:border-indigo-500 dark:border-slate-800">
+                <span class="text-xs uppercase tracking-wider text-slate-500">Next</span>
+                <span class="mt-1 block text-sm font-medium text-slate-900 dark:text-white">Webhooks (v2)</span>
+            </a>
+            </nav>
+
+
+    
+    <div class="mt-6 flex flex-wrap items-center justify-end gap-4 rounded-lg border border-slate-200 p-4 dark:border-slate-800">
+                    <p class="min-w-0 flex-1 text-sm text-slate-600 dark:text-slate-400">Free while you are building.</p>
+        
+        <a href="https://github.com/fpeposhi/lusen" class="shrink-0 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500">
+        Get an API key
+    </a>
+
+        </div>
+
+    <p class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
+        <span>
+            This page as
+            <a href="/example/endpoints/v2-products-show.md" class="underline hover:text-slate-900 dark:hover:text-white">Markdown</a>,
+            or the whole API as
+            <a href="/example/openapi.json" class="underline hover:text-slate-900 dark:hover:text-white">OpenAPI</a>.
+        </span>
+
+        
+        <button type="button" data-lusen-copy-page="/example/endpoints/v2-products-show.md" hidden
+                class="underline hover:text-slate-900 dark:hover:text-white">
+            Copy for an LLM
+        </button>
+
+        <a href="https://chatgpt.com/?q=Read%20https%3A%2F%2Flusen.oda.al%2Fexample%2Fendpoints%2Fv2-products-show.md%20%E2%80%94%20the%20documentation%20for%20GET%20%2Fapi%2Fv2%2Fproducts%2F%7Bproduct%7D%20in%20the%20Acme%20Commerce%20API.%20Answer%20my%20questions%20using%20only%20what%20that%20page%20says%2C%20and%20tell%20me%20when%20it%20does%20not%20say." target="_blank" rel="noopener noreferrer"
+       class="inline-flex items-center gap-1.5 underline hover:text-slate-900 dark:hover:text-white">
+        <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z" />
+                    <path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z" />
+            </svg>
+        Ask ChatGPT
+    </a>
+    <a href="https://claude.ai/new?q=Read%20https%3A%2F%2Flusen.oda.al%2Fexample%2Fendpoints%2Fv2-products-show.md%20%E2%80%94%20the%20documentation%20for%20GET%20%2Fapi%2Fv2%2Fproducts%2F%7Bproduct%7D%20in%20the%20Acme%20Commerce%20API.%20Answer%20my%20questions%20using%20only%20what%20that%20page%20says%2C%20and%20tell%20me%20when%20it%20does%20not%20say." target="_blank" rel="noopener noreferrer"
+       class="inline-flex items-center gap-1.5 underline hover:text-slate-900 dark:hover:text-white">
+        <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z" />
+                    <path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z" />
+            </svg>
+        Ask Claude
+    </a>
+    </p>
+
+    </main>
+
+</div>
+
+<footer class="mx-auto flex max-w-[96rem] flex-wrap items-center justify-between gap-4 px-4 py-10 text-xs text-slate-500 sm:px-6 lg:px-8">
+    <p>
+        Generated by <a href="https://github.com/fpeposhi/lusen" class="underline hover:text-slate-900 dark:hover:text-white">Lusen</a>.
+        Machine-readable:
+        <a href="/example/openapi.json" class="underline hover:text-slate-900 dark:hover:text-white">OpenAPI</a>,
+        <a href="/example/llms.txt" class="underline hover:text-slate-900 dark:hover:text-white">llms.txt</a>.
+
+        
+                    
+            <a href="https://github.com/fpeposhi/lusen" class="underline hover:text-slate-900 dark:hover:text-white">Acme</a>.
+            </p>
+
+            
+        <button type="button" data-lusen-theme hidden
+                class="rounded-md border border-slate-200 px-2.5 py-1 text-xs text-slate-500 hover:border-indigo-500 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
+            <span data-lusen-theme-label>Theme</span>
+        </button>
+    </footer>
+
+    
+    <script src="/example/assets/lusen.js" defer></script>
+<script>window.lusenSearchIndex = "\/example\/search-index.json";</script>
+    <script>window.lusenTryIt = {"credentials":false,"persist":"session","baseUrl":"https:\/\/api.acme.example"};</script>
+
+</body>
+</html>

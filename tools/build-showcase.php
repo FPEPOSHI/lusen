@@ -11,6 +11,10 @@ declare(strict_types=1);
 | so the showcase is exactly what `php artisan lusen:build` produces rather
 | than a mockup that can drift from it.
 |
+| The front page of docs/ is about the package, and is one hand-written file
+| (landing.html). The generated example lives under docs/example/, so the
+| example keeps an index of its own.
+|
 |   php tools/build-showcase.php
 |
 | Also writes a single-page render (the runtime mode) to the path given by
@@ -63,7 +67,7 @@ $app['config']->set('lusen.product', [
     'banner' => [
         'text' => 'v2 is generally available.',
         'label' => 'See what changed',
-        'url' => '/pages/versioning.html',
+        'url' => '/example/pages/versioning.html',
     ],
     'action' => [
         'label' => 'Get an API key',
@@ -84,7 +88,7 @@ $app['config']->set('lusen.ui.edit_url', 'https://github.com/fpeposhi/lusen/edit
 $renderer = new BladeRenderer($app['view']);
 
 $registry = new EmitterRegistry(
-    output: ['url' => '/', 'emitters' => ['html', 'markdown', 'openapi', 'llms', 'sitemap', 'search', 'postman', 'discovery']],
+    output: ['url' => '/example', 'emitters' => ['html', 'markdown', 'openapi', 'llms', 'sitemap', 'search', 'postman', 'discovery']],
     renderer: $renderer,
     canonicalOrigin: $origin,
 );
@@ -93,9 +97,26 @@ $files = [];
 
 foreach ($registry->enabled() as $emitter) {
     foreach ($emitter->emit($spec) as $file) {
-        $files[] = $file;
+        $files[] = new EmittedFile('example/'.$file->path, $file->contents, $file->contentType);
+
+        // The conventional location too, at the root of the domain, pointing
+        // at the example: the one guessable URL an agent tries first.
+        if ($file->path === '.well-known/api-docs') {
+            $files[] = $file;
+        }
     }
 }
+
+// The front page is about the package rather than the API, and it is one
+// hand-written file: the example already shows what the emitters produce, and
+// a landing page rendered through the documentation layout would carry the
+// fictional API's navigation. The counts are substituted so the page cannot
+// drift from the spec beside it.
+$files[] = EmittedFile::html('index.html', strtr((string) file_get_contents(__DIR__.'/landing.html'), [
+    '{{endpoints}}' => (string) count($spec->endpoints()),
+    '{{groups}}' => (string) count($spec->groups),
+]));
+$files[] = new EmittedFile('lusen-icon.svg', (string) file_get_contents($root.'/art/lusen-icon.svg'), 'image/svg+xml');
 
 // GitHub Pages runs Jekyll by default, which skips directories it does not
 // recognise and would drop files beginning with an underscore.
