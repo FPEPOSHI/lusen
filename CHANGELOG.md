@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here.
 
+## 0.6.3 — 2026-09-08
+
+### Fixed
+
+- **Every field below the top level of a request body lost its description.**
+  A docblock above `items.*.product_id` reached the parameter it described and
+  went no further: the nested walk carried the type, the constraints and
+  whether the field was required, and dropped the one sentence a caller cannot
+  work out from any of them. It travels on the schema now, which is what
+  survives the walk, so a nested table says what a top-level one always did.
+- **A docblock's first sentence ran into its second.** DocBlock takes the full
+  stop off a summary because a page title carries none, and a field's docblock
+  has no title: the two paragraphs met in the description column as "never
+  returns an error `price` is still the full unit price". The stop goes back
+  on before the join.
+
 ## 0.6.2 — 2026-09-08
 
 ### Fixed
@@ -18,17 +34,6 @@ All notable changes to this project are documented here.
   group's own page and wrong in a list of every group, where it pushes the
   next one off the screen, and wrong again in a meta description, where it is
   truncated mid-workflow.
-- **Every field below the top level of a request body lost its description.**
-  A docblock above `items.*.product_id` reached the parameter it described and
-  went no further: the nested walk carried the type, the constraints and
-  whether the field was required, and dropped the one sentence a caller cannot
-  work out from any of them. It travels on the schema now, which is what
-  survives the walk, so a nested table says what a top-level one always did.
-- **A docblock's first sentence ran into its second.** DocBlock takes the full
-  stop off a summary because a page title carries none, and a field's docblock
-  has no title: the two paragraphs met in the description column as "never
-  returns an error `price` is still the full unit price". The stop goes back
-  on before the join.
 - **A group spanning two controllers took the description of whichever sorted
   first.** A route reaching across into another controller brought that
   controller's copy with it and spoke for the whole group. The description
