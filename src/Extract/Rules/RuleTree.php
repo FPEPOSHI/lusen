@@ -89,6 +89,15 @@ final class RuleTree
     }
 
     /**
+     * The description travels on the schema, not beside it.
+     *
+     * A top-level field's docblock reaches the page as the parameter's own
+     * description, and until this carried it too, everything below the top
+     * level lost the sentence its author wrote: `items.*.product_id`
+     * documented as `integer, required` and nothing else, on the very fields
+     * a caller cannot guess. The schema is the only thing that survives the
+     * walk down into a nested body, so it has to hold the prose.
+     *
      * @param  array{rules?: RuleSet, children: array<string, mixed>}  $node
      */
     private static function schema(array $node): Schema
@@ -103,15 +112,13 @@ final class RuleTree
         // `items.*` - a wildcard child means this node is a list, and its own
         // rules (min, max) constrain the list rather than an element.
         if (isset($children['*'])) {
-            return new Schema(
+            $base = new Schema(
                 type: SchemaType::Array,
                 nullable: $base->nullable,
                 items: self::schema($children['*']),
                 constraints: $base->constraints,
             );
-        }
-
-        if ($children !== []) {
+        } elseif ($children !== []) {
             $properties = [];
             $required = [];
 
@@ -123,7 +130,7 @@ final class RuleTree
                 }
             }
 
-            return new Schema(
+            $base = new Schema(
                 type: SchemaType::Object,
                 nullable: $base->nullable,
                 properties: $properties,
@@ -132,6 +139,6 @@ final class RuleTree
             );
         }
 
-        return $base;
+        return $base->describedAs($set?->description());
     }
 }

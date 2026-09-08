@@ -200,3 +200,16 @@ it('keeps a rule-derived note alongside the authored sentence', function (): voi
 it('leaves an undocumented rule undescribed rather than inventing a sentence', function (): void {
     expect(bodyParam('orders.store', 'email')?->description)->toBeNull();
 });
+
+it('keeps the description of a field nested inside the body', function (): void {
+    // A top-level field's docblock reaches the page as the parameter's own
+    // description; below the top level the schema is the only thing left to
+    // carry it, and these are the fields a caller can least afford to guess.
+    $customer = bodyParam('orders.store', 'customer');
+    $items = bodyParam('orders.store', 'items');
+
+    expect($customer?->schema->properties['name']->description)->toBe('The name to put on the delivery note.')
+        ->and($customer?->schema->properties['vip']->description)->toBeNull()
+        ->and($items?->schema->description)->toBe('One entry per product. The order is not preserved.')
+        ->and($items?->schema->items?->properties['product_id']->description)->toBe('The catalogue id, not the SKU.');
+});

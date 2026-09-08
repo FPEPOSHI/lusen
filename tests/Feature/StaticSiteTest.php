@@ -699,5 +699,8 @@ it('documents what goes inside a nested request body, not just its type', functi
     )
         // Scoped to the cell: pl-3 is the contents list and the search box,
         // and asserting on it page-wide would pass for the wrong reason.
-        ->and($html)->not->toContain('font-mono pl-');
+        ->and($html)->not->toContain('font-mono pl-')
+        // And what its author wrote about it, which is the half of the row
+        // that a type cannot supply.
+        ->and($html)->toContain('The catalogue id, not the SKU.');
 });

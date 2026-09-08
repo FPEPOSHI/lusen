@@ -48,9 +48,22 @@ final class StoreOrderRequest extends FormRequest
             'notes' => ['sometimes', 'string', 'max:500'],
             'coupon' => ['nullable', 'string', 'regex:/^[A-Z0-9]+$/'],
             'customer' => 'required|array',
+            /**
+             * The name to put on the delivery note.
+             *
+             * @example Ada Lovelace
+             */
             'customer.name' => 'required|string|max:120',
             'customer.vip' => 'nullable|boolean',
+            /**
+             * One entry per product. The order is not preserved.
+             */
             'items' => 'required|array|min:1|max:20',
+            /**
+             * The catalogue id, not the SKU.
+             *
+             * @example 4821
+             */
             'items.*.product_id' => 'required|integer',
             'items.*.quantity' => 'required|integer|min:1',
             'tags' => 'nullable|array',

@@ -18,6 +18,12 @@ All notable changes to this project are documented here.
   group's own page and wrong in a list of every group, where it pushes the
   next one off the screen, and wrong again in a meta description, where it is
   truncated mid-workflow.
+- **Every field below the top level of a request body lost its description.**
+  A docblock above `items.*.product_id` reached the parameter it described and
+  went no further: the nested walk carried the type, the constraints and
+  whether the field was required, and dropped the one sentence a caller cannot
+  work out from any of them. It travels on the schema now, which is what
+  survives the walk, so a nested table says what a top-level one always did.
 - **A group spanning two controllers took the description of whichever sorted
   first.** A route reaching across into another controller brought that
   controller's copy with it and spoke for the whole group. The description
