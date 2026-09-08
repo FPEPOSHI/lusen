@@ -19,7 +19,7 @@ use Lusen\Attributes\ApiResponse;
  * name and arguments without loading it, and the extractor has to work in a
  * codebase that has already removed the tool it is migrating from.
  */
-#[Group(name: 'Klienti', description: 'Clients, in the team\'s own words.')]
+#[Group(name: 'Klienti', description: 'Clients, in the team\'s own words.', weight: 4)]
 final class ScrambledController
 {
     /**

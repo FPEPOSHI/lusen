@@ -86,11 +86,19 @@ final readonly class ExternalAttributeExtractor implements Extractor
     }
 
     /**
-     * `#[Group(name: 'Klienti', description: '...')]` on the controller.
+     * `#[Group(name: 'Klienti', description: '...', weight: 4)]` on the
+     * controller.
      *
      * Worth reading even where a group name is already derived: the URI
      * fallback splits `/client` from `/clients` into two groups that a team
      * calling both "Klienti" never meant to have.
+     *
+     * The weight is read as the group's order. It is the same idea under
+     * another name, and a team that has already decided which group a reader
+     * should meet first should not have to decide it twice. Scramble spells
+     * "no weight given" as PHP_INT_MAX, which means the same as no order at
+     * all and is dropped rather than carried into the IR, where it would
+     * serialize as a nineteen-digit number that says nothing.
      *
      * @param  ReflectionClass<object>  $class
      */
@@ -100,7 +108,9 @@ final readonly class ExternalAttributeExtractor implements Extractor
             $name = $this->string($arguments, 'name', 0);
 
             if ($name !== null) {
-                return $endpoint->with(group: $name);
+                $weight = $this->integer($arguments, 'weight', 2);
+
+                return $endpoint->with(group: $name, groupOrder: $weight === PHP_INT_MAX ? null : $weight);
             }
         }
 

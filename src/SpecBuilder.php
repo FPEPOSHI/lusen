@@ -166,6 +166,11 @@ final readonly class SpecBuilder
      * Below two versions nothing is scoped at all, so a single-version API
      * keeps exactly the group names and anchors it had before.
      *
+     * Within a version, a group that states an order comes before one that
+     * does not, and the rest stay alphabetical. Ordering is partial on
+     * purpose: naming the three groups a reader should meet first should not
+     * oblige anyone to number the other twenty.
+     *
      * @param  list<Endpoint>  $endpoints
      * @param  list<ApiVersion>  $versions
      * @return list<Group>
@@ -175,31 +180,52 @@ final readonly class SpecBuilder
         $scoped = count($versions) > 1;
         $order = Versions::order($versions);
 
-        /** @var array<string, array{version: string|null, name: string, endpoints: list<Endpoint>}> $buckets */
+        /** @var array<string, array{version: string|null, name: string, order: int|null, endpoints: list<Endpoint>}> $buckets */
         $buckets = [];
 
         foreach ($endpoints as $endpoint) {
             $version = $scoped ? $endpoint->version : null;
             $name = $endpoint->group ?? 'General';
 
-            $buckets[$version.'|'.$name] ??= ['version' => $version, 'name' => $name, 'endpoints' => []];
+            $buckets[$version.'|'.$name] ??= ['version' => $version, 'name' => $name, 'order' => null, 'endpoints' => []];
             $buckets[$version.'|'.$name]['endpoints'][] = $endpoint;
+            $buckets[$version.'|'.$name]['order'] ??= $endpoint->groupOrder;
         }
 
         uasort($buckets, static fn (array $a, array $b): int => [
-            $a['version'] === null ? PHP_INT_MAX : ($order[$a['version']] ?? PHP_INT_MAX), $a['name'],
+            $a['version'] === null ? PHP_INT_MAX : ($order[$a['version']] ?? PHP_INT_MAX), $a['order'] ?? PHP_INT_MAX, $a['name'],
         ] <=> [
-            $b['version'] === null ? PHP_INT_MAX : ($order[$b['version']] ?? PHP_INT_MAX), $b['name'],
+            $b['version'] === null ? PHP_INT_MAX : ($order[$b['version']] ?? PHP_INT_MAX), $b['order'] ?? PHP_INT_MAX, $b['name'],
         ]);
 
         return array_values(array_map(
             static fn (array $bucket): Group => new Group(
                 name: $bucket['name'],
-                endpoints: $bucket['endpoints'],
+                endpoints: self::sequence($bucket['endpoints']),
                 version: $bucket['version'],
+                order: $bucket['order'],
             ),
             $buckets,
         ));
+    }
+
+    /**
+     * The order a group's operations are read in.
+     *
+     * Collection sorts by path so a build never depends on the order routes
+     * happened to be registered in, which is the right default and the wrong
+     * answer for a group whose operations are the steps of a sequence:
+     * onboarding does not begin at the letter A. An operation that states its
+     * place takes it; the rest keep the path order behind them.
+     *
+     * @param  list<Endpoint>  $endpoints
+     * @return list<Endpoint>
+     */
+    private static function sequence(array $endpoints): array
+    {
+        usort($endpoints, static fn (Endpoint $a, Endpoint $b): int => ($a->order ?? PHP_INT_MAX) <=> ($b->order ?? PHP_INT_MAX));
+
+        return $endpoints;
     }
 
     /**

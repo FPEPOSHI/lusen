@@ -29,6 +29,10 @@ use Attribute;
  * the API keeps it - an export that takes a minute, a search that costs money
  * per call. It only ever removes: an endpoint cannot opt into a playground the
  * site has turned off.
+ *
+ * `order` places the operation inside its group. A group whose operations are
+ * steps in a sequence reads as the sequence rather than as an alphabet;
+ * operations that state no order follow the ones that do, by path.
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 final readonly class ApiDoc
@@ -45,5 +49,6 @@ final readonly class ApiDoc
         public array $tags = [],
         public ?string $version = null,
         public ?bool $tryIt = null,
+        public ?int $order = null,
     ) {}
 }

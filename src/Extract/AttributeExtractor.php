@@ -127,7 +127,7 @@ final readonly class AttributeExtractor implements Extractor
     {
         $group = $this->instance($class, ApiGroup::class);
 
-        return $group === null ? $endpoint : $endpoint->with(group: $group->name);
+        return $group === null ? $endpoint : $endpoint->with(group: $group->name, groupOrder: $group->order);
     }
 
     /**
@@ -149,6 +149,7 @@ final readonly class AttributeExtractor implements Extractor
                 tags: $doc->tags === [] ? null : $doc->tags,
                 version: $doc->version,
                 tryIt: $doc->tryIt,
+                order: $doc->order,
             );
         }
 

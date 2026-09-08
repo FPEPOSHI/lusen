@@ -13,6 +13,7 @@ use Lusen\Ir\Enums\ParameterLocation;
 use Lusen\Ir\Enums\SchemaType;
 use Lusen\Ir\Parameter;
 use Lusen\SpecBuilder;
+use Lusen\Tests\Fixtures\PlainController;
 use Lusen\Tests\Fixtures\ScrambledController;
 
 function scrambledSpec(): ApiSpec
@@ -43,6 +44,28 @@ it('reads attributes whose class is not installed at all', function (): void {
     // codebase that has already dropped the dependency.
     expect(class_exists('Dedoc\\Scramble\\Attributes\\Group'))->toBeFalse()
         ->and(scrambledSpec()->endpoint('clients.index')?->group)->toBe('Klienti');
+});
+
+it('reads the group weight as the group order', function (): void {
+    // An API that already told Scramble which group comes first should not
+    // have to say it twice.
+    $group = scrambledSpec()->groups[0];
+
+    expect($group->name)->toBe('Klienti')
+        ->and($group->order)->toBe(4);
+});
+
+it('treats Scramble\'s unweighted default as no order at all', function (): void {
+    // Scramble spells "no weight" as PHP_INT_MAX; carrying that into the IR
+    // would serialize a nineteen-digit number meaning nothing.
+    Route::get('api/widgets', [PlainController::class, 'index'])->name('widgets.index');
+
+    $weightless = array_values(array_filter(
+        scrambledSpec()->groups,
+        fn ($group): bool => $group->name !== 'Klienti' && $group->name !== 'Lusen has the last word',
+    ));
+
+    expect($weightless[0]->order)->toBeNull();
 });
 
 it('documents a response per status, with a schema read from the declared type', function (): void {

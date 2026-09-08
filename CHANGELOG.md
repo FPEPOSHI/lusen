@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented here.
 
+## Unreleased
+
+### Added
+
+- **Groups and operations can say where they belong.** `#[ApiGroup(order: 1)]`
+  places a group in the navigation and `#[ApiDoc(order: 1)]` places an
+  operation inside its group. Alphabetical is the right default for a
+  reference, and the wrong one for a group whose operations are the steps of a
+  sequence: an onboarding flow that starts at "Add a bank account" because B
+  sorts before R reads as a list of unrelated calls rather than a path through
+  the product.
+
+  Ordering is partial. What states a place takes it, lowest first; everything
+  else follows behind in the order it had before. So naming the three groups a
+  reader should meet first costs three numbers, not twenty-three, and adding a
+  controller next month still needs no edit anywhere.
+
+  Scramble's `#[Group(weight: 1)]` is read as the same thing. An API that
+  already ordered its groups for Scramble arrives with that order intact,
+  which is the point of reading another tool's attributes at all.
+
 ## 0.6.0 — 2026-09-07
 
 ### Added

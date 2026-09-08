@@ -409,8 +409,8 @@ or is wrong.
 
 | Attribute | Where | What it does |
 | --- | --- | --- |
-| `#[ApiDoc]` | class, method | `summary`, `description`, `group`, `authenticated`, `deprecated`, `tags`, `version`. Leave a property out to keep the inferred value |
-| `#[ApiGroup]` | class | Names the group and describes it — the description becomes the group's landing copy |
+| `#[ApiDoc]` | class, method | `summary`, `description`, `group`, `authenticated`, `deprecated`, `tags`, `version`, `order`. Leave a property out to keep the inferred value |
+| `#[ApiGroup]` | class | Names the group, describes it — the description becomes the group's landing copy — and can place it with `order` |
 | `#[ApiParam]` | method, repeatable | A parameter inference cannot reach: a query filter, a custom header, a body field validated outside a FormRequest |
 | `#[ApiResponse]` | method, repeatable | A response, per status. `type` takes the same grammar as `@response`, so `type: 'array{id: int}'` or `type: 'OrderShape'` documents the body; `example` overrides the generated one |
 | `#[Authenticated]` | class, method | Force the auth flag on, or `#[Authenticated(false)]` to force it off |
@@ -562,9 +562,31 @@ what the newest one added or dropped compared with the one before it. Write
 ## Grouping, ordering and hiding
 
 **Groups** come from `#[ApiGroup]`, then `@group`, then the first meaningful
-URI segment — the version and a leading `api` are skipped. Endpoints within a
-group follow route registration order; groups are alphabetical, after their
-version when the API has more than one.
+URI segment — the version and a leading `api` are skipped. Groups are
+alphabetical, after their version when the API has more than one, and
+endpoints within a group follow their path.
+
+**Ordering** overrides that alphabet where the alphabet is the wrong answer.
+`#[ApiGroup(order: 1)]` places a group; `#[ApiDoc(order: 1)]` places an
+operation inside its group. Both are partial: what states a place takes it,
+what does not follows behind, still alphabetical. So a group whose operations
+are the steps of an onboarding sequence can read as the sequence without
+anyone numbering the other twenty groups.
+
+```php
+#[ApiGroup('Onboarding', order: 1)]
+final class OnboardingController extends Controller
+{
+    #[ApiDoc(summary: 'Register the company', order: 1)]
+    public function register(RegisterRequest $request): JsonResponse { /* ... */ }
+
+    #[ApiDoc(summary: 'Upload the certificate', order: 2)]
+    public function certificate(CertificateRequest $request): JsonResponse { /* ... */ }
+}
+```
+
+Scramble's `#[Group(weight: 1)]` is read as the same thing, so an API that
+already ordered its groups for Scramble keeps that order here.
 
 **Hiding** an endpoint, in order of preference:
 

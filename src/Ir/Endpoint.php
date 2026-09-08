@@ -27,6 +27,8 @@ final readonly class Endpoint
      * @param  string|null  $version  the API version this endpoint belongs to, as its URL spells it
      * @param  string|null  $supersededBy  id of the same operation in a newer version, when there is one
      * @param  bool|null  $tryIt  false withholds the playground from this operation; null leaves the site's setting alone
+     * @param  int|null  $order  where this operation sits inside its group; null sorts it after the ones that state a place
+     * @param  int|null  $groupOrder  where the group sits in the navigation, carried here because groups are derived from their endpoints
      */
     public function __construct(
         public string $id,
@@ -47,6 +49,8 @@ final readonly class Endpoint
         public ?string $version = null,
         public ?string $supersededBy = null,
         public ?bool $tryIt = null,
+        public ?int $order = null,
+        public ?int $groupOrder = null,
     ) {}
 
     public static function make(
@@ -112,6 +116,8 @@ final readonly class Endpoint
             version: Data::nullableString($data, 'version'),
             supersededBy: Data::nullableString($data, 'supersededBy'),
             tryIt: isset($data['tryIt']) ? Data::bool($data, 'tryIt') : null,
+            order: Data::nullableInt($data, 'order'),
+            groupOrder: Data::nullableInt($data, 'groupOrder'),
         );
     }
 
@@ -230,6 +236,8 @@ final readonly class Endpoint
         ?string $version = null,
         ?string $supersededBy = null,
         ?bool $tryIt = null,
+        ?int $order = null,
+        ?int $groupOrder = null,
     ): self {
         return new self(
             id: $this->id,
@@ -250,6 +258,8 @@ final readonly class Endpoint
             version: $version ?? $this->version,
             supersededBy: $supersededBy ?? $this->supersededBy,
             tryIt: $tryIt ?? $this->tryIt,
+            order: $order ?? $this->order,
+            groupOrder: $groupOrder ?? $this->groupOrder,
         );
     }
 
@@ -281,6 +291,8 @@ final readonly class Endpoint
             'version' => $this->version,
             'supersededBy' => $this->supersededBy,
             'tryIt' => $this->tryIt,
+            'order' => $this->order,
+            'groupOrder' => $this->groupOrder,
         ], static fn (mixed $v): bool => $v !== null);
     }
 }

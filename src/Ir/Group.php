@@ -18,6 +18,7 @@ final readonly class Group
 {
     /**
      * @param  list<Endpoint>  $endpoints
+     * @param  int|null  $order  where the group sits in the navigation; null sorts it after the groups that state a place
      */
     public function __construct(
         public string $name,
@@ -25,6 +26,7 @@ final readonly class Group
         public ?string $description = null,
         public ?string $slug = null,
         public ?string $version = null,
+        public ?int $order = null,
     ) {}
 
     /**
@@ -41,6 +43,7 @@ final readonly class Group
             description: Data::nullableString($data, 'description'),
             slug: Data::nullableString($data, 'slug'),
             version: Data::nullableString($data, 'version'),
+            order: Data::nullableInt($data, 'order'),
         );
     }
 
@@ -76,6 +79,7 @@ final readonly class Group
             'name' => $this->name,
             'slug' => $this->slug(),
             'version' => $this->version,
+            'order' => $this->order,
             'description' => $this->description,
             'endpoints' => array_map(static fn (Endpoint $e): array => $e->toArray(), $this->endpoints),
         ], static fn (mixed $v): bool => $v !== null);

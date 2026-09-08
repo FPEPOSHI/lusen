@@ -14,6 +14,10 @@ use Attribute;
  *
  *     #[ApiGroup('Users', 'Create, read and deactivate user accounts.')]
  *     final class UserController extends Controller
+ *
+ * `order` places the group in the navigation. Groups that state one come
+ * first, lowest number first; the rest follow alphabetically, so ordering one
+ * group does not require ordering all of them.
  */
 #[Attribute(Attribute::TARGET_CLASS)]
 final readonly class ApiGroup
@@ -21,5 +25,6 @@ final readonly class ApiGroup
     public function __construct(
         public string $name,
         public ?string $description = null,
+        public ?int $order = null,
     ) {}
 }

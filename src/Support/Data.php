@@ -50,6 +50,23 @@ final class Data
     }
 
     /**
+     * Absent and non-numeric both read as null, so a caller can tell "no value
+     * given" from the integer zero.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public static function nullableInt(array $data, string $key): ?int
+    {
+        $value = $data[$key] ?? null;
+
+        if (is_int($value)) {
+            return $value;
+        }
+
+        return is_string($value) && preg_match('/^-?\d+$/', $value) === 1 ? (int) $value : null;
+    }
+
+    /**
      * @param  array<string, mixed>  $data
      */
     public static function bool(array $data, string $key, bool $default = false): bool
