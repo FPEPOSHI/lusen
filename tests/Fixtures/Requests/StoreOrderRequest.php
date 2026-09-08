@@ -62,6 +62,9 @@ final class StoreOrderRequest extends FormRequest
             /**
              * The catalogue id, not the SKU.
              *
+             * A product withdrawn from sale is still accepted here, so an
+             * order placed against an old catalogue can be replayed.
+             *
              * @example 4821
              */
             'items.*.product_id' => 'required|integer',

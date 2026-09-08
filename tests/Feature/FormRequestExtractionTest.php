@@ -211,5 +211,18 @@ it('keeps the description of a field nested inside the body', function (): void 
     expect($customer?->schema->properties['name']->description)->toBe('The name to put on the delivery note.')
         ->and($customer?->schema->properties['vip']->description)->toBeNull()
         ->and($items?->schema->description)->toBe('One entry per product. The order is not preserved.')
-        ->and($items?->schema->items?->properties['product_id']->description)->toBe('The catalogue id, not the SKU.');
+        ->and($items?->schema->items?->properties['product_id']->description)->toStartWith('The catalogue id, not the SKU.');
+});
+
+it('keeps the full stop between a docblock\'s first sentence and the next', function (): void {
+    // DocBlock takes the full stop off a summary because a page title carries
+    // none. A field has no title, so without putting it back the paragraphs
+    // meet as "not the SKU A product withdrawn from sale".
+    $items = bodyParam('orders.store', 'items');
+
+    // The line break inside the second paragraph is the author's wrapping and
+    // is kept: a description holds the shape it was written in, so a list or a
+    // fenced block survives. Only the join between the two needed a stop.
+    expect($items?->schema->items?->properties['product_id']->description)
+        ->toBe("The catalogue id, not the SKU. A product withdrawn from sale is still accepted here, so an\norder placed against an old catalogue can be replayed.");
 });

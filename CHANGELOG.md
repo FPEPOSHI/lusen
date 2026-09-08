@@ -24,6 +24,11 @@ All notable changes to this project are documented here.
   whether the field was required, and dropped the one sentence a caller cannot
   work out from any of them. It travels on the schema now, which is what
   survives the walk, so a nested table says what a top-level one always did.
+- **A docblock's first sentence ran into its second.** DocBlock takes the full
+  stop off a summary because a page title carries none, and a field's docblock
+  has no title: the two paragraphs met in the description column as "never
+  returns an error `price` is still the full unit price". The stop goes back
+  on before the join.
 - **A group spanning two controllers took the description of whichever sorted
   first.** A route reaching across into another controller brought that
   controller's copy with it and spoke for the whole group. The description

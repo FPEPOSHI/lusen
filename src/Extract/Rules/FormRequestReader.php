@@ -110,9 +110,25 @@ final class FormRequestReader
         return $rules;
     }
 
+    /**
+     * The whole docblock as one description.
+     *
+     * A field's docblock is not an endpoint's: there is no heading here, only
+     * a description that happens to have been written in paragraphs, and the
+     * first one is a sentence like the rest. DocBlock strips the full stop off
+     * a summary because a page title carries none, so it goes back on before
+     * the join, or two sentences meet as "never returns an error `price` is
+     * still the full unit price".
+     */
     private static function sentence(DocBlock $doc): ?string
     {
-        $written = trim($doc->summary.' '.$doc->description);
+        $summary = $doc->summary;
+
+        if ($summary !== '' && $doc->description !== '' && preg_match('/[.!?:]$/', $summary) !== 1) {
+            $summary .= '.';
+        }
+
+        $written = trim($summary.' '.$doc->description);
 
         return $written === '' ? null : $written;
     }
