@@ -91,7 +91,9 @@ final readonly class ExternalAttributeExtractor implements Extractor
      *
      * Worth reading even where a group name is already derived: the URI
      * fallback splits `/client` from `/clients` into two groups that a team
-     * calling both "Klienti" never meant to have.
+     * calling both "Klienti" never meant to have. The description comes with
+     * it: it is the group's landing copy, and a paragraph somebody already
+     * wrote for Scramble is the same paragraph here.
      *
      * The weight is read as the group's order. It is the same idea under
      * another name, and a team that has already decided which group a reader
@@ -110,7 +112,11 @@ final readonly class ExternalAttributeExtractor implements Extractor
             if ($name !== null) {
                 $weight = $this->integer($arguments, 'weight', 2);
 
-                return $endpoint->with(group: $name, groupOrder: $weight === PHP_INT_MAX ? null : $weight);
+                return $endpoint->with(
+                    group: $name,
+                    groupOrder: $weight === PHP_INT_MAX ? null : $weight,
+                    groupDescription: $this->string($arguments, 'description', 1),
+                );
             }
         }
 

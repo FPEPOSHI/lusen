@@ -127,7 +127,15 @@ final readonly class AttributeExtractor implements Extractor
     {
         $group = $this->instance($class, ApiGroup::class);
 
-        return $group === null ? $endpoint : $endpoint->with(group: $group->name, groupOrder: $group->order);
+        if ($group === null) {
+            return $endpoint;
+        }
+
+        return $endpoint->with(
+            group: $group->name,
+            groupOrder: $group->order,
+            groupDescription: $group->description,
+        );
     }
 
     /**

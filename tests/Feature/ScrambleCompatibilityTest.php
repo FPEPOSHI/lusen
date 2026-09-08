@@ -46,6 +46,10 @@ it('reads attributes whose class is not installed at all', function (): void {
         ->and(scrambledSpec()->endpoint('clients.index')?->group)->toBe('Klienti');
 });
 
+it('reads the group description as the group\'s landing copy', function (): void {
+    expect(scrambledSpec()->groups[0]->description)->toBe('Clients, in the team\'s own words.');
+});
+
 it('reads the group weight as the group order', function (): void {
     // An API that already told Scramble which group comes first should not
     // have to say it twice.

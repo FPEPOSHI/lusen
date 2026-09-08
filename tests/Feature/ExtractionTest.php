@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Lusen\Ir\Endpoint;
 use Lusen\Ir\Enums\ParameterLocation;
 use Lusen\SpecBuilder;
 use Lusen\Tests\Fixtures\HiddenController;
@@ -23,6 +24,29 @@ beforeEach(function (): void {
 
 it('takes the group name from the controller attribute', function (): void {
     expect(buildSpec()->endpoint('users.index')?->group)->toBe('Users');
+});
+
+it('takes the group description from the controller attribute', function (): void {
+    // The description is the group's landing copy on the index, in the
+    // Markdown mirror, in llms.txt and on the OpenAPI tag. A group nobody
+    // described stays undescribed rather than getting one invented.
+    $descriptions = [];
+
+    foreach (buildSpec()->groups as $group) {
+        $descriptions[$group->name] = $group->description;
+    }
+
+    expect($descriptions)->toBe(['Orders' => null, 'Users' => 'Create and read user accounts.']);
+});
+
+it('carries the group description on the endpoint, so a cached endpoint keeps it', function (): void {
+    // Groups are derived after extraction, and the incremental cache stores
+    // endpoints one at a time; anything a group needs has to survive an
+    // endpoint's round trip through toArray().
+    $endpoint = buildSpec()->endpoint('users.index');
+
+    expect($endpoint?->groupDescription)->toBe('Create and read user accounts.')
+        ->and(Endpoint::fromArray($endpoint?->toArray() ?? [])->groupDescription)->toBe('Create and read user accounts.');
 });
 
 it('takes summary and description from the ApiDoc attribute', function (): void {

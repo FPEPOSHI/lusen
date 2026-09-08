@@ -29,6 +29,7 @@ final readonly class Endpoint
      * @param  bool|null  $tryIt  false withholds the playground from this operation; null leaves the site's setting alone
      * @param  int|null  $order  where this operation sits inside its group; null sorts it after the ones that state a place
      * @param  int|null  $groupOrder  where the group sits in the navigation, carried here because groups are derived from their endpoints
+     * @param  string|null  $groupDescription  what the group is for, carried here for the same reason
      */
     public function __construct(
         public string $id,
@@ -51,6 +52,7 @@ final readonly class Endpoint
         public ?bool $tryIt = null,
         public ?int $order = null,
         public ?int $groupOrder = null,
+        public ?string $groupDescription = null,
     ) {}
 
     public static function make(
@@ -118,6 +120,7 @@ final readonly class Endpoint
             tryIt: isset($data['tryIt']) ? Data::bool($data, 'tryIt') : null,
             order: Data::nullableInt($data, 'order'),
             groupOrder: Data::nullableInt($data, 'groupOrder'),
+            groupDescription: Data::nullableString($data, 'groupDescription'),
         );
     }
 
@@ -238,6 +241,7 @@ final readonly class Endpoint
         ?bool $tryIt = null,
         ?int $order = null,
         ?int $groupOrder = null,
+        ?string $groupDescription = null,
     ): self {
         return new self(
             id: $this->id,
@@ -260,6 +264,7 @@ final readonly class Endpoint
             tryIt: $tryIt ?? $this->tryIt,
             order: $order ?? $this->order,
             groupOrder: $groupOrder ?? $this->groupOrder,
+            groupDescription: $groupDescription ?? $this->groupDescription,
         );
     }
 
@@ -293,6 +298,7 @@ final readonly class Endpoint
             'tryIt' => $this->tryIt,
             'order' => $this->order,
             'groupOrder' => $this->groupOrder,
+            'groupDescription' => $this->groupDescription,
         ], static fn (mixed $v): bool => $v !== null);
     }
 }

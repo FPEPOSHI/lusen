@@ -156,7 +156,9 @@ final readonly class SpecBuilder
 
     /**
      * Endpoints carry a group name; groups are derived, not configured, so a
-     * new controller shows up in the docs without anyone editing a file.
+     * new controller shows up in the docs without anyone editing a file. The
+     * group's description and order travel on its endpoints for the same
+     * reason, and the first endpoint to state one speaks for the group.
      *
      * A versioned API groups by version first, newest version first, so a
      * reader meets the version they should be writing against before the one
@@ -180,16 +182,17 @@ final readonly class SpecBuilder
         $scoped = count($versions) > 1;
         $order = Versions::order($versions);
 
-        /** @var array<string, array{version: string|null, name: string, order: int|null, endpoints: list<Endpoint>}> $buckets */
+        /** @var array<string, array{version: string|null, name: string, order: int|null, description: string|null, endpoints: list<Endpoint>}> $buckets */
         $buckets = [];
 
         foreach ($endpoints as $endpoint) {
             $version = $scoped ? $endpoint->version : null;
             $name = $endpoint->group ?? 'General';
 
-            $buckets[$version.'|'.$name] ??= ['version' => $version, 'name' => $name, 'order' => null, 'endpoints' => []];
+            $buckets[$version.'|'.$name] ??= ['version' => $version, 'name' => $name, 'order' => null, 'description' => null, 'endpoints' => []];
             $buckets[$version.'|'.$name]['endpoints'][] = $endpoint;
             $buckets[$version.'|'.$name]['order'] ??= $endpoint->groupOrder;
+            $buckets[$version.'|'.$name]['description'] ??= $endpoint->groupDescription;
         }
 
         uasort($buckets, static fn (array $a, array $b): int => [
@@ -202,6 +205,7 @@ final readonly class SpecBuilder
             static fn (array $bucket): Group => new Group(
                 name: $bucket['name'],
                 endpoints: self::sequence($bucket['endpoints']),
+                description: $bucket['description'],
                 version: $bucket['version'],
                 order: $bucket['order'],
             ),

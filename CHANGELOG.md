@@ -23,6 +23,18 @@ All notable changes to this project are documented here.
   already ordered its groups for Scramble arrives with that order intact,
   which is the point of reading another tool's attributes at all.
 
+### Fixed
+
+- **A group's description never reached the page.** The second argument of
+  `#[ApiGroup('Users', 'Create and read user accounts.')]` is documented as
+  the group's landing copy, and the index, the Markdown mirror, `llms.txt`,
+  the OpenAPI tag and the Postman folder all render it — but nothing carried
+  it from the attribute to the group. Groups are derived from their endpoints
+  after extraction, and an endpoint had nowhere to hold it, so every group in
+  every build was undescribed. It now travels on the endpoint the way the
+  group's order does. Scramble's `#[Group(description: …)]` was lost the same
+  way and is read too.
+
 ## 0.6.0 — 2026-09-07
 
 ### Added
