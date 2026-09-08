@@ -17,8 +17,13 @@
 
     <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{{ $group->displayName() }}</h1>
 
+    {{-- Rendered as Markdown for the same reason an endpoint's description is:
+         this is the copy an author writes for a reader who has never seen the
+         API, and they reach for a list and a heading the moment the page is
+         worth writing. Printed raw it puts asterisks on the landing page most
+         likely to be somebody's first. --}}
     @if ($group->description)
-        <p class="mt-3 max-w-2xl text-slate-600 dark:text-slate-400">{{ $group->description }}</p>
+        <div class="lusen-prose mt-3 max-w-2xl">{!! \Lusen\Support\MarkdownDocument::render($group->description)->html !!}</div>
     @endif
 
     {{-- Repeated here rather than linked: a page has to stand alone, and

@@ -71,6 +71,29 @@ final readonly class Group
     }
 
     /**
+     * The opening paragraph of the description, as one line.
+     *
+     * A description is prose, and prose written for a group's landing page
+     * runs to headings, lists and several paragraphs — the fature.al
+     * onboarding group narrates a six-step workflow. That belongs on the page
+     * and nowhere else: a meta description, a search result and a line in an
+     * index each want the first sentence, and pouring the whole thing into
+     * them truncates it mid-workflow.
+     */
+    public function lede(): ?string
+    {
+        if ($this->description === null) {
+            return null;
+        }
+
+        $paragraph = preg_split('/\R\s*\R/', trim($this->description), 2)[0] ?? '';
+
+        // Newlines inside the paragraph are the author's line wrapping, not
+        // structure; a single line is what every caller of this wants.
+        return trim((string) preg_replace('/\s+/', ' ', $paragraph)) ?: null;
+    }
+
+    /**
      * One line on what the group is for, where nobody wrote one: the
      * operations themselves, named. That is the sentence under the group's
      * page in a search result, and "List users, Create a user, Show a user."
@@ -78,8 +101,10 @@ final readonly class Group
      */
     public function summary(): string
     {
-        if ($this->description !== null) {
-            return $this->description;
+        $lede = $this->lede();
+
+        if ($lede !== null) {
+            return $lede;
         }
 
         if ($this->endpoints === []) {

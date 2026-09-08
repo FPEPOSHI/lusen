@@ -10,6 +10,7 @@ use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Page;
 use Lusen\SpecBuilder;
 use Lusen\Support\Links;
+use Lusen\Tests\Fixtures\OnboardingController;
 use Lusen\Tests\Fixtures\OrderController;
 use Lusen\Tests\Fixtures\UserController;
 
@@ -145,6 +146,29 @@ it('renders a group page with its description and its operations', function (): 
         ->toContain('1 of 2 operations require authentication.')
         // Listed, not repeated: the operations keep their own pages.
         ->and($html)->not->toContain('Example request');
+});
+
+it('renders a group description as markdown on the group page', function (): void {
+    Route::post('api/onboarding/register', [OnboardingController::class, 'register'])->name('onboarding.register');
+
+    $spec = staticSpec();
+    $html = staticEmitter()->group($spec->group('onboarding'), $spec);
+
+    expect($html)->toContain('<strong>The order matters:</strong>')
+        ->toContain('<li>Register the company.</li>')
+        // The asterisks and the digits belong to the source, not to the page.
+        ->not->toContain('**The order matters:**');
+});
+
+it('puts only the lede under a group heading on the index', function (): void {
+    Route::post('api/onboarding/register', [OnboardingController::class, 'register'])->name('onboarding.register');
+
+    $index = staticEmitter()->index(staticSpec());
+
+    expect($index)->toContain('Everything a new company does before its first invoice.')
+        // The workflow is what the group page is for; repeating it here would
+        // push the next group off the screen.
+        ->not->toContain('<li>Register the company.</li>');
 });
 
 it('links the index heading and the sidebar to the group page', function (): void {

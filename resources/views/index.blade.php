@@ -148,8 +148,12 @@
                 @endif
             </h2>
 
-            @if ($group->description)
-                <p class="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400">{{ $group->description }}</p>
+            {{-- The opening paragraph only. The index is a list of every
+                 group, and a group that narrates a workflow would push the
+                 next one off the screen; the rest of it is what the group's
+                 own page is for. --}}
+            @if ($group->lede())
+                <p class="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400">{!! \Lusen\Support\MarkdownDocument::inline($group->lede()) !!}</p>
             @endif
 
             {{-- In static output each endpoint owns a page, so the index lists

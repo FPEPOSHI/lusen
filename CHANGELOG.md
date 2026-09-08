@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented here.
 
+## Unreleased
+
+### Fixed
+
+- **A group description was printed rather than rendered.** It is the landing
+  copy for the page most likely to be somebody's first, so authors write it as
+  prose: headings, a numbered workflow, a path in backticks. All of it arrived
+  on the page as literal asterisks and flattened into one paragraph, which is
+  what an endpoint's description already avoided by going through the Markdown
+  converter. The group page now does the same.
+
+  The index and the meta description take only the opening paragraph
+  (`Group::lede()`). A description that narrates six steps is right on the
+  group's own page and wrong in a list of every group, where it pushes the
+  next one off the screen, and wrong again in a meta description, where it is
+  truncated mid-workflow.
+
 ## 0.6.1 — 2026-09-08
 
 ### Added

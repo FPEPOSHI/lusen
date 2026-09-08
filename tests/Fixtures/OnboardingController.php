@@ -15,7 +15,15 @@ use Lusen\Attributes\ApiGroup;
  * deliberately not the path order and deliberately not contiguous: a reader
  * who inserts a step later should not have to renumber the ones after it.
  */
-#[ApiGroup('Onboarding', 'Everything a new company does before its first invoice.', order: 1)]
+#[ApiGroup('Onboarding', <<<'DESC'
+Everything a new company does before its first invoice.
+
+**The order matters:**
+
+1. Register the company.
+2. Upload the certificate.
+3. Add a bank account.
+DESC, order: 1)]
 final class OnboardingController
 {
     #[ApiDoc(summary: 'Register the company', order: 10)]

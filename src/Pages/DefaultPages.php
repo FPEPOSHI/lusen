@@ -125,7 +125,11 @@ final class DefaultPages
 
             foreach ($spec->groups as $group) {
                 $count = count($group->endpoints);
-                $summary = $group->description ?? self::describeGroup($group);
+
+                // The lede, not the whole description: this is one bullet in
+                // a list, and a description that runs to paragraphs would end
+                // the list on its first blank line.
+                $summary = $group->lede() ?? self::describeGroup($group);
 
                 // The display name, not the plain one: a versioned API has a
                 // Customers group per version, and a list naming both of them
