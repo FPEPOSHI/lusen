@@ -97,7 +97,9 @@
             @endif
 
             <li>
-                <a href="{{ $links->group($group) }}" class="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                <a href="{{ $links->group($group) }}"
+                   @if (($current ?? null) === 'group:'.$group->slug()) aria-current="page" @endif
+                   class="text-xs font-semibold uppercase tracking-wider hover:text-slate-900 dark:hover:text-white {{ ($current ?? null) === 'group:'.$group->slug() ? 'text-slate-900 dark:text-white' : 'text-slate-500' }}">
                     {{ $group->name }}
                 </a>
                 <ul class="mt-2 space-y-1 border-l border-slate-200 dark:border-slate-800">

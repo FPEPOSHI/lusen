@@ -6,13 +6,16 @@ namespace Lusen\Support;
 
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Endpoint;
+use Lusen\Ir\Group;
 use Lusen\Ir\Page;
 
 /**
  * The documentation read as one ordered sequence.
  *
  * Prose sections come first, then the endpoint reference, which is the order a
- * newcomer needs: what this is, how to authenticate, then the operations.
+ * newcomer needs: what this is, how to authenticate, then the operations. In
+ * the reference a group's own page comes before its operations, as it does in
+ * the sidebar.
  * Flattening it lets every page carry previous/next links, which is what turns
  * a pile of pages into something a person can read through once.
  */
@@ -39,6 +42,13 @@ final readonly class Navigation
         }
 
         foreach ($spec->groups as $group) {
+            $items[] = [
+                'id' => 'group:'.$group->slug(),
+                'title' => $group->displayName(),
+                'href' => $links->group($group),
+                'kind' => 'group',
+            ];
+
             foreach ($group->endpoints as $endpoint) {
                 $items[] = [
                     'id' => 'endpoint:'.$endpoint->id,
@@ -91,6 +101,14 @@ final readonly class Navigation
     public function aroundEndpoint(Endpoint $endpoint): array
     {
         return $this->around('endpoint:'.$endpoint->id);
+    }
+
+    /**
+     * @return array{previous: array{title: string, href: string}|null, next: array{title: string, href: string}|null}
+     */
+    public function aroundGroup(Group $group): array
+    {
+        return $this->around('group:'.$group->slug());
     }
 
     /**

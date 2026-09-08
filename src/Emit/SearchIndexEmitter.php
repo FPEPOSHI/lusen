@@ -7,6 +7,7 @@ namespace Lusen\Emit;
 use Lusen\Emit\Contracts\Emitter;
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Endpoint;
+use Lusen\Ir\Group;
 use Lusen\Ir\Page;
 use Lusen\Ir\Parameter;
 use Lusen\Support\Links;
@@ -60,8 +61,12 @@ final readonly class SearchIndexEmitter implements Emitter
             $items[] = $this->page($page);
         }
 
-        foreach ($spec->endpoints() as $endpoint) {
-            $items[] = $this->endpoint($endpoint);
+        foreach ($spec->groups as $group) {
+            $items[] = $this->group($group);
+
+            foreach ($group->endpoints as $endpoint) {
+                $items[] = $this->endpoint($endpoint);
+            }
         }
 
         return ['version' => $spec->version, 'items' => $items];
@@ -85,6 +90,35 @@ final readonly class SearchIndexEmitter implements Emitter
             'kind' => 'page',
             'context' => $page->section ?? '',
             'text' => $this->trim($page->summary().' '.implode(' ', $headings)),
+        ], static fn (string $value): bool => $value !== '');
+    }
+
+    /**
+     * A group is the result for a bare noun. Somebody who types "orders"
+     * wants the page that says what can be done with orders before they want
+     * any one operation on them.
+     *
+     * @return array<string, string>
+     */
+    private function group(Group $group): array
+    {
+        $count = count($group->endpoints);
+
+        return array_filter([
+            'title' => $group->name,
+            'url' => $this->links->group($group),
+            'kind' => 'group',
+            'context' => implode(' · ', array_filter([
+                $group->version,
+                $count.' '.($count === 1 ? 'operation' : 'operations'),
+            ])),
+            'text' => $this->trim(implode(' ', array_filter([
+                $group->description,
+                ...array_map(
+                    static fn (Endpoint $endpoint): string => $endpoint->title().' '.$endpoint->path(),
+                    $group->endpoints,
+                ),
+            ]))),
         ], static fn (string $value): bool => $value !== '');
     }
 

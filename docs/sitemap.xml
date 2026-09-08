@@ -25,10 +25,16 @@
         <loc>https://lusen.oda.al/pages/pagination.html</loc>
     </url>
     <url>
+        <loc>https://lusen.oda.al/groups/v2-authentication.html</loc>
+    </url>
+    <url>
         <loc>https://lusen.oda.al/endpoints/v2-auth-tokens-store.html</loc>
     </url>
     <url>
         <loc>https://lusen.oda.al/endpoints/v2-auth-tokens-destroy.html</loc>
+    </url>
+    <url>
+        <loc>https://lusen.oda.al/groups/v2-customers.html</loc>
     </url>
     <url>
         <loc>https://lusen.oda.al/endpoints/v2-customers-index.html</loc>
@@ -46,6 +52,9 @@
         <loc>https://lusen.oda.al/endpoints/v2-customers-destroy.html</loc>
     </url>
     <url>
+        <loc>https://lusen.oda.al/groups/v2-orders.html</loc>
+    </url>
+    <url>
         <loc>https://lusen.oda.al/endpoints/v2-orders-index.html</loc>
     </url>
     <url>
@@ -58,10 +67,16 @@
         <loc>https://lusen.oda.al/endpoints/v2-orders-refunds-store.html</loc>
     </url>
     <url>
+        <loc>https://lusen.oda.al/groups/v2-products.html</loc>
+    </url>
+    <url>
         <loc>https://lusen.oda.al/endpoints/v2-products-index.html</loc>
     </url>
     <url>
         <loc>https://lusen.oda.al/endpoints/v2-products-show.html</loc>
+    </url>
+    <url>
+        <loc>https://lusen.oda.al/groups/v2-webhooks.html</loc>
     </url>
     <url>
         <loc>https://lusen.oda.al/endpoints/v2-webhooks-index.html</loc>
@@ -70,10 +85,16 @@
         <loc>https://lusen.oda.al/endpoints/v2-webhooks-store.html</loc>
     </url>
     <url>
+        <loc>https://lusen.oda.al/groups/v1-authentication.html</loc>
+    </url>
+    <url>
         <loc>https://lusen.oda.al/endpoints/v1-auth-tokens-store.html</loc>
     </url>
     <url>
         <loc>https://lusen.oda.al/endpoints/v1-auth-tokens-destroy.html</loc>
+    </url>
+    <url>
+        <loc>https://lusen.oda.al/groups/v1-customers.html</loc>
     </url>
     <url>
         <loc>https://lusen.oda.al/endpoints/v1-customers-index.html</loc>
@@ -85,10 +106,16 @@
         <loc>https://lusen.oda.al/endpoints/v1-customers-show.html</loc>
     </url>
     <url>
+        <loc>https://lusen.oda.al/groups/v1-orders.html</loc>
+    </url>
+    <url>
         <loc>https://lusen.oda.al/endpoints/v1-orders-index.html</loc>
     </url>
     <url>
         <loc>https://lusen.oda.al/endpoints/v1-orders-store.html</loc>
+    </url>
+    <url>
+        <loc>https://lusen.oda.al/groups/v1-products.html</loc>
     </url>
     <url>
         <loc>https://lusen.oda.al/endpoints/v1-products-index.html</loc>

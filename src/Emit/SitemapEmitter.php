@@ -75,8 +75,8 @@ final readonly class SitemapEmitter implements Emitter
     }
 
     /**
-     * Every canonical URL, index first, then prose, then reference - the same
-     * order the sidebar uses.
+     * Every canonical URL, index first, then prose, then reference with each
+     * group's page ahead of its operations - the same order the sidebar uses.
      *
      * @return list<string>
      */
@@ -100,11 +100,19 @@ final readonly class SitemapEmitter implements Emitter
             }
         }
 
-        foreach ($spec->endpoints() as $endpoint) {
-            $url = $this->links->canonicalEndpoint($endpoint);
+        foreach ($spec->groups as $group) {
+            $url = $this->links->canonicalGroup($group);
 
             if ($url !== null) {
                 $urls[] = $url;
+            }
+
+            foreach ($group->endpoints as $endpoint) {
+                $url = $this->links->canonicalEndpoint($endpoint);
+
+                if ($url !== null) {
+                    $urls[] = $url;
+                }
             }
         }
 

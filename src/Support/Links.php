@@ -77,22 +77,33 @@ final readonly class Links
         return $this->base().'/endpoints/'.$endpoint->slug().'.md';
     }
 
+    /**
+     * A group's own page in static output. At runtime the whole API is one
+     * page, so it is the group's section of that page.
+     */
     public function group(Group $group): string
     {
-        return $this->static
-            ? $this->base().'/index.html#'.$group->slug()
-            : '#'.$group->slug();
+        return $this->groupSlug($group->slug());
     }
 
     /**
-     * For callers that hold a slug rather than the Group itself, such as a
-     * breadcrumb built from an endpoint's group name.
+     * For callers that hold a slug rather than the Group itself.
      */
     public function groupSlug(string $slug): string
     {
         return $this->static
-            ? $this->base().'/index.html#'.$slug
+            ? $this->base().'/groups/'.$slug.'.html'
             : '#'.$slug;
+    }
+
+    public function groupMarkdown(Group $group): string
+    {
+        return $this->base().'/groups/'.$group->slug().'.md';
+    }
+
+    public function canonicalGroup(Group $group): ?string
+    {
+        return $this->canonical(ltrim($this->base().'/groups/'.$group->slug().'.html', '/'));
     }
 
     public function asset(string $file): string

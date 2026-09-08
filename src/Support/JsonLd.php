@@ -6,6 +6,7 @@ namespace Lusen\Support;
 
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Endpoint;
+use Lusen\Ir\Group;
 use Lusen\Ir\Page;
 
 /**
@@ -53,7 +54,7 @@ final class JsonLd
             'breadcrumb' => [
                 '@type' => 'BreadcrumbList',
                 'itemListElement' => array_values(array_filter([
-                    self::crumb(1, $spec->title, $docsUrl),
+                    self::crumb(1, $spec->title, self::site($docsUrl)),
                     $page->section === null ? null : self::crumb(2, $page->section, $docsUrl),
                     self::crumb(3, $page->title, $url),
                 ])),
@@ -61,9 +62,48 @@ final class JsonLd
         ]);
     }
 
+    /**
+     * A group page lists the operations on one resource, which is what
+     * `CollectionPage` means. Each operation is named as a part so a consumer
+     * learns what the page holds without fetching it.
+     */
+    public static function forGroup(Group $group, ApiSpec $spec, string $docsUrl): string
+    {
+        $url = self::base($docsUrl).'/groups/'.$group->slug();
+
+        return self::encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'CollectionPage',
+            'headline' => $group->displayName(),
+            'description' => Str::summarise($group->summary()),
+            'url' => $url,
+            'isPartOf' => [
+                '@type' => 'WebSite',
+                'name' => $spec->title,
+                'url' => self::site($docsUrl),
+            ],
+            'breadcrumb' => [
+                '@type' => 'BreadcrumbList',
+                'itemListElement' => [
+                    self::crumb(1, $spec->title, self::site($docsUrl)),
+                    self::crumb(2, $group->displayName(), $url),
+                ],
+            ],
+            'hasPart' => array_map(
+                static fn (Endpoint $endpoint): array => [
+                    '@type' => 'TechArticle',
+                    'headline' => $endpoint->title(),
+                    'url' => self::base($docsUrl).'/endpoints/'.$endpoint->slug(),
+                ],
+                $group->endpoints,
+            ),
+        ]);
+    }
+
     public static function forEndpoint(Endpoint $endpoint, ApiSpec $spec, string $docsUrl): string
     {
         $url = self::base($docsUrl).'/endpoints/'.$endpoint->slug();
+        $group = $spec->groupFor($endpoint);
 
         return self::encode([
             '@context' => 'https://schema.org',
@@ -79,11 +119,15 @@ final class JsonLd
             'breadcrumb' => [
                 '@type' => 'BreadcrumbList',
                 'itemListElement' => array_values(array_filter([
-                    self::crumb(1, $spec->title, $docsUrl),
-                    $endpoint->group === null ? null : self::crumb(
+                    self::crumb(1, $spec->title, self::site($docsUrl)),
+                    // Looked up rather than rebuilt from the name: with two
+                    // versions in play the name alone does not identify the
+                    // group, and the crumb would point at a page that is not
+                    // there.
+                    $group === null ? null : self::crumb(
                         2,
-                        $endpoint->group,
-                        rtrim($docsUrl, '/').'/#'.Str::slug($endpoint->group),
+                        $group->displayName(),
+                        self::base($docsUrl).'/groups/'.$group->slug(),
                     ),
                     self::crumb(3, $endpoint->title(), $url),
                 ])),

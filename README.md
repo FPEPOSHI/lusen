@@ -45,11 +45,11 @@ Prefer a live preview while developing? Set `LUSEN_RUNTIME=true` and visit
 Most Laravel API docs packages optimise for one reader: a developer with a
 browser. Lusen assumes three, and treats them as equally important.
 
-**People** get server-rendered HTML, one endpoint per page, styled with
-Tailwind — a contents column beside the page, tabbed request examples, search
-on `⌘K`, and navigation that works on a phone. All of it readable with
-JavaScript disabled: every control is an enhancement over markup that already
-works without it.
+**People** get server-rendered HTML, one page per endpoint and one per group,
+styled with Tailwind — a contents column beside the page, tabbed request
+examples, search on `⌘K`, and navigation that works on a phone. All of it
+readable with JavaScript disabled: every control is an enhancement over markup
+that already works without it.
 
 **Search engines** get canonical URLs, real meta descriptions, JSON-LD
 `TechArticle` and `BreadcrumbList` data, and a sitemap. Nothing is behind a
@@ -61,6 +61,7 @@ than scraped HTML:
 | Surface | What it is |
 | --- | --- |
 | `/docs/endpoints/{id}.md` | Every page mirrored in Markdown — swap `.html` for `.md` |
+| `/docs/groups/{slug}.html` | One page per group — what a resource is for and every operation on it, for the query that names no operation |
 | `/docs/openapi.json` | OpenAPI 3.1 — real JSON Schema, so generated clients stop guessing |
 | `/docs/llms.txt` | A curated index, one line per endpoint, per [llmstxt.org](https://llmstxt.org) |
 | `/docs/llms-full.txt` | The entire API as Markdown in one file |
@@ -105,7 +106,7 @@ in `llms.txt` — swap `.html` for `.md` on any URL and see for yourself.
 Build it yourself in one command:
 
 ```bash
-php tools/build-showcase.php   # 7 prose pages, 24 endpoint pages, Markdown mirrors, OpenAPI, llms.txt, sitemap, search index
+php tools/build-showcase.php   # 7 prose pages, 9 group pages, 24 endpoint pages, Markdown mirrors, OpenAPI, llms.txt, sitemap, search index
 open docs/index.html
 ```
 

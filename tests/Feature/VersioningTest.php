@@ -161,10 +161,10 @@ it('leaves the current version without a notice to chase', function (): void {
 });
 
 it('breadcrumbs to the group of the right version', function (): void {
-    // The group anchor carries the version, so a breadcrumb rebuilt from the
-    // group name alone would point at a section that is not there.
+    // The group's slug carries the version, so a breadcrumb rebuilt from the
+    // group name alone would point at a page that is not there.
     expect(versionedHtml('v1.users.index'))
-        ->toContain('href="/docs/index.html#v1-users"')
+        ->toContain('href="/docs/groups/v1-users.html"')
         ->toContain('>Users (v1)</a>');
 });
 

@@ -566,6 +566,14 @@ URI segment — the version and a leading `api` are skipped. Groups are
 alphabetical, after their version when the API has more than one, and
 endpoints within a group follow their path.
 
+Every group gets a page of its own — `groups/{slug}.html`, with a Markdown
+twin — that opens with the description and lists the operations. It is the
+page a search engine or an assistant hands to somebody asking what can be done
+with orders at all, before they know an operation's name, so the description
+is worth a sentence: it is the first thing on that page and the snippet under
+its search result. A group nobody described is summarised by naming its
+operations rather than left blank.
+
 **Ordering** overrides that alphabet where the alphabet is the wrong answer.
 `#[ApiGroup(order: 1)]` places a group; `#[ApiDoc(order: 1)]` places an
 operation inside its group. Both are partial: what states a place takes it,

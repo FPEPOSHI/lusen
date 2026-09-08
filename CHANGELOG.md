@@ -22,6 +22,23 @@ All notable changes to this project are documented here.
   Scramble's `#[Group(weight: 1)]` is read as the same thing. An API that
   already ordered its groups for Scramble arrives with that order intact,
   which is the point of reading another tool's attributes at all.
+- **A page per group.** `groups/{slug}.html`, with a Markdown twin at
+  `groups/{slug}.md`. The index lists every group and each endpoint page
+  answers one operation, and neither is the page for somebody asking what can
+  be done with orders at all — the question a search engine or an assistant is
+  asked before it knows an operation's name. The page opens with the group's
+  description, states the base URL, the version and whether a credential is
+  needed, and lists the operations. It lists rather than repeats, so it does
+  not compete with the endpoint pages for their own queries. It sits in the
+  sidebar, the sitemap, the search index and the reading order ahead of its
+  operations, and carries `CollectionPage` structured data naming each of
+  them. A group nobody described is summarised by naming its operations rather
+  than left blank.
+
+  Group links — the sidebar heading, the breadcrumb on every endpoint page,
+  the JSON-LD breadcrumb — now point at these pages rather than at a section
+  of the index. The index sections keep their anchors, so an existing link
+  still lands.
 
 ### Fixed
 

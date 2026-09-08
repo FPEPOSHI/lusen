@@ -51,6 +51,13 @@
             "text": "Every list endpoint pages the same way, so this is documented once here rather than repeated on each one. Requesting a page Reading the response Iterating safely"
         },
         {
+            "title": "Authentication",
+            "url": "/groups/v2-authentication.html",
+            "kind": "group",
+            "context": "v2 · 2 operations",
+            "text": "Exchange an API key pair for a bearer token, and revoke it when you are done. Issue an access token /api/v2/auth/tokens Revoke the current token /api/v2/auth/tokens/current"
+        },
+        {
             "title": "Issue an access token",
             "url": "/endpoints/v2-auth-tokens-store.html",
             "kind": "endpoint",
@@ -67,6 +74,13 @@
             "path": "/api/v2/auth/tokens/current",
             "context": "Authentication · v2",
             "text": "Revoke the current token Invalidates the token used to make this call. Idempotent — revoking an already-revoked token still returns 204. v2"
+        },
+        {
+            "title": "Customers",
+            "url": "/groups/v2-customers.html",
+            "kind": "group",
+            "context": "v2 · 5 operations",
+            "text": "Create and manage the people who place orders. List customers /api/v2/customers Create a customer /api/v2/customers Retrieve a customer /api/v2/customers/{customer} Update a customer /api/v2/customers/{customer} Delete a customer /api/v2/customers/{customer}"
         },
         {
             "title": "List customers",
@@ -114,6 +128,13 @@
             "text": "Delete a customer Permanently removes the customer and anonymises their orders. Prefer archiving via the update endpoint. v2 customer"
         },
         {
+            "title": "Orders",
+            "url": "/groups/v2-orders.html",
+            "kind": "group",
+            "context": "v2 · 4 operations",
+            "text": "Place, read and refund orders. List orders /api/v2/orders Create an order /api/v2/orders Retrieve an order /api/v2/orders/{order} Refund an order /api/v2/orders/{order}/refunds"
+        },
+        {
             "title": "List orders",
             "url": "/endpoints/v2-orders-index.html",
             "kind": "endpoint",
@@ -150,6 +171,13 @@
             "text": "Refund an order Refunds all or part of a paid order. Partial refunds may be issued repeatedly up to the order total. v2 order amount reason"
         },
         {
+            "title": "Products",
+            "url": "/groups/v2-products.html",
+            "kind": "group",
+            "context": "v2 · 2 operations",
+            "text": "The public product catalogue. List products /api/v2/products Retrieve a product /api/v2/products/{product}"
+        },
+        {
             "title": "List products",
             "url": "/endpoints/v2-products-index.html",
             "kind": "endpoint",
@@ -166,6 +194,13 @@
             "path": "/api/v2/products/{product}",
             "context": "Products · v2",
             "text": "Retrieve a product v2 product"
+        },
+        {
+            "title": "Webhooks",
+            "url": "/groups/v2-webhooks.html",
+            "kind": "group",
+            "context": "v2 · 2 operations",
+            "text": "Receive signed callbacks when things happen in your account. List webhook endpoints /api/v2/webhooks Register a webhook endpoint /api/v2/webhooks"
         },
         {
             "title": "List webhook endpoints",
@@ -186,6 +221,13 @@
             "text": "Register a webhook endpoint We POST a signed JSON payload to your URL for each subscribed event. Verify the `X-Acme-Signature` header before trusting a delivery. v2 url events"
         },
         {
+            "title": "Authentication",
+            "url": "/groups/v1-authentication.html",
+            "kind": "group",
+            "context": "v1 · 2 operations",
+            "text": "Unchanged in v2 apart from the path. Issue an access token /api/v1/auth/tokens Revoke the current token /api/v1/auth/tokens/current"
+        },
+        {
             "title": "Issue an access token",
             "url": "/endpoints/v1-auth-tokens-store.html",
             "kind": "endpoint",
@@ -202,6 +244,13 @@
             "path": "/api/v1/auth/tokens/current",
             "context": "Authentication · v1",
             "text": "Revoke the current token Invalidates the token used to make this call. Idempotent — revoking an already-revoked token still returns 204. v1"
+        },
+        {
+            "title": "Customers",
+            "url": "/groups/v1-customers.html",
+            "kind": "group",
+            "context": "v1 · 3 operations",
+            "text": "Reading and creating customers. Updating and deleting them arrived in v2. List customers /api/v1/customers Create a customer /api/v1/customers Retrieve a customer /api/v1/customers/{customer}"
         },
         {
             "title": "List customers",
@@ -231,6 +280,13 @@
             "text": "Retrieve a customer v1 customer include"
         },
         {
+            "title": "Orders",
+            "url": "/groups/v1-orders.html",
+            "kind": "group",
+            "context": "v1 · 2 operations",
+            "text": "Placing and reading orders. Refunds arrived in v2. List orders /api/v1/orders Create an order /api/v1/orders"
+        },
+        {
             "title": "List orders",
             "url": "/endpoints/v1-orders-index.html",
             "kind": "endpoint",
@@ -247,6 +303,13 @@
             "path": "/api/v1/orders",
             "context": "Orders · v1",
             "text": "Create an order Creates an order in `pending` state. A retried request creates a second order; v2 accepts an `Idempotency-Key` header that makes the retry safe. v1 customer_id currency items"
+        },
+        {
+            "title": "Products",
+            "url": "/groups/v1-products.html",
+            "kind": "group",
+            "context": "v1 · 2 operations",
+            "text": "The public product catalogue, with the search route v2 replaced. List products /api/v1/products Search products /api/v1/products/search"
         },
         {
             "title": "List products",

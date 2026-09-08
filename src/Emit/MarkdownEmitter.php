@@ -8,6 +8,7 @@ use Lusen\Diff\VersionDiff;
 use Lusen\Emit\Contracts\Emitter;
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Endpoint;
+use Lusen\Ir\Group;
 use Lusen\Ir\Page;
 use Lusen\Support\Links;
 use Lusen\Support\Str;
@@ -42,11 +43,15 @@ final readonly class MarkdownEmitter implements Emitter
             $files[] = EmittedFile::markdown('pages/'.$page->slug().'.md', $this->page($page, $spec));
         }
 
-        foreach ($spec->endpoints() as $endpoint) {
-            $files[] = EmittedFile::markdown(
-                'endpoints/'.$endpoint->slug().'.md',
-                $this->endpoint($endpoint, $spec),
-            );
+        foreach ($spec->groups as $group) {
+            $files[] = EmittedFile::markdown('groups/'.$group->slug().'.md', $this->group($group, $spec));
+
+            foreach ($group->endpoints as $endpoint) {
+                $files[] = EmittedFile::markdown(
+                    'endpoints/'.$endpoint->slug().'.md',
+                    $this->endpoint($endpoint, $spec),
+                );
+            }
         }
 
         return $files;
@@ -88,7 +93,9 @@ final readonly class MarkdownEmitter implements Emitter
         }
 
         foreach ($spec->groups as $group) {
-            $lines[] = "## {$group->displayName()}";
+            // The heading is the way to the group's own page, as it is on
+            // the HTML index.
+            $lines[] = "## [{$group->displayName()}]({$this->links->groupMarkdown($group)})";
             $lines[] = '';
 
             if ($group->description !== null) {
@@ -96,17 +103,7 @@ final readonly class MarkdownEmitter implements Emitter
                 $lines[] = '';
             }
 
-            foreach ($group->endpoints as $endpoint) {
-                $lines[] = sprintf(
-                    '- [%s %s](%s)%s',
-                    $endpoint->method->value,
-                    $endpoint->path(),
-                    $this->links->markdown($endpoint),
-                    $endpoint->summary === null ? '' : ' — '.Str::summarise($endpoint->summary),
-                );
-            }
-
-            $lines[] = '';
+            $lines = [...$lines, ...$this->operations($group)];
         }
 
         $lines[] = '## Machine-readable';
@@ -213,6 +210,82 @@ final readonly class MarkdownEmitter implements Emitter
         )];
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * The group's page: what the resource is for, and the operations on it,
+     * each linking to its own mirror. Lists rather than repeats, like the HTML
+     * page it twins.
+     */
+    public function group(Group $group, ApiSpec $spec): string
+    {
+        $lines = [
+            '---',
+            'title: '.$this->quote($group->displayName()),
+            'group: '.$this->quote($group->name),
+        ];
+
+        if ($group->version !== null) {
+            $lines[] = 'api_version: '.$this->quote($group->version);
+        }
+
+        $canonical = $this->links->canonicalGroup($group);
+
+        if ($canonical !== null) {
+            $lines[] = 'canonical: '.$this->quote($canonical);
+        }
+
+        $lines[] = '---';
+        $lines[] = '';
+        $lines[] = "# {$group->displayName()}";
+        $lines[] = '';
+        $lines[] = "Part of the [{$spec->title}]({$this->links->index()}) documentation.";
+        $lines[] = '';
+
+        if ($group->description !== null) {
+            $lines[] = $group->description;
+            $lines[] = '';
+        }
+
+        // Repeated here rather than linked: a retrieved page has to stand
+        // alone, and these are the two things a reader needs before the
+        // first call.
+        if ($spec->baseUrl !== null) {
+            $lines[] = "Base URL: `{$spec->baseUrl}`";
+            $lines[] = '';
+        }
+
+        $lines[] = $group->authenticationSummary();
+        $lines[] = '';
+        $lines[] = '## Operations';
+        $lines[] = '';
+
+        return implode("\n", [...$lines, ...$this->operations($group)]);
+    }
+
+    /**
+     * One line per operation, linking to its mirror. Shared by the index and
+     * the group page so the two cannot list the same group differently.
+     *
+     * @return list<string>
+     */
+    private function operations(Group $group): array
+    {
+        $lines = [];
+
+        foreach ($group->endpoints as $endpoint) {
+            $lines[] = sprintf(
+                '- [%s %s](%s)%s',
+                $endpoint->method->value,
+                $endpoint->path(),
+                $this->links->markdown($endpoint),
+                $endpoint->summary === null ? '' : ' — '.Str::summarise($endpoint->summary),
+            );
+        }
+
+        $lines[] = '';
+
+        return $lines;
     }
 
     private function quote(string $value): string

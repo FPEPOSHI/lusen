@@ -132,6 +132,56 @@ it('documents a form-request body on its own static page', function (): void {
         ->toContain('jane@example.com');
 });
 
+it('renders a group page with its description and its operations', function (): void {
+    $spec = staticSpec();
+    $html = staticEmitter()->group($spec->group('users'), $spec);
+
+    expect($html)->toContain('Users</h1>')
+        ->toContain('Create and read user accounts.')
+        ->toContain('<link rel="canonical" href="https://example.com/docs/groups/users.html">')
+        ->toContain('CollectionPage')
+        ->toContain('href="/docs/endpoints/users-index.html"')
+        ->toContain('href="/docs/endpoints/users-show.html"')
+        ->toContain('1 of 2 operations require authentication.')
+        // Listed, not repeated: the operations keep their own pages.
+        ->and($html)->not->toContain('Example request');
+});
+
+it('links the index heading and the sidebar to the group page', function (): void {
+    $spec = staticSpec();
+    $page = staticEmitter()->group($spec->group('users'), $spec);
+
+    expect(staticEmitter()->index($spec))->toContain('href="/docs/groups/users.html"')
+        ->and(preg_match('/<a href="\/docs\/groups\/users\.html"\s+aria-current="page"/', $page))->toBe(1);
+});
+
+it('reads a group page before its operations', function (): void {
+    $spec = staticSpec();
+
+    expect(staticEmitter()->group($spec->group('users'), $spec))
+        ->toContain('rel="next"')
+        ->toContain('href="/docs/endpoints/users-index.html"')
+        ->and(staticEmitter()->endpoint($spec->endpoint('users.index'), $spec))
+        ->toContain('rel="prev"')
+        ->toContain('href="/docs/groups/users.html"');
+});
+
+it('produces a group page outline with no skipped heading levels', function (): void {
+    $spec = staticSpec();
+    $html = staticEmitter()->group($spec->group('users'), $spec);
+
+    preg_match_all('/<h([1-6])[\s>]/', $html, $matches);
+    $levels = array_map('intval', $matches[1]);
+
+    expect($levels[0])->toBe(1);
+
+    foreach ($levels as $index => $level) {
+        if ($index > 0) {
+            expect($level - $levels[$index - 1])->toBeLessThanOrEqual(1);
+        }
+    }
+});
+
 it('produces a document outline with no skipped heading levels', function (): void {
     $spec = staticSpec();
     $html = staticEmitter()->endpoint($spec->endpoint('orders.store'), $spec);

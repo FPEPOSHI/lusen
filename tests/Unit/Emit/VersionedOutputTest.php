@@ -58,6 +58,18 @@ it('leaves titles alone when there is only one version', function (): void {
     expect(renderedWith(fixtureSpec(), 'users.index')['title'])->toBe('List users — Test API');
 });
 
+it('names the version on a group page', function (): void {
+    // Two versions of Users are two pages; the title and the file name both
+    // have to say which, or the two compete for one query.
+    $spec = versionedFixtureSpec();
+    $renderer = recordingRenderer();
+
+    (new HtmlEmitter($renderer, versionedLinks()))->group($spec->groups[0], $spec);
+
+    expect($renderer->calls[0]['data']['title'])->toBe('Users (v2) — Test API')
+        ->and($renderer->calls[0]['data']['canonical'])->toBe('https://docs.test/docs/groups/v2-users.html');
+});
+
 it('carries the version and the successor in the markdown front matter', function (): void {
     $spec = versionedFixtureSpec();
     $markdown = (new MarkdownEmitter(versionedLinks()))->endpoint($spec->endpoint('v1.users.index'), $spec);
@@ -84,7 +96,7 @@ it('opens the markdown index with the versions on offer', function (): void {
         ->toContain('| `v2` | current | 1 |')
         ->toContain('| `v1` | deprecated — retires 2026-06-01 | 2 |')
         ->toContain('Write new integrations against `v2`.')
-        ->toContain('## Users (v1)');
+        ->toContain('## [Users (v1)](/docs/groups/v1-users.md)');
 });
 
 it('keeps the version out of an unversioned index', function (): void {

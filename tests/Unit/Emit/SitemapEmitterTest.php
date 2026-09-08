@@ -23,6 +23,7 @@ it('lists the index, then prose, then reference', function (): void {
     expect(sitemap()->urls(specWithPages()))->toBe([
         'https://example.com/docs/index.html',
         'https://example.com/docs/pages/introduction.html',
+        'https://example.com/docs/groups/users.html',
         'https://example.com/docs/endpoints/users-index.html',
         'https://example.com/docs/endpoints/users-store.html',
         'https://example.com/docs/endpoints/users-show.html',

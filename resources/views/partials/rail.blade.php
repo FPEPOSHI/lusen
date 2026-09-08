@@ -46,7 +46,7 @@
                 @php($askLinks = \Lusen\Support\AskAi::links(
                     config('lusen.ui.ask_ai'),
                     $links->canonical(ltrim($markdownHref, '/')),
-                    ($page ?? null)?->title ?? '',
+                    $askSubject ?? (($page ?? null)?->title ?? ''),
                     $spec->title,
                 ))
 

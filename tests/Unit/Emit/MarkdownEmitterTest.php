@@ -14,11 +14,12 @@ function markdown(): MarkdownEmitter
     return new MarkdownEmitter(new Links('/docs', static: true, canonicalOrigin: 'https://example.com'));
 }
 
-it('emits an index plus one file per endpoint', function (): void {
+it('emits an index, a file per group and a file per endpoint', function (): void {
     $paths = array_map(fn ($f): string => $f->path, markdown()->emit(fixtureSpec()));
 
     expect($paths)->toBe([
         'index.md',
+        'groups/users.md',
         'endpoints/users-index.md',
         'endpoints/users-store.md',
         'endpoints/users-show.md',
@@ -83,6 +84,28 @@ it('links the index to every endpoint mirror', function (): void {
     expect(markdown()->index(fixtureSpec()))
         ->toContain('- [GET /api/users](/docs/endpoints/users-index.md) — List users')
         ->toContain('## Machine-readable');
+});
+
+it('gives each group a page that lists its operations', function (): void {
+    $spec = fixtureSpec();
+    $page = markdown()->group($spec->groups[0], $spec);
+
+    expect($page)->toStartWith("---\n")
+        ->toContain('title: "Users"')
+        ->toContain('group: "Users"')
+        ->toContain('canonical: "https://example.com/docs/groups/users.html"')
+        ->toContain('# Users')
+        ->toContain('Create and read user accounts.')
+        ->toContain('Base URL: `https://api.test`')
+        ->toContain('1 of 3 operations require authentication.')
+        ->toContain('## Operations')
+        ->toContain('- [GET /api/users](/docs/endpoints/users-index.md) — List users')
+        // Listed, not repeated: the operations keep their own mirrors.
+        ->and($page)->not->toContain('Example request');
+});
+
+it('links the index to each group page', function (): void {
+    expect(markdown()->index(fixtureSpec()))->toContain('## [Users](/docs/groups/users.md)');
 });
 
 it('escapes quotes in front matter values', function (): void {

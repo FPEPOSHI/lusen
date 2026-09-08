@@ -138,7 +138,14 @@
                  heading that needs the one above it to make sense is a heading
                  that arrives without its context. --}}
             <h2 id="{{ $group->slug() }}-heading" class="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
-                {{ $group->displayName() }}
+                {{-- Static output gives the group a page of its own, and the
+                     heading is the way to it. At runtime this section is that
+                     page. --}}
+                @if ($links->isStatic())
+                    <a href="{{ $links->group($group) }}" class="hover:text-indigo-600 dark:hover:text-indigo-400">{{ $group->displayName() }}</a>
+                @else
+                    {{ $group->displayName() }}
+                @endif
             </h2>
 
             @if ($group->description)

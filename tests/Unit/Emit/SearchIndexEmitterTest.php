@@ -34,11 +34,23 @@ it('emits one json file', function (): void {
         ->and(json_decode($file->contents, true))->toHaveKeys(['version', 'items']);
 });
 
-it('indexes prose pages before endpoints', function (): void {
+it('indexes prose pages, then each group ahead of its endpoints', function (): void {
     $kinds = array_column(searchIndex()->index(indexedSpec())['items'], 'kind');
 
-    expect($kinds[0])->toBe('page')
-        ->and($kinds[1])->toBe('endpoint');
+    expect(array_slice($kinds, 0, 3))->toBe(['page', 'group', 'endpoint']);
+});
+
+it('indexes a group by its description and the operations it holds', function (): void {
+    // "users" typed into search should offer the page that says what can be
+    // done with users before it offers any one operation on them.
+    $group = searchIndex()->index(indexedSpec())['items'][1];
+
+    expect($group['title'])->toBe('Users')
+        ->and($group['kind'])->toBe('group')
+        ->and($group['url'])->toBe('/docs/groups/users.html')
+        ->and($group['context'])->toBe('3 operations')
+        ->and($group['text'])->toContain('Create and read user accounts.')
+        ->toContain('List users');
 });
 
 it('indexes a page by its summary and headings', function (): void {
@@ -53,7 +65,7 @@ it('indexes a page by its summary and headings', function (): void {
 
 it('indexes an endpoint by method, path, summary and parameter names', function (): void {
     $items = searchIndex()->index(indexedSpec())['items'];
-    $endpoint = $items[1];
+    $endpoint = $items[2];
 
     expect($endpoint['title'])->toBe('List users')
         ->and($endpoint['method'])->toBe('GET')
@@ -65,7 +77,7 @@ it('indexes an endpoint by method, path, summary and parameter names', function 
 it('links entries to their own pages', function (): void {
     $items = searchIndex()->index(indexedSpec())['items'];
 
-    expect($items[1]['url'])->toBe('/docs/endpoints/users-index.html');
+    expect($items[2]['url'])->toBe('/docs/endpoints/users-index.html');
 });
 
 it('keeps entry text bounded so a large api still ships a usable index', function (): void {

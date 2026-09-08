@@ -8,6 +8,7 @@ use Lusen\Emit\Contracts\Emitter;
 use Lusen\Emit\Contracts\Renderer;
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Endpoint;
+use Lusen\Ir\Group;
 use Lusen\Ir\Page;
 use Lusen\Support\Assets;
 use Lusen\Support\JsonLd;
@@ -17,7 +18,7 @@ use Lusen\Support\Navigation;
 use Lusen\Support\Str;
 
 /**
- * The static site: an index plus one page per endpoint.
+ * The static site: an index, a page per group and a page per endpoint.
  *
  * One page per endpoint is the whole SEO argument. A single page with sixteen
  * anchors competes with itself for every query and gives a retrieval model one
@@ -67,11 +68,20 @@ final readonly class HtmlEmitter implements Emitter
             );
         }
 
-        foreach ($spec->endpoints() as $endpoint) {
+        // A group's page, then its operations: the order the sidebar reads
+        // in, and the order the sitemap and the pager follow.
+        foreach ($spec->groups as $group) {
             $files[] = EmittedFile::html(
-                'endpoints/'.$endpoint->slug().'.html',
-                $this->endpoint($endpoint, $spec, $navigation),
+                'groups/'.$group->slug().'.html',
+                $this->group($group, $spec, $navigation),
             );
+
+            foreach ($group->endpoints as $endpoint) {
+                $files[] = EmittedFile::html(
+                    'endpoints/'.$endpoint->slug().'.html',
+                    $this->endpoint($endpoint, $spec, $navigation),
+                );
+            }
         }
 
         return $files;
@@ -116,6 +126,40 @@ final readonly class HtmlEmitter implements Emitter
             'description' => $page->summary(),
             'jsonLd' => JsonLd::forPage($page, $spec, $this->links->base()),
             'markdownHref' => $this->links->pageMarkdown($page),
+        ]);
+    }
+
+    /**
+     * A group's own page: what the resource is for, and the operations on it.
+     *
+     * The index lists every group and each endpoint page answers one
+     * operation, and neither is the page for somebody asking what can be
+     * done with orders at all - the question a search engine or an assistant
+     * is asked before it knows an operation's name. This one is. It lists
+     * rather than repeats: the operations keep their own pages, and a page
+     * reproducing them would compete with them for their own queries.
+     */
+    public function group(Group $group, ApiSpec $spec, ?Navigation $navigation = null): string
+    {
+        $navigation ??= Navigation::for($spec, $this->links);
+
+        return $this->renderer->render('lusen::group', [
+            'pager' => $navigation->aroundGroup($group),
+            'current' => 'group:'.$group->slug(),
+            'spec' => $spec,
+            'group' => $group,
+            'links' => $this->links,
+            'docsUrl' => $this->links->base(),
+            'cssHref' => $this->links->asset('lusen.css'),
+            'jsHref' => $this->links->asset('lusen.js'),
+            'canonical' => $this->links->canonicalGroup($group),
+            // displayName() already carries the version when the API serves
+            // more than one - the same disambiguation qualify() does for an
+            // operation, for the same reason.
+            'title' => $group->displayName().' — '.$spec->title,
+            'description' => Str::summarise($group->summary()),
+            'jsonLd' => JsonLd::forGroup($group, $spec, $this->links->base()),
+            'markdownHref' => $this->links->groupMarkdown($group),
         ]);
     }
 

@@ -71,6 +71,52 @@ final readonly class Group
     }
 
     /**
+     * One line on what the group is for, where nobody wrote one: the
+     * operations themselves, named. That is the sentence under the group's
+     * page in a search result, and "List users, Create a user, Show a user."
+     * says more than "Users" and invents nothing.
+     */
+    public function summary(): string
+    {
+        if ($this->description !== null) {
+            return $this->description;
+        }
+
+        if ($this->endpoints === []) {
+            return "Operations on {$this->name}.";
+        }
+
+        return implode(', ', array_map(static fn (Endpoint $e): string => $e->title(), $this->endpoints)).'.';
+    }
+
+    /**
+     * Whether a reader needs a credential here, as a sentence.
+     *
+     * Stated on the group's own page because that page has to stand alone:
+     * somebody arriving from a search result must not be sent to an
+     * authentication section elsewhere to learn whether to bring a token.
+     */
+    public function authenticationSummary(): string
+    {
+        $total = count($this->endpoints);
+        $authenticated = count(array_filter(
+            $this->endpoints,
+            static fn (Endpoint $e): bool => $e->authenticated,
+        ));
+
+        return match (true) {
+            $total === 0 => 'No operations.',
+            $authenticated === 0 => $total === 1
+                ? 'Does not require authentication.'
+                : 'None of these operations requires authentication.',
+            $authenticated === $total => $total === 1
+                ? 'Requires authentication.'
+                : 'All of these operations require authentication.',
+            default => "{$authenticated} of {$total} operations require authentication.",
+        };
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(): array
