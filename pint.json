@@ -9,5 +9,8 @@
             "import_functions": false
         },
         "ordered_class_elements": true
-    }
+    },
+    "exclude": [
+        "demo"
+    ]
 }
