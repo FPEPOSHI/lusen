@@ -56,6 +56,19 @@ final class ProfileController
     {
         return response()->json(compact('anything'));
     }
+
+    /**
+     * The idiom Laravel's own docs give for a 201.
+     */
+    public function created(): JsonResponse
+    {
+        return (new UserResource(User::query()->first()))->response()->setStatusCode(201);
+    }
+
+    public function wrapped(): JsonResponse
+    {
+        return response()->json(UserResource::make(User::query()->first()), 201);
+    }
 }
 
 /**

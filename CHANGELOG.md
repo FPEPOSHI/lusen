@@ -31,6 +31,17 @@ All notable changes to this project are documented here.
   there for a bearer scheme, which OpenAPI gives no scopes. Both surfaces now
   say "a bearer token with the `orders:write` scope", from one sentence the
   scheme builds, so they cannot drift.
+- **Two ways of returning a resource documented no response.**
+  `(new OrderResource($order))->response()->setStatusCode(201)` is the idiom
+  Laravel's own documentation gives for a 201, and
+  `response()->json(new OrderResource($order), 201)` is the other one people
+  write; the return analyser saw neither as a resource, so every store
+  action written either way had no response at all. Both are followed to
+  the resource now, and the status the chain or the wrapper adds is kept.
+  The second is documented without the `data` wrapper, because
+  `json_encode()` serialises a resource without `toResponse()` and so
+  without it - a recording of exactly that call is what showed the schema
+  and the body disagreeing.
 
 ## 0.6.4 — 2026-09-08
 

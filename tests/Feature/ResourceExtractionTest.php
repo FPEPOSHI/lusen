@@ -17,6 +17,20 @@ function resourceSpec()
     return app(SpecBuilder::class)->build();
 }
 
+/**
+ * @return array{0: int, 1: Schema|null}|null
+ */
+function successResponse(string $id): ?array
+{
+    foreach (resourceSpec()->endpoint($id)?->responses ?? [] as $response) {
+        if ($response->isSuccess()) {
+            return [$response->status, $response->schema];
+        }
+    }
+
+    return null;
+}
+
 function successSchema(string $id): ?Schema
 {
     foreach (resourceSpec()->endpoint($id)?->responses ?? [] as $response) {
@@ -38,6 +52,8 @@ beforeEach(function (): void {
     Route::post('api/profiles', [ProfileController::class, 'store'])->name('profiles.store');
     Route::get('api/bare', [ProfileController::class, 'bare'])->name('profiles.bare');
     Route::get('api/literal', [ProfileController::class, 'literal'])->name('profiles.literal');
+    Route::post('api/profiles/created', [ProfileController::class, 'created'])->name('profiles.created');
+    Route::post('api/profiles/wrapped', [ProfileController::class, 'wrapped'])->name('profiles.wrapped');
     Route::delete('api/profiles/{profile}', [ProfileController::class, 'destroy'])->name('profiles.destroy');
     Route::get('api/teams', [ProfileController::class, 'team'])->name('profiles.team');
     Route::get('api/unknown', [ProfileController::class, 'unknown'])->name('profiles.unknown');
@@ -209,4 +225,24 @@ it('carries that name into the openapi document as a component', function (): vo
     expect($document['components']['schemas'] ?? [])->toHaveKey('User')
         ->and($document['paths']['/api/profiles/{profile}']['get']['responses']['200']['content']['application/json']['schema']['properties']['data'])
         ->toBe(['$ref' => '#/components/schemas/User']);
+});
+
+it('follows a resource through ->response()->setStatusCode(), the idiom the laravel docs give for a 201', function (): void {
+    // Found on a real application: every store action written this way
+    // documented no response at all.
+    [$status, $schema] = successResponse('profiles.created') ?? [null, null];
+
+    expect($status)->toBe(201)
+        ->and($schema)->not->toBeNull()
+        ->and($schema?->toArray())->toBe(successSchema('profiles.show')?->toArray());
+});
+
+it('follows a resource through response()->json(), keeping the status and dropping the data wrapper', function (): void {
+    // json_encode() serialises the resource without toResponse(), so there
+    // is no `data` around it. A recording of exactly this call showed the
+    // schema and the body disagreeing.
+    [$status, $schema] = successResponse('profiles.wrapped') ?? [null, null];
+
+    expect($status)->toBe(201)
+        ->and($schema?->toArray())->toBe(successSchema('profiles.show')?->properties['data']->toArray());
 });

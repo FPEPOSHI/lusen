@@ -221,11 +221,41 @@ final class ReturnAnalyzer
             return new ResourceReturn(status: 204);
         }
 
+        // (new UserResource($user))->response()->setStatusCode(201): the
+        // resource decides the body and the chain decides the status. The
+        // idiom Laravel's own docs give for a 201, so it is on every other
+        // store action.
+        if ($method === 'setstatuscode') {
+            $inner = $call->var instanceof MethodCall
+                ? self::fromMethodCall($call->var, $class, $locals, $depth)
+                : new ResourceReturn;
+
+            return self::withStatus($inner, self::intArgument($arguments, 0));
+        }
+
+        if ($method === 'response' && ($call->var instanceof New_ || $call->var instanceof StaticCall)) {
+            return self::fromExpression($call->var, $class, $locals, $depth);
+        }
+
         if ($method !== 'json' || ! self::isResponseHelper($call->var)) {
             return $class === null ? new ResourceReturn : self::fromHelper($call, $class, $depth);
         }
 
         $body = $arguments[0]->value ?? null;
+        $status = self::intArgument($arguments, 1);
+
+        // response()->json(new OrderResource($order), 201): the resource is
+        // the body and the status is the one thing the wrapper adds - and
+        // the one thing it takes away is the `data` wrapper, since
+        // json_encode() serialises the resource without going through
+        // toResponse(). A recording of exactly this call is how that showed.
+        if ($body instanceof New_ || $body instanceof StaticCall) {
+            $inner = self::fromExpression($body, $class, $locals, $depth);
+
+            if ($inner->resource !== null) {
+                return self::withStatus($inner, $status, unwrapped: true);
+            }
+        }
 
         $literal = match (true) {
             $body instanceof Array_ => self::literal($body),
@@ -233,11 +263,31 @@ final class ReturnAnalyzer
             default => null,
         };
 
-        $status = isset($arguments[1]) && $arguments[1]->value instanceof Int_
-            ? $arguments[1]->value->value
-            : null;
-
         return new ResourceReturn(literal: $literal, status: $status);
+    }
+
+    private static function withStatus(ResourceReturn $return, ?int $status, bool $unwrapped = false): ResourceReturn
+    {
+        return new ResourceReturn(
+            resource: $return->resource,
+            collection: $return->collection,
+            // The pagination envelope is added by toResponse() too, so an
+            // unwrapped collection is a bare list whatever built it.
+            paginated: $return->paginated && ! $unwrapped,
+            literal: $return->literal,
+            status: $status ?? $return->status,
+            unwrapped: $unwrapped || $return->unwrapped,
+        );
+    }
+
+    /**
+     * @param  array<Node\Arg>  $arguments
+     */
+    private static function intArgument(array $arguments, int $position): ?int
+    {
+        $value = $arguments[$position]->value ?? null;
+
+        return $value instanceof Int_ ? $value->value : null;
     }
 
     /**

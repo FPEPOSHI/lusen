@@ -21,6 +21,12 @@ final readonly class ResourceReturn
         public bool $paginated = false,
         public ?Schema $literal = null,
         public ?int $status = null,
+        /**
+         * Sent through `response()->json($resource)`, which json-encodes the
+         * resource and so skips the `data` wrapper - and, for a collection,
+         * the pagination envelope - that `toResponse()` would have added.
+         */
+        public bool $unwrapped = false,
     ) {}
 
     public function isEmpty(): bool

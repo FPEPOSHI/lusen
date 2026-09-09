@@ -91,7 +91,7 @@ final readonly class ResourceExtractor implements Extractor
 
         $body = $return->collection ? Schema::arrayOf($shape) : $shape;
 
-        if (! ResourceReader::wrapsResponses($return->resource)) {
+        if ($return->unwrapped || ! ResourceReader::wrapsResponses($return->resource)) {
             return $body;
         }
 
