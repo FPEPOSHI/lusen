@@ -29,7 +29,8 @@ composer require fpeposhi/lusen
 ```
 
 That is the whole setup. Lusen discovers `api/*` routes and documents them with
-no configuration.
+no configuration. It supports Laravel 12 and 13 on PHP 8.2 and up (Laravel 13
+itself needs 8.3), and is tested against every combination.
 
 ```bash
 php artisan lusen:build

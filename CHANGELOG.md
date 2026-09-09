@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- **Laravel 13.** A fresh `laravel new` is Laravel 13 now, and the package
+  could not be installed on one at all. The constraints admit `^13.0`
+  alongside `^12.0`, the suite runs against both in CI (Laravel 13 on PHP 8.3
+  and 8.4, since the framework itself needs 8.3), and Testbench 11 and Pest
+  5 are allowed for the same reason.
+
 ### Fixed
 
 - **`Route::apiResource` documented `update` twice under one id, and kept one.**
