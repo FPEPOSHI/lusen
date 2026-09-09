@@ -164,6 +164,31 @@ final readonly class SecurityScheme
     }
 
     /**
+     * The label without its article, for a parenthesis: "required (bearer
+     * token with the `orders:write` scope)".
+     */
+    public function phrase(): string
+    {
+        return preg_replace('/^(An?|The) /', '', $this->label()) ?? $this->label();
+    }
+
+    /**
+     * What to send, as the one sentence a page prints under the operation.
+     * Built here rather than in a view so the HTML and its Markdown twin
+     * cannot say different things - and so a scope the extractor went to the
+     * trouble of reading is stated where a reader looks, not only in a
+     * security requirement inside the OpenAPI document.
+     */
+    public function instruction(): string
+    {
+        return match ($this->type) {
+            self::API_KEY => 'Send '.lcfirst($this->label()).'.',
+            self::BASIC => 'Send HTTP basic credentials in the Authorization header.',
+            default => 'Send '.lcfirst($this->label()).' in the Authorization header.',
+        };
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(): array

@@ -24,6 +24,13 @@ All notable changes to this project are documented here.
   reader, which made an `any` schema of it and generated the word "example"
   as its example, so every such response documented nothing. The value is
   now the example and the shape is read off it.
+- **A scope was read and then shown nowhere a person looks.** Passport's
+  `scopes:` and Sanctum's `abilities:` were extracted, and then the page said
+  "send a bearer token" and the Markdown twin said "(bearer token)", with the
+  scope surviving only as an OpenAPI security requirement — and not even
+  there for a bearer scheme, which OpenAPI gives no scopes. Both surfaces now
+  say "a bearer token with the `orders:write` scope", from one sentence the
+  scheme builds, so they cannot drift.
 
 ## 0.6.4 — 2026-09-08
 

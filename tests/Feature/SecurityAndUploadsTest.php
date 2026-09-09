@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Lusen\Emit\Contracts\Renderer;
+use Lusen\Emit\HtmlEmitter;
+use Lusen\Emit\MarkdownEmitter;
 use Lusen\Emit\OpenApiEmitter;
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Endpoint;
@@ -13,6 +16,7 @@ use Lusen\Ir\Response;
 use Lusen\Ir\Schema;
 use Lusen\Ir\SecurityScheme;
 use Lusen\SpecBuilder;
+use Lusen\Support\Links;
 use Lusen\Support\Snippets;
 use Lusen\Tests\Fixtures\OrderController;
 use Lusen\Tests\Fixtures\UserController;
@@ -52,6 +56,23 @@ it('reads sanctum abilities as bearer scopes', function (): void {
 
     expect($scheme?->type)->toBe(SecurityScheme::BEARER)
         ->and($scheme?->scopes)->toBe(['posts:write']);
+});
+
+it('states the scope where a reader looks, on the page and in its markdown twin', function (): void {
+    // Extracted and then shown nowhere but an OpenAPI security requirement
+    // is a scope nobody reads. Found on a real application, where the page
+    // for a route behind `abilities:orders:write` said "send a bearer token".
+    $spec = secSpec();
+    $endpoint = $spec->endpoint('s.abilities');
+    $links = new Links('/docs', static: true);
+
+    $html = (new HtmlEmitter(app(Renderer::class), $links))->endpoint($endpoint, $spec);
+    $markdown = (new MarkdownEmitter($links))->endpoint($endpoint, $spec);
+
+    expect($html)->toContain('Send a bearer token with the posts:write scope in the Authorization header.')
+        ->and($markdown)->toContain('Authentication: required (bearer token with the `posts:write` scope).')
+        ->and((new MarkdownEmitter($links))->endpoint($spec->endpoint('s.plain'), $spec))
+        ->toContain('Authentication: required (bearer token).');
 });
 
 it('detects basic auth instead of assuming bearer', function (): void {

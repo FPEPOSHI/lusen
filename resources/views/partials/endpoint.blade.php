@@ -63,7 +63,7 @@
          where it used to sit. --}}
     <p class="mt-2 text-sm text-slate-500">
         {{ $endpoint->authenticated
-            ? 'Send a bearer token in the Authorization header.'
+            ? \Lusen\Support\Str::plain($endpoint->securityScheme()?->instruction() ?? 'Send a bearer token in the Authorization header.')
             : 'No authentication required.' }}
     </p>
 

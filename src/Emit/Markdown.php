@@ -88,7 +88,7 @@ final class Markdown
         }
 
         $lines[] = $endpoint->authenticated
-            ? 'Authentication: required (bearer token).'
+            ? 'Authentication: required ('.($endpoint->securityScheme()?->phrase() ?? 'bearer token').').'
             : 'Authentication: not required.';
         $lines[] = '';
 
