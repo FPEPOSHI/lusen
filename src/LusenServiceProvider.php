@@ -453,7 +453,16 @@ final class LusenServiceProvider extends ServiceProvider
 
         unset($config['cache'], $config['output'], $config['ui'], $config['seo']);
 
-        return hash('xxh128', (json_encode($config) ?: '').'|'.$this->packageVersion());
+        // The recordings are an input to every endpoint, and they are the one
+        // input the per-endpoint fingerprint cannot see: it hashes the source
+        // files an endpoint was read from, and a recording is read from a
+        // JSON file nobody parses. Keying the whole cache on it means
+        // `lusen:record` followed by `lusen:build` documents what was
+        // recorded, rather than handing back yesterday's examples.
+        $recordings = $this->recordingPath();
+        $recorded = is_file($recordings) ? (hash_file('xxh128', $recordings) ?: '') : '';
+
+        return hash('xxh128', (json_encode($config) ?: '').'|'.$this->packageVersion().'|'.$recorded);
     }
 
     /**

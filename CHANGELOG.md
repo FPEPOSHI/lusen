@@ -54,6 +54,12 @@ All notable changes to this project are documented here.
   cache off for the run, which re-analysed everything and stored none of it,
   so the stale entries were still there for the next ordinary build to hand
   back. A fresh build now ignores what is stored and stores what it found.
+- **A new recording did not reach a cached endpoint.** `lusen:record`
+  followed by `lusen:build` could change nothing: the per-endpoint
+  fingerprint covers the source files an endpoint was read from, and a
+  recording is a JSON file no extractor parses. The cache is now keyed on
+  the recordings file as well, so recording anything re-analyses
+  everything, which is what recording means.
 
 ## 0.6.4 — 2026-09-08
 
