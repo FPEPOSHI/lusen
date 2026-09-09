@@ -33,13 +33,6 @@ final class BuildCommand extends Command
     {
         $started = microtime(true);
 
-        // Resolved here rather than method-injected: --fresh has to be applied
-        // before anything reads the cache config, and method injection happens
-        // before handle() runs.
-        if ($this->option('fresh')) {
-            config()->set('lusen.cache.enabled', false);
-        }
-
         // Built fresh, then shared for the rest of this run. Fresh, because a
         // previous run in the same process must not hand back a cache built
         // from the config as it was then. Shared, because resolving twice
@@ -49,6 +42,13 @@ final class BuildCommand extends Command
 
         $cache = app(BuildCache::class);
         app()->instance(BuildCache::class, $cache);
+
+        // Re-analyse everything and keep the result. Switching the cache off
+        // for the run used to leave the stale entries behind, so the next
+        // ordinary build quietly handed back what --fresh had just replaced.
+        if ($this->option('fresh')) {
+            $cache->refresh();
+        }
 
         $registry = app(EmitterRegistry::class);
 

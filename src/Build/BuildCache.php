@@ -43,6 +43,14 @@ final class BuildCache
     private bool $loaded = false;
 
     /**
+     * Set by `--fresh`: nothing stored is trusted, everything is re-analysed,
+     * and what that produced is what gets stored. Bypassing the cache instead
+     * would leave the stale entries in place for the next ordinary build to
+     * hand back - the fresh build's output undone one run later.
+     */
+    private bool $fresh = false;
+
+    /**
      * @param  string  $key  invalidates everything when it changes: config,
      *                       the extractor list, the package's own version
      */
@@ -55,9 +63,20 @@ final class BuildCache
     /**
      * The cached endpoint, if the route and every file behind it are unchanged.
      */
+    public function refresh(): void
+    {
+        $this->fresh = true;
+    }
+
     public function reuse(RouteCandidate $candidate, string $id): ?Endpoint
     {
         if (! $this->enabled) {
+            return null;
+        }
+
+        if ($this->fresh) {
+            $this->misses++;
+
             return null;
         }
 

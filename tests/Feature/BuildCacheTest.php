@@ -159,6 +159,26 @@ it('drops entries for endpoints that no longer exist', function (): void {
     expect(strlen((string) file_get_contents(cachePath())))->toBeLessThan($before);
 });
 
+it('re-analyses everything on a fresh build and stores what it found', function (): void {
+    // Bypassing the cache would leave the stale entries in place for the
+    // next ordinary build to hand back, undoing the fresh build one run
+    // later. Seen on a real application after the package changed under it.
+    buildWith(newCache());
+
+    $fresh = newCache();
+    $fresh->refresh();
+    [, $stats] = buildWith($fresh);
+
+    expect($stats['hits'])->toBe(0)
+        ->and($stats['misses'])->toBeGreaterThan(0);
+
+    // And the next ordinary build reuses what the fresh one stored.
+    [, $after] = buildWith(newCache());
+
+    expect($after['misses'])->toBe(0)
+        ->and($after['hits'])->toBeGreaterThan(0);
+});
+
 it('does nothing at all when disabled', function (): void {
     buildWith(newCache(enabled: false));
 

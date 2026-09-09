@@ -42,6 +42,10 @@ All notable changes to this project are documented here.
   `json_encode()` serialises a resource without `toResponse()` and so
   without it - a recording of exactly that call is what showed the schema
   and the body disagreeing.
+- **`lusen:build --fresh` was undone by the next build.** It switched the
+  cache off for the run, which re-analysed everything and stored none of it,
+  so the stale entries were still there for the next ordinary build to hand
+  back. A fresh build now ignores what is stored and stores what it found.
 
 ## 0.6.4 — 2026-09-08
 
