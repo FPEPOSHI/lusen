@@ -12,15 +12,15 @@ documentation as **static files** — HTML for people, OpenAPI and Markdown for
 machines. There is no build step for consumers, no database, and no JavaScript
 required to read a page.
 
-> **Status: early — `0.6.4`.** Prose pages, route collection, FormRequest and
+> **Status: early — `0.7.0`.** Prose pages, route collection, FormRequest and
 > attribute extraction, request-example generation, API versioning, and the
 > static HTML, Markdown, OpenAPI, `llms.txt`, sitemap, search and Postman
 > surfaces all work, as does the MCP server.
 >
 > Endpoint identifiers and the emitted URLs are already treated as a stability
 > contract. Configuration keys and the IR are not yet, so pin to the minor you
-> installed — `^0.6` today. On a `0.x` version a caret pins the minor, so an
-> older `^0.5` will not pick this release up.
+> installed — `^0.7` today. On a `0.x` version a caret pins the minor, so an
+> older `^0.6` will not pick this release up.
 
 ## Install
 
