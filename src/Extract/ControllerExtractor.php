@@ -12,6 +12,7 @@ use Lusen\Ir\Endpoint;
 use Lusen\Ir\Enums\HttpMethod;
 use Lusen\Ir\Example;
 use Lusen\Ir\Response;
+use Lusen\Ir\Schema;
 use Lusen\Support\DocBlock;
 use Lusen\Support\Examples;
 use ReflectionClass;
@@ -113,6 +114,27 @@ final readonly class ControllerExtractor implements Extractor
             [$status, $expression] = $this->statusAndType($value, $endpoint);
 
             if ($expression === '' || $this->hasStatus($responses, $status)) {
+                continue;
+            }
+
+            // Scribe's spelling - `@response 422 {"message": "..."}` - is a
+            // body rather than a type. The value is the example and the shape
+            // is read off it, so a codebase arriving from that tool keeps
+            // every response it wrote instead of seeing each one misread as a
+            // type expression.
+            if (str_starts_with($expression, '{') || str_starts_with($expression, '[')) {
+                $body = json_decode($expression, true);
+
+                if (is_array($body)) {
+                    $responses[] = new Response(
+                        status: $status,
+                        schema: Schema::fromValue($body),
+                        examples: [new Example('Example', $body)],
+                    );
+
+                    $added = true;
+                }
+
                 continue;
             }
 

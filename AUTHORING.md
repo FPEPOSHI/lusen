@@ -362,6 +362,13 @@ Anything unreadable becomes `any`, never a guess. A hand-written `@response`
 always beats a shape inferred from `toArray()`, and an `#[ApiResponse]`
 attribute beats both.
 
+A `@response` can also be the body itself, as JSON — `@response 404
+{"message": "Not found."}` — which is how Scribe spells it, so a codebase
+arriving from that tool keeps every response it wrote. The value becomes the
+example and the shape is read off it: an object's keys are its fields, a list
+is typed by its first item, and a `null` is left `any`, since one null says
+nothing about what the field holds when it is set.
+
 ### Response envelopes
 
 Most APIs that answer with plain arrays send them through one helper on a base

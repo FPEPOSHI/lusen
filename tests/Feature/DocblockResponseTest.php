@@ -18,6 +18,23 @@ beforeEach(function (): void {
     Route::post('api/orders', [ShapedController::class, 'store'])->name('orders.store');
     Route::get('api/orders/{order}', [ShapedController::class, 'show'])->name('orders.show');
     Route::delete('api/orders/{order}', [ShapedController::class, 'destroy'])->name('orders.destroy');
+    Route::post('api/orders/{order}/refunds', [ShapedController::class, 'refund'])->name('orders.refund');
+});
+
+it('reads a @response written as a json body, the way scribe spells it', function (): void {
+    // Misread as a type expression, the body became an `any` schema whose
+    // generated example was the word "example" - on every response a
+    // codebase migrating from Scribe had written.
+    $responses = shapedSpec()->endpoint('orders.refund')?->responses ?? [];
+
+    expect(array_map(fn ($r): int => $r->status, $responses))->toBe([200, 404])
+        ->and($responses[0]->examples[0]->value)->toBe(['status' => true, 'data' => ['id' => 7, 'total' => 12.5, 'tags' => ['refund'], 'note' => null]])
+        ->and($responses[0]->schema?->properties['status']->type)->toBe(SchemaType::Boolean)
+        ->and($responses[0]->schema?->properties['data']->properties['id']->type)->toBe(SchemaType::Integer)
+        ->and($responses[0]->schema?->properties['data']->properties['total']->type)->toBe(SchemaType::Number)
+        ->and($responses[0]->schema?->properties['data']->properties['tags']->items?->type)->toBe(SchemaType::String)
+        ->and($responses[0]->schema?->properties['data']->properties['note']->type)->toBe(SchemaType::Any)
+        ->and($responses[1]->schema?->properties['message']->type)->toBe(SchemaType::String);
 });
 
 it('documents a response from the @response docblock', function (): void {

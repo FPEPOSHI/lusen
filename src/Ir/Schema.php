@@ -197,6 +197,39 @@ final readonly class Schema
         return new self(type: SchemaType::Any);
     }
 
+    /**
+     * The shape of a value somebody wrote down - a `@response` body given as
+     * JSON rather than as a type. Read from the value alone: an object's keys
+     * are its properties, a list is typed by its first item, and null is
+     * `any`, since one null says nothing about what the field holds when it
+     * is set. Nothing is marked required: one example cannot say which of
+     * its fields are always there.
+     */
+    public static function fromValue(mixed $value): self
+    {
+        if (is_array($value) && array_is_list($value)) {
+            return self::arrayOf($value === [] ? self::any() : self::fromValue($value[0]));
+        }
+
+        if (is_array($value)) {
+            $properties = [];
+
+            foreach ($value as $key => $item) {
+                $properties[(string) $key] = self::fromValue($item);
+            }
+
+            return self::object($properties);
+        }
+
+        return match (true) {
+            is_bool($value) => self::boolean(),
+            is_int($value) => self::integer(),
+            is_float($value) => self::number(),
+            is_string($value) => self::string(),
+            default => self::any(),
+        };
+    }
+
     public function label(): string
     {
         $parts = [$this->type === SchemaType::Any ? 'any' : $this->type->value];

@@ -18,6 +18,12 @@ All notable changes to this project are documented here.
   suffixed with its own: `customers.update` and `customers.update.patch`.
   Found by installing the package into a fresh application, which is what
   the next person will do.
+- **A `@response` written as JSON was misread as a type.** `@response 422
+  {"message": "…"}` is how Scribe spells a response, and a codebase arriving
+  from that tool has one on every action. The body was handed to the type
+  reader, which made an `any` schema of it and generated the word "example"
+  as its example, so every such response documented nothing. The value is
+  now the example and the shape is read off it.
 
 ## 0.6.4 — 2026-09-08
 

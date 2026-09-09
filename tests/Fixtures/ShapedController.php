@@ -44,4 +44,15 @@ final class ShapedController
      * @response array{status: true}
      */
     public function destroy(): void {}
+
+    /**
+     * Refund an order
+     *
+     * Scribe's spelling, which a codebase arriving from that tool has on
+     * every action: the body itself, as JSON, rather than a type.
+     *
+     * @response 200 {"status": true, "data": {"id": 7, "total": 12.5, "tags": ["refund"], "note": null}}
+     * @response 404 {"message": "No query results for model [Order]."}
+     */
+    public function refund(): void {}
 }
