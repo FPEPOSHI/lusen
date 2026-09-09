@@ -37,8 +37,20 @@ final readonly class RouteCollector
                 continue;
             }
 
-            foreach ($this->documentableMethods($route) as $method) {
-                $candidates[] = RouteCandidate::fromRoute($route, $method, $this->middlewareGroups());
+            $name = $route->getName();
+
+            // `Route::apiResource` registers `update` as PUT|PATCH under one
+            // name, and a name is an endpoint's id. The verb Laravel lists
+            // first keeps the bare name, so a route documented for years
+            // keeps its anchors; every further verb is suffixed with its
+            // own, so `customers.update` and `customers.update.patch` are
+            // two operations rather than one page written twice.
+            foreach ($this->documentableMethods($route) as $position => $method) {
+                $id = $position > 0 && $name !== null && $name !== ''
+                    ? $name.'.'.strtolower($method->value)
+                    : null;
+
+                $candidates[] = RouteCandidate::fromRoute($route, $method, $this->middlewareGroups(), $id);
             }
         }
 

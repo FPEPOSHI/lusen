@@ -26,13 +26,22 @@ final readonly class RouteCandidate
         public ?string $action = null,
         /** @var array<string, array<mixed>> */
         public array $middlewareGroups = [],
+        /**
+         * An identity the route name alone cannot supply. A route answering
+         * more than one verb is one route with one name and becomes one
+         * candidate per verb, and two endpoints cannot share an id: it is
+         * the OpenAPI operationId, the file name and the anchor, and the
+         * second page would overwrite the first.
+         */
+        public ?string $id = null,
     ) {}
 
     /**
      * @param  array<string, array<mixed>>  $middlewareGroups  the router's groups, so
      *                                                         `api` resolves to what it holds
+     * @param  string|null  $id  an id to use instead of the route name
      */
-    public static function fromRoute(Route $route, HttpMethod $method, array $middlewareGroups = []): self
+    public static function fromRoute(Route $route, HttpMethod $method, array $middlewareGroups = [], ?string $id = null): self
     {
         [$controller, $action] = self::resolveTarget($route);
 
@@ -44,6 +53,7 @@ final readonly class RouteCandidate
             controller: $controller,
             action: $action,
             middlewareGroups: $middlewareGroups,
+            id: $id,
         );
     }
 

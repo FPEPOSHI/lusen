@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented here.
 
+## Unreleased
+
+### Fixed
+
+- **`Route::apiResource` documented `update` twice under one id, and kept one.**
+  Laravel registers `update` as `PUT|PATCH` under a single route name, and a
+  route name is an endpoint's id — so the two verbs became two endpoints with
+  one identity. The OpenAPI document carried the same `operationId` twice,
+  which is invalid; the static site wrote one page and then overwrote it with
+  the other; the search index offered two results for one URL; and a warm
+  rebuild reported four files written when nothing had changed, because the
+  two were taking turns. The verb Laravel lists first keeps the bare name, so
+  a route documented for years keeps its anchors, and every further verb is
+  suffixed with its own: `customers.update` and `customers.update.patch`.
+  Found by installing the package into a fresh application, which is what
+  the next person will do.
+
 ## 0.6.4 — 2026-09-08
 
 ### Fixed

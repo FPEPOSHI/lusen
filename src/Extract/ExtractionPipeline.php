@@ -53,7 +53,7 @@ final readonly class ExtractionPipeline
 
     private function resolve(RouteCandidate $candidate): ?Endpoint
     {
-        $id = Endpoint::deriveId($candidate->method, $candidate->uri, $candidate->name);
+        $id = $candidate->id ?? Endpoint::deriveId($candidate->method, $candidate->uri, $candidate->name);
 
         $cached = $this->cache?->reuse($candidate, $id);
 
@@ -89,6 +89,7 @@ final readonly class ExtractionPipeline
             method: $candidate->method,
             uri: $candidate->uri,
             routeName: $candidate->name,
+            id: $candidate->id,
         );
 
         foreach ($this->extractors as $extractor) {

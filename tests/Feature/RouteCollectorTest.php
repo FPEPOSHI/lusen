@@ -55,6 +55,25 @@ it('splits a multi-verb route into one candidate per verb', function (): void {
         ->toContain('POST api/users');
 });
 
+it('gives each verb of a multi-verb route an id of its own', function (): void {
+    // `Route::apiResource` registers update as PUT|PATCH under one name, and
+    // a name is an endpoint's id. Two endpoints sharing one would be one
+    // OpenAPI operationId twice and one page written twice.
+    Route::match(['put', 'patch'], 'api/users/{user}', [UserController::class, 'update'])->name('users.update');
+
+    $ids = [];
+
+    foreach (collector(['include' => ['api/users/*']])->collect() as $candidate) {
+        if ($candidate->name === 'users.update') {
+            $ids[$candidate->method->value] = $candidate->id;
+        }
+    }
+
+    // The verb Laravel lists first keeps the bare name, so a route documented
+    // for years keeps its anchors; the rest carry their verb.
+    expect($ids)->toBe(['PATCH' => 'users.update.patch', 'PUT' => null]);
+});
+
 it('orders candidates by uri then method so output never depends on registration order', function (): void {
     expect(uris(collector(['include' => ['api/*']])->collect()))->toBe([
         'GET api/documentation',

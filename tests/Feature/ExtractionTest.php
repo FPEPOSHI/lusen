@@ -107,6 +107,21 @@ it('infers authentication from auth middleware', function (): void {
         ->and(buildSpec()->endpoint('users.index')?->authenticated)->toBeFalse();
 });
 
+it('documents each verb of a multi-verb route as an endpoint of its own', function (): void {
+    Route::match(['put', 'patch'], 'api/users/{user}', [UserController::class, 'show'])->name('users.update');
+
+    $spec = buildSpec();
+    $put = $spec->endpoint('users.update');
+    $patch = $spec->endpoint('users.update.patch');
+
+    expect($put?->method->value)->toBe('PUT')
+        ->and($patch?->method->value)->toBe('PATCH')
+        ->and($put?->routeName)->toBe('users.update')
+        ->and($patch?->routeName)->toBe('users.update')
+        ->and(array_count_values(array_map(fn ($e): string => $e->id, $spec->endpoints())))
+        ->each->toBe(1);
+});
+
 it('falls back to the first meaningful uri segment for the group', function (): void {
     expect(buildSpec()->endpoint('orders.lines')?->group)->toBe('Orders');
 });

@@ -81,8 +81,8 @@ Two rules make those surfaces actually usable:
   auth requirement, every parameter and a complete example. A model that
   retrieves one page never needs a second one.
 - **Identifiers are stable.** An endpoint's `operationId`, anchor and file
-  name derive from its route name and do not change between builds, so links
-  and citations keep working.
+  name derive from its route name — one per verb for a `PUT|PATCH` route —
+  and do not change between builds, so links and citations keep working.
 
 ## See it
 
