@@ -36,11 +36,26 @@ final readonly class FormRequestExtractor implements Extractor
             return $endpoint;
         }
 
+        // Noted before anything is read out of it, and kept even when nothing
+        // is. An action that type-hints a FormRequest has an input the caller
+        // has to get right, so an endpoint with no parameters afterwards is
+        // not an operation that takes nothing - it is one whose rules defeated
+        // the reader, and `lusen:check` is the place that difference has to be
+        // visible. Without it the two are indistinguishable in the IR, which
+        // is how a request body can vanish off a page with nothing failing.
+        $endpoint = $endpoint->with(requestClass: $request);
+
         $file = $this->fileFor($request);
 
         if ($file === null) {
             return $endpoint;
         }
+
+        // Also recorded unconditionally: a FormRequest this could not read
+        // today is still what the endpoint's documentation depends on, and a
+        // cache that cannot see the file hands back the same empty body after
+        // somebody rewrites the rules into a shape that does read.
+        $endpoint = $endpoint->with(sourceFiles: array_values(array_unique([...$endpoint->sourceFiles, $file])));
 
         $rules = FormRequestReader::read($file, $request);
 
@@ -52,9 +67,9 @@ final readonly class FormRequestExtractor implements Extractor
             ? ParameterLocation::Body
             : ParameterLocation::Query;
 
-        return $endpoint
-            ->withParameters($this->merge($endpoint->parameters, RuleTree::toParameters($rules, $location)))
-            ->with(sourceFiles: array_values(array_unique([...$endpoint->sourceFiles, $file])));
+        return $endpoint->withParameters(
+            $this->merge($endpoint->parameters, RuleTree::toParameters($rules, $location)),
+        );
     }
 
     /**

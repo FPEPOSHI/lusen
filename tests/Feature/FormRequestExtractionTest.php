@@ -226,3 +226,58 @@ it('keeps the full stop between a docblock\'s first sentence and the next', func
     expect($items?->schema->items?->properties['product_id']->description)
         ->toBe("The catalogue id, not the SKU. A product withdrawn from sale is still accepted here, so an\norder placed against an old catalogue can be replayed.");
 });
+
+it('reads a rules() that composes its answer with array_merge', function (): void {
+    // The literal array is the easy case and the rarest one. A FormRequest of
+    // any size shares rules with a base class or a trait, and until this was
+    // followed such a request documented as having no body at all - the whole
+    // reference for an endpoint gone, silently, because somebody factored out
+    // three lines.
+    expect(bodyParam('orders.store', 'idempotency_key'))->not->toBeNull()
+        ->and(bodyParam('orders.store', 'carrier'))->not->toBeNull()
+        ->and(bodyParam('orders.store', 'email'))->not->toBeNull();
+});
+
+it('follows parent::rules() into the base request, docblock and all', function (): void {
+    $key = bodyParam('orders.store', 'idempotency_key');
+
+    expect($key?->required)->toBeTrue()
+        ->and($key?->schema->constraints)->toBe(['minLength' => 8, 'maxLength' => 8])
+        ->and($key?->description)->toStartWith('Your own key for this order.')
+        ->and($key?->schema->example)->toBe('7b1f0c2e');
+});
+
+it('follows a trait method the rules delegate to', function (): void {
+    expect(bodyParam('orders.store', 'carrier')?->description)->toBe('Who is carrying it.');
+});
+
+it('resolves a class constant inside a concatenated rule', function (): void {
+    // `'in:'.implode(',', self::CARRIERS)` and `'max:'.self::MAX_PARCELS` are
+    // how a limit gets into a rule string in practice. Reading the constant
+    // touches the class definition and constructs nothing.
+    expect(bodyParam('orders.store', 'carrier')?->schema->enum)->toBe(['dhl', 'ups', 'royal-mail'])
+        ->and(bodyParam('orders.store', 'parcels')?->schema->constraints)->toBe(['max' => 12]);
+});
+
+it('truncates the one rule it cannot finish rather than dropping the field', function (): void {
+    // 'service' ends in `'in:'.$argument`. An `in:` with nothing after the
+    // colon would document an enum of one empty string, and dropping the
+    // field would lose a required parameter over a constraint - so the rules
+    // before the unreadable tail stand and that rule goes.
+    $service = bodyParam('orders.store', 'service');
+
+    expect($service)->not->toBeNull()
+        ->and($service?->required)->toBeTrue()
+        ->and($service?->schema->type->value)->toBe('string')
+        ->and($service?->schema->enum)->toBe([]);
+});
+
+it('records the trait and base request as source files too', function (): void {
+    // They are as much an input to this endpoint's documentation as the
+    // request itself; a cache that cannot see them hands back yesterday's
+    // fields after somebody edits the trait.
+    $files = implode(' ', orderSpec()->endpoint('orders.store')?->sourceFiles ?? []);
+
+    expect($files)->toContain('HasShippingRules.php')
+        ->and($files)->toContain('BaseOrderRequest.php');
+});

@@ -303,6 +303,34 @@ public function rules(): array
 `@example` is typed the way you wrote it — `3` stays a number, so the example
 request does not quote it — and it beats the value Lusen would have generated.
 
+Rules do not have to be written in one literal array. A `rules()` that composes
+its answer is read as the whole thing it returns:
+
+```php
+public function rules(): array
+{
+    return array_merge(parent::rules(), $this->shippingRules(), [
+        'depot' => 'required|string|max:'.self::MAX_DEPOT,
+    ]);
+}
+```
+
+`array_merge()`, `[...$this->shared(), ...]`, `+`, `parent::rules()` and a
+method reached through a trait are all followed, and class constants inside a
+rule string are read. Where a rule genuinely cannot be read — `'in:'.$variable`
+— that one rule is dropped and the field keeps the rest of its rules.
+
+Where a whole `rules()` cannot be read — built in a loop, or assembled from the
+database — the endpoint documents with no fields at all, and `lusen:check` says
+so, naming the class:
+
+```
+POST /api/orders ............... no fields read from `StoreOrderRequest`
+```
+
+That is the signal to write the body out with `#[ApiParam]`, or to move the
+rules into a shape that reads.
+
 Anything the rules add that the schema could not express is kept alongside your
 sentence rather than replacing it: "must be a JPEG" and "the customer's avatar"
 answer different questions.

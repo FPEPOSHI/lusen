@@ -7,6 +7,7 @@ namespace Lusen\Console;
 use Illuminate\Console\Command;
 use Lusen\Ir\ApiSpec;
 use Lusen\Ir\Endpoint;
+use Lusen\Ir\Enums\ParameterLocation;
 use Lusen\SpecBuilder;
 
 /**
@@ -106,6 +107,14 @@ final class CheckCommand extends Command
      * reporting; an untyped field the codebase never states is not, and
      * flagging it would train people to ignore the output.
      *
+     * That rule is why the empty-request finding asks about the FormRequest
+     * rather than about the body. "A POST with no documented body" would flag
+     * every state transition in the API - `POST /orders/{id}/ready` takes
+     * nothing and is right to - and nobody could ever clear it, which is the
+     * fastest way to teach a team to stop reading the output. An action that
+     * type-hints a FormRequest and produces no fields is a different claim and
+     * always a real one: the rules exist and could not be read.
+     *
      * @return array<string, list<string>>
      */
     private function findings(ApiSpec $spec): array
@@ -117,6 +126,14 @@ final class CheckCommand extends Command
 
             if ($endpoint->description === null) {
                 $problems[] = 'no description';
+            }
+
+            if ($endpoint->requestClass !== null && $this->hasNoInput($endpoint)) {
+                // The short name, because the findings share a line with the
+                // route and the terminal truncates it. Two FormRequests in one
+                // application rarely share a class name, and the one that
+                // matters is the one you open.
+                $problems[] = 'no fields read from `'.class_basename($endpoint->requestClass).'`';
             }
 
             if ($endpoint->responses === []) {
@@ -139,6 +156,17 @@ final class CheckCommand extends Command
         }
 
         return $findings;
+    }
+
+    /**
+     * Nothing came out of the request at all - neither the body a write takes
+     * nor the query string a read does, and neither an `#[ApiParam]` an author
+     * wrote by hand afterwards.
+     */
+    private function hasNoInput(Endpoint $endpoint): bool
+    {
+        return $endpoint->parametersIn(ParameterLocation::Body) === []
+            && $endpoint->parametersIn(ParameterLocation::Query) === [];
     }
 
     private function hasExample(Endpoint $endpoint): bool

@@ -2,6 +2,57 @@
 
 All notable changes to this project are documented here.
 
+## Unreleased
+
+### Added
+
+- **`lusen:check` reports a FormRequest it read no fields from.** The two read
+  failures below were silent for a day because nothing asks whether an
+  endpoint still has a request body — the page just stopped having one. The
+  check now names the class when an action type-hints a FormRequest and no
+  parameters came out of it, which is the moment to look rather than the day
+  after.
+
+  It asks about the FormRequest rather than about the body on purpose. "A POST
+  with no documented body" would flag every state transition in an API —
+  `POST /orders/{id}/ready` takes nothing and is right to — and nobody could
+  ever clear it, which is the fastest way to teach a team to stop reading the
+  output. An action that declares a FormRequest and yields no fields is a
+  different claim and always a real one. Endpoints that take no input, and
+  those documented by hand with `#[ApiParam]`, are not reported.
+
+  `Endpoint` carries the class for it (`requestClass`), so the finding
+  survives the incremental cache. Stored caches from before this are
+  discarded once, since an entry that predates the field would report clean.
+
+### Fixed
+
+- **A `rules()` that composed its answer documented no request body at all.**
+  `return array_merge($this->sharedRules(), [...])` is what a FormRequest of
+  any size looks like once its rules are shared with a base class or a trait,
+  and the reader only understood `return [...]`. Anything else read as no
+  rules, which is not a thinner page but no page: the parameter table, the
+  fields in the example body, the OpenAPI `requestBody` and the playground
+  form all come off that one array. An endpoint's entire reference could
+  disappear because somebody factored three lines out of two requests, and
+  nothing failed while it happened.
+
+  Composition is now followed where it can be read: `array_merge()`, the
+  spread that spells the same thing, `+`, and the method on the other side of
+  the call — `parent::rules()` into a base class, `$this->sharedRules()` into
+  a trait. The files those live in are recorded as the endpoint's sources, so
+  the incremental cache notices when one is edited.
+
+- **A rule string built by concatenation lost the whole field.**
+  `'required|string|max:'.self::LIMIT` and `'in:'.implode(',', self::TYPES)`
+  are the ordinary way a limit reaches a rule, and neither is a literal, so
+  the field they belonged to was dropped rather than typed. Class constants are read
+  (which defines a class, and constructs nothing — the same bargain
+  `Rule::enum` already made), and where a piece genuinely cannot be read it
+  now costs that one rule instead of the field: `'in:'.$variable` documents as
+  `required|string` with no enum, rather than as nothing at all, or as an enum
+  of one empty string.
+
 ## 0.7.0 — 2026-09-09
 
 ### Added

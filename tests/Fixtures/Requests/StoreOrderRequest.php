@@ -4,27 +4,29 @@ declare(strict_types=1);
 
 namespace Lusen\Tests\Fixtures\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Lusen\Tests\Fixtures\Requests\Concerns\HasShippingRules;
 
 /**
  * Exercises every rule shape the reader is expected to survive: both string
  * and array spellings, dot and wildcard nesting, Rule::in, Rule::enum, and a
  * closure it must skip without complaint.
+ *
+ * It composes its answer as well, because a real FormRequest of any size does:
+ * a base class through `parent::rules()`, a trait through `$this->`, and its
+ * own fields last. The literal array is not the interesting case - a reader
+ * that only handles the literal reports this whole request as empty.
  */
-final class StoreOrderRequest extends FormRequest
+final class StoreOrderRequest extends BaseOrderRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
+    use HasShippingRules;
 
     /**
      * @return array<string, mixed>
      */
     public function rules(): array
     {
-        return [
+        return array_merge(parent::rules(), $this->shippingRules($this->input('service', '')), [
             /**
              * Where to deliver the order.
              *
@@ -75,6 +77,6 @@ final class StoreOrderRequest extends FormRequest
             'callback' => [static fn (): bool => true],
             'website' => 'nullable|url',
             'ships_at' => 'nullable|date',
-        ];
+        ]);
     }
 }
