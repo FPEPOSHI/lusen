@@ -6,3 +6,5 @@ parameters:
     paths:
         - src
     tmpDir: .phpstan.cache
+    bootstrapFiles:
+        - tools/phpstan-bootstrap.php

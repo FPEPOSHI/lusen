@@ -15,6 +15,7 @@ final readonly class BladeRenderer implements Renderer
     public function __construct(private Factory $views) {}
 
     /**
+     * @param  view-string  $view
      * @param  array<string, mixed>  $data
      */
     public function render(string $view, array $data): string

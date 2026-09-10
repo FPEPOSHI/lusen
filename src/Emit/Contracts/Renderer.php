@@ -15,6 +15,7 @@ namespace Lusen\Emit\Contracts;
 interface Renderer
 {
     /**
+     * @param  view-string  $view  a name Blade can resolve, so a renamed view is a static-analysis error rather than a 500
      * @param  array<string, mixed>  $data
      */
     public function render(string $view, array $data): string;
