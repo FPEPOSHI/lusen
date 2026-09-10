@@ -24,7 +24,7 @@ use Lusen\Ir\Endpoint;
  */
 final class BuildCache
 {
-    private const FORMAT = 2;
+    private const FORMAT = 3;
 
     /**
      * @var array<string, array{fingerprint: string, endpoint: array<string, mixed>}>

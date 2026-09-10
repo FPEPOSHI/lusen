@@ -30,6 +30,7 @@ final readonly class Endpoint
      * @param  int|null  $order  where this operation sits inside its group; null sorts it after the ones that state a place
      * @param  int|null  $groupOrder  where the group sits in the navigation, carried here because groups are derived from their endpoints
      * @param  string|null  $groupDescription  what the group is for, carried here for the same reason
+     * @param  string|null  $requestClass  the FormRequest the action type-hints, recorded whether or not any rules could be read from it
      */
     public function __construct(
         public string $id,
@@ -53,6 +54,7 @@ final readonly class Endpoint
         public ?int $order = null,
         public ?int $groupOrder = null,
         public ?string $groupDescription = null,
+        public ?string $requestClass = null,
     ) {}
 
     public static function make(
@@ -121,6 +123,7 @@ final readonly class Endpoint
             order: Data::nullableInt($data, 'order'),
             groupOrder: Data::nullableInt($data, 'groupOrder'),
             groupDescription: Data::nullableString($data, 'groupDescription'),
+            requestClass: Data::nullableString($data, 'requestClass'),
         );
     }
 
@@ -242,6 +245,7 @@ final readonly class Endpoint
         ?int $order = null,
         ?int $groupOrder = null,
         ?string $groupDescription = null,
+        ?string $requestClass = null,
     ): self {
         return new self(
             id: $this->id,
@@ -265,6 +269,7 @@ final readonly class Endpoint
             order: $order ?? $this->order,
             groupOrder: $groupOrder ?? $this->groupOrder,
             groupDescription: $groupDescription ?? $this->groupDescription,
+            requestClass: $requestClass ?? $this->requestClass,
         );
     }
 
@@ -299,6 +304,7 @@ final readonly class Endpoint
             'order' => $this->order,
             'groupOrder' => $this->groupOrder,
             'groupDescription' => $this->groupDescription,
+            'requestClass' => $this->requestClass,
         ], static fn (mixed $v): bool => $v !== null);
     }
 }

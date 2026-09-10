@@ -5,20 +5,27 @@ declare(strict_types=1);
 namespace Lusen\Extract\Rules;
 
 use BackedEnum;
+use Lusen\Support\Ast;
 use Lusen\Support\DocBlock;
 use PhpParser\Node;
+use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\BinaryOp\Concat;
+use PhpParser\Node\Expr\BinaryOp\Plus;
 use PhpParser\Node\Expr\ClassConstFetch;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\New_;
+use PhpParser\Node\Expr\NullsafeMethodCall;
 use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Scalar\Float_;
+use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
-use PhpParser\Node\Stmt\Return_;
 use PhpParser\NodeFinder;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\ParserFactory;
+use ReflectionMethod;
 use Throwable;
 use UnitEnum;
 
@@ -32,10 +39,29 @@ use UnitEnum;
  *
  * The cost is that only statically-expressible rules are seen. That is the
  * right trade: a rule this cannot read produces slightly thinner docs, never
- * a failed build.
+ * a failed build. What that costs is worth keeping small, though, because a
+ * FormRequest the reader cannot follow is a request body that vanishes off the
+ * page - so three shapes a real application writes constantly are followed
+ * rather than given up on:
+ *
+ * - `return array_merge($this->sharedRules(), [...])`, and the spread that
+ *   spells the same thing. A rules() that composes is still a rules().
+ * - The method on the other side of that call, whether it arrives from a trait
+ *   or a parent class. `parent::rules()` is how a base request shares a date
+ *   range across nine reports.
+ * - A rule string built by concatenation - `'in:'.implode(',', self::TYPES)`,
+ *   `'max:'.self::LIMIT`. Constants are read without constructing anything,
+ *   and a piece that cannot be read truncates that one rule instead of
+ *   discarding the field.
  */
 final class FormRequestReader
 {
+    /**
+     * How far a rules() may delegate before this stops following. Nothing
+     * legitimate nests this deep; a cycle the seen-list somehow misses does.
+     */
+    private const MAX_DEPTH = 8;
+
     /**
      * Parsing the same request class once per route would be wasteful on a
      * resource controller, where five actions share one FormRequest.
@@ -74,22 +100,20 @@ final class FormRequestReader
             return [];
         }
 
-        $array = self::findReturnedArray($method);
+        $seen = [strtolower($class.'::rules') => true];
 
-        if ($array === null) {
-            return [];
-        }
+        $items = self::itemsIn($method, $class, $class, $seen, 0);
 
         $rules = [];
 
-        foreach ($array->items as $item) {
+        foreach ($items as $item) {
             if (! $item->key instanceof String_) {
                 // A computed key cannot be read statically; skip it rather
                 // than inventing a field name.
                 continue;
             }
 
-            $value = self::ruleStrings($item->value);
+            $value = self::ruleStrings($item->value, $class);
 
             if ($value !== []) {
                 // A docblock above the rule is the only place in a
@@ -155,88 +179,208 @@ final class FormRequestReader
         };
     }
 
+    /**
+     * The class's own `rules()` where it writes one, and the one it inherits
+     * where it does not.
+     */
     private static function findRulesMethod(string $file, string $class): ?ClassMethod
     {
-        if (! is_file($file)) {
-            return null;
-        }
+        $ast = Ast::parse($file);
 
-        $code = file_get_contents($file);
+        if ($ast !== null) {
+            /** @var list<Class_> $classes */
+            $classes = (new NodeFinder)->findInstanceOf($ast, Class_::class);
 
-        if ($code === false) {
-            return null;
-        }
+            foreach ($classes as $candidate) {
+                if ($candidate->namespacedName?->toString() !== ltrim($class, '\\')) {
+                    continue;
+                }
 
-        try {
-            $ast = (new ParserFactory)->createForNewestSupportedVersion()->parse($code);
-        } catch (Throwable) {
-            // A file we cannot parse is not a reason to fail the build.
-            return null;
-        }
-
-        if ($ast === null) {
-            return null;
-        }
-
-        // Resolves `Rule` to `Illuminate\Validation\Rule` and `Status::class`
-        // to its fully qualified name.
-        $traverser = new NodeTraverser(new NameResolver);
-        $ast = $traverser->traverse($ast);
-
-        $finder = new NodeFinder;
-
-        /** @var list<Class_> $classes */
-        $classes = $finder->findInstanceOf($ast, Class_::class);
-
-        foreach ($classes as $candidate) {
-            if ($candidate->namespacedName?->toString() !== ltrim($class, '\\')) {
-                continue;
-            }
-
-            foreach ($candidate->getMethods() as $method) {
-                if ($method->name->toLowerString() === 'rules') {
-                    return $method;
+                foreach ($candidate->getMethods() as $method) {
+                    if ($method->name->toLowerString() === 'rules') {
+                        return $method;
+                    }
                 }
             }
         }
 
-        return null;
+        return Ast::declaredMethod($class, 'rules');
     }
 
-    private static function findReturnedArray(ClassMethod $method): ?Array_
+    /**
+     * Every entry the method returns, following the calls it composes its
+     * answer from.
+     *
+     * @param  string  $object  the class `$this` refers to, which stays put no
+     *                          matter whose file the rules are written in
+     * @param  string  $declaring  the class the method being read belongs to,
+     *                             which is what `parent::` is relative to
+     * @param  array<string, true>  $seen
+     * @return list<ArrayItem>
+     */
+    private static function itemsIn(ClassMethod $method, string $object, string $declaring, array &$seen, int $depth): array
     {
-        /** @var list<Return_> $returns */
-        $returns = (new NodeFinder)->findInstanceOf($method->stmts ?? [], Return_::class);
+        foreach (Ast::returns($method) as $return) {
+            $items = self::itemsFrom($return->expr, $object, $declaring, $seen, $depth);
 
-        foreach ($returns as $return) {
-            if ($return->expr instanceof Array_) {
-                return $return->expr;
+            if ($items !== []) {
+                return $items;
             }
         }
 
-        return null;
+        return [];
+    }
+
+    /**
+     * @param  array<string, true>  $seen
+     * @return list<ArrayItem>
+     */
+    private static function itemsFrom(?Node $expr, string $object, string $declaring, array &$seen, int $depth): array
+    {
+        if ($expr instanceof Array_) {
+            $items = [];
+
+            foreach ($expr->items as $item) {
+                if ($item->unpack) {
+                    // `[...$this->sharedRules(), 'field' => ...]`.
+                    $items = [...$items, ...self::itemsFrom($item->value, $object, $declaring, $seen, $depth)];
+
+                    continue;
+                }
+
+                $items[] = $item;
+            }
+
+            return $items;
+        }
+
+        if ($expr instanceof FuncCall && self::isFunction($expr, ['array_merge', 'array_merge_recursive', 'array_replace'])) {
+            $items = [];
+
+            foreach ($expr->getArgs() as $argument) {
+                $items = [...$items, ...self::itemsFrom($argument->value, $object, $declaring, $seen, $depth)];
+            }
+
+            return $items;
+        }
+
+        if ($expr instanceof Plus) {
+            // `+` keeps the left-hand entry on a collision where array_merge
+            // keeps the right-hand one, and the caller takes the last of a
+            // repeated key - so the left goes last to win.
+            return [
+                ...self::itemsFrom($expr->right, $object, $declaring, $seen, $depth),
+                ...self::itemsFrom($expr->left, $object, $declaring, $seen, $depth),
+            ];
+        }
+
+        if ($expr instanceof MethodCall || $expr instanceof NullsafeMethodCall || $expr instanceof StaticCall) {
+            return self::itemsFromCall($expr, $object, $declaring, $seen, $depth);
+        }
+
+        return [];
+    }
+
+    /**
+     * @param  MethodCall|NullsafeMethodCall|StaticCall  $call
+     * @param  array<string, true>  $seen
+     * @return list<ArrayItem>
+     */
+    private static function itemsFromCall(Node $call, string $object, string $declaring, array &$seen, int $depth): array
+    {
+        if ($depth >= self::MAX_DEPTH) {
+            return [];
+        }
+
+        if (! $call->name instanceof Node\Identifier) {
+            return [];
+        }
+
+        $name = $call->name->toString();
+        $target = self::callTarget($call, $object, $declaring);
+
+        if ($target === null) {
+            return [];
+        }
+
+        $key = strtolower($target.'::'.$name);
+
+        if (isset($seen[$key])) {
+            return [];
+        }
+
+        $seen[$key] = true;
+
+        $method = Ast::declaredMethod($target, $name);
+
+        if ($method === null) {
+            return [];
+        }
+
+        return self::itemsIn($method, $object, self::declaringClass($target, $name) ?? $target, $seen, $depth + 1);
+    }
+
+    /**
+     * Which class the called method should be looked for on. Only calls whose
+     * receiver is this request are followed - a call on some other object is a
+     * collaborator whose return value cannot be read from here.
+     *
+     * @param  MethodCall|NullsafeMethodCall|StaticCall  $call
+     */
+    private static function callTarget(Node $call, string $object, string $declaring): ?string
+    {
+        if ($call instanceof StaticCall) {
+            if (! $call->class instanceof Node\Name) {
+                return null;
+            }
+
+            return match ($call->class->toLowerString()) {
+                'parent' => get_parent_class($declaring) ?: null,
+                'self', 'static' => $object,
+                default => $call->class->toString(),
+            };
+        }
+
+        $variable = $call->var ?? null;
+
+        return $variable instanceof Variable && $variable->name === 'this' ? $object : null;
+    }
+
+    /**
+     * A trait's method reports the using class, which is what `parent::` inside
+     * it resolves against - so this is the right answer for both.
+     */
+    private static function declaringClass(string $class, string $method): ?string
+    {
+        try {
+            return (new ReflectionMethod($class, $method))->getDeclaringClass()->getName();
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * @param  list<string>  $names
+     */
+    private static function isFunction(FuncCall $call, array $names): bool
+    {
+        return $call->name instanceof Node\Name
+            && in_array(strtolower($call->name->toString()), $names, true);
     }
 
     /**
      * @return list<string>
      */
-    private static function ruleStrings(Node $value): array
+    private static function ruleStrings(Node $value, string $object): array
     {
-        if ($value instanceof String_) {
-            return array_values(array_filter(
-                array_map(trim(...), explode('|', $value->value)),
-                static fn (string $rule): bool => $rule !== '',
-            ));
-        }
-
         if (! $value instanceof Array_) {
-            return [];
+            return self::ruleFromElement($value, $object);
         }
 
         $rules = [];
 
         foreach ($value->items as $item) {
-            $rules = [...$rules, ...self::ruleFromElement($item->value)];
+            $rules = [...$rules, ...self::ruleFromElement($item->value, $object)];
         }
 
         return $rules;
@@ -245,25 +389,214 @@ final class FormRequestReader
     /**
      * @return list<string>
      */
-    private static function ruleFromElement(Node $node): array
+    private static function ruleFromElement(Node $node, string $object): array
     {
-        if ($node instanceof String_) {
-            return array_values(array_filter(
-                array_map(trim(...), explode('|', $node->value)),
-                static fn (string $rule): bool => $rule !== '',
-            ));
-        }
-
         if ($node instanceof StaticCall) {
-            return self::ruleFromStaticCall($node);
+            return self::ruleFromStaticCall($node, $object);
         }
 
         if ($node instanceof New_) {
             return self::ruleFromNew($node);
         }
 
+        if ($node instanceof String_ || $node instanceof Concat) {
+            return self::ruleFromText($node, $object);
+        }
+
         // Rule objects and closures carry no statically readable constraint.
         return [];
+    }
+
+    /**
+     * A pipe-separated rule string, which may have been built by concatenation.
+     *
+     * When part of it cannot be read, the rule that part belonged to goes with
+     * it: `'required|string|max:'.self::LIMIT` with an unreadable LIMIT is
+     * `required|string`, not a `max:` with nothing after the colon, which
+     * `RuleSet` would read as a length of zero.
+     *
+     * @return list<string>
+     */
+    private static function ruleFromText(Node $node, string $object): array
+    {
+        [$text, $whole] = self::text($node, $object);
+
+        if ($text === null) {
+            return [];
+        }
+
+        $rules = array_map(trim(...), explode('|', $text));
+
+        if (! $whole) {
+            array_pop($rules);
+        }
+
+        return array_values(array_filter($rules, static fn (string $rule): bool => $rule !== ''));
+    }
+
+    /**
+     * The literal text of an expression, and whether all of it could be read.
+     *
+     * @return array{0: string|null, 1: bool}
+     */
+    private static function text(Node $node, string $object): array
+    {
+        if ($node instanceof String_) {
+            return [$node->value, true];
+        }
+
+        if ($node instanceof Concat) {
+            [$left, $leftWhole] = self::text($node->left, $object);
+
+            if ($left === null || ! $leftWhole) {
+                return [$left, false];
+            }
+
+            [$right, $rightWhole] = self::text($node->right, $object);
+
+            return $right === null ? [$left, false] : [$left.$right, $rightWhole];
+        }
+
+        $scalar = self::scalar($node, $object);
+
+        return $scalar === null ? [null, false] : [$scalar, true];
+    }
+
+    /**
+     * The scalar an expression evaluates to, where that can be known without
+     * running anything: a literal, a class constant, or an `implode()` over
+     * either. Those three cover how a rule string is built in practice.
+     */
+    private static function scalar(Node $node, string $object): ?string
+    {
+        if ($node instanceof Int_ || $node instanceof Float_) {
+            return (string) $node->value;
+        }
+
+        if ($node instanceof ClassConstFetch) {
+            return self::stringify(self::constantValue($node, $object));
+        }
+
+        if ($node instanceof FuncCall && self::isFunction($node, ['implode', 'join'])) {
+            return self::implode($node, $object);
+        }
+
+        return null;
+    }
+
+    private static function implode(FuncCall $call, string $object): ?string
+    {
+        $arguments = $call->getArgs();
+
+        if (count($arguments) !== 2) {
+            return null;
+        }
+
+        [$glue, $whole] = self::text($arguments[0]->value, $object);
+
+        if ($glue === null || ! $whole) {
+            return null;
+        }
+
+        $values = self::valueList($arguments[1]->value, $object);
+
+        return $values === null ? null : implode($glue, $values);
+    }
+
+    /**
+     * @return list<string>|null
+     */
+    private static function valueList(Node $node, string $object): ?array
+    {
+        if ($node instanceof ClassConstFetch) {
+            $constant = self::constantValue($node, $object);
+
+            if (! is_array($constant)) {
+                return null;
+            }
+
+            $values = [];
+
+            foreach ($constant as $entry) {
+                $value = self::stringify($entry);
+
+                if ($value === null) {
+                    return null;
+                }
+
+                $values[] = $value;
+            }
+
+            return $values;
+        }
+
+        if (! $node instanceof Array_) {
+            return null;
+        }
+
+        $values = [];
+
+        foreach ($node->items as $item) {
+            $value = self::scalar($item->value, $object);
+
+            if ($value === null && $item->value instanceof String_) {
+                $value = $item->value->value;
+            }
+
+            if ($value === null) {
+                return null;
+            }
+
+            $values[] = $value;
+        }
+
+        return $values;
+    }
+
+    /**
+     * Reading a constant loads its class, which defines it without
+     * constructing it - the same thing `enum_exists()` below already does.
+     */
+    private static function constantValue(ClassConstFetch $node, string $object): mixed
+    {
+        if (! $node->class instanceof Node\Name || ! $node->name instanceof Node\Identifier) {
+            return null;
+        }
+
+        // `self` and `static` are left alone by the name resolver, because
+        // only the object they are evaluated against can say what they mean -
+        // and a rule reaching for `self::MAX` is the commonest way a limit
+        // gets into a rule string at all.
+        $class = match ($node->class->toLowerString()) {
+            'self', 'static' => $object,
+            'parent' => get_parent_class($object) ?: '',
+            default => $node->class->toString(),
+        };
+
+        $constant = $node->name->toString();
+
+        if (strtolower($constant) === 'class') {
+            return $class;
+        }
+
+        if (! class_exists($class) && ! interface_exists($class) && ! enum_exists($class)) {
+            return null;
+        }
+
+        return defined($class.'::'.$constant) ? constant($class.'::'.$constant) : null;
+    }
+
+    private static function stringify(mixed $value): ?string
+    {
+        if ($value instanceof BackedEnum) {
+            return (string) $value->value;
+        }
+
+        if ($value instanceof UnitEnum) {
+            return $value->name;
+        }
+
+        return is_string($value) || is_int($value) || is_float($value) ? (string) $value : null;
     }
 
     /**
@@ -272,7 +605,7 @@ final class FormRequestReader
      *
      * @return list<string>
      */
-    private static function ruleFromStaticCall(StaticCall $call): array
+    private static function ruleFromStaticCall(StaticCall $call, string $object): array
     {
         if (! $call->class instanceof Node\Name || ! $call->name instanceof Node\Identifier) {
             return [];
@@ -286,7 +619,7 @@ final class FormRequestReader
         }
 
         if ($method === 'in') {
-            $values = self::literalList($arguments[0]->value);
+            $values = self::literalList($arguments[0]->value, $object);
 
             return $values === [] ? [] : ['in:'.implode(',', $values)];
         }
@@ -346,10 +679,14 @@ final class FormRequestReader
     /**
      * @return list<string>
      */
-    private static function literalList(Node $node): array
+    private static function literalList(Node $node, string $object): array
     {
         if ($node instanceof String_) {
             return [$node->value];
+        }
+
+        if ($node instanceof ClassConstFetch) {
+            return self::valueList($node, $object) ?? [];
         }
 
         if (! $node instanceof Array_) {
@@ -361,7 +698,7 @@ final class FormRequestReader
         foreach ($node->items as $item) {
             if ($item->value instanceof String_) {
                 $values[] = $item->value->value;
-            } elseif ($item->value instanceof Node\Scalar\Int_) {
+            } elseif ($item->value instanceof Int_) {
                 $values[] = (string) $item->value->value;
             } elseif ($item->value instanceof ClassConstFetch
                 && $item->value->name instanceof Node\Identifier

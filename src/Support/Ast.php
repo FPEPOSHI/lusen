@@ -14,6 +14,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 use ReflectionClass;
+use ReflectionMethod;
 use Throwable;
 
 /**
@@ -98,6 +99,69 @@ final class Ast
         }
 
         return null;
+    }
+
+    /**
+     * A method as the class actually resolves it - inherited from a parent or
+     * pulled in from a trait, not only the ones written in the class's own
+     * file.
+     *
+     * `method()` looks in one file for one class node, which is the whole
+     * answer for a class that writes what it declares. A FormRequest that
+     * shares its rules through a trait or a base class declares nothing in its
+     * own file, and reading only that file reports it as having no rules at
+     * all. Reflection names the file the method really lives in without
+     * constructing anything, which is the same bargain the extractors already
+     * make to find a FormRequest from a method signature.
+     */
+    public static function declaredMethod(string $class, string $method): ?ClassMethod
+    {
+        if (! class_exists($class) && ! trait_exists($class)) {
+            return null;
+        }
+
+        try {
+            $reflection = new ReflectionMethod($class, $method);
+        } catch (Throwable) {
+            return null;
+        }
+
+        $file = $reflection->getFileName();
+
+        if ($file === false || ! is_file($file)) {
+            return null;
+        }
+
+        $ast = self::parse($file);
+
+        if ($ast === null) {
+            return null;
+        }
+
+        /** @var list<ClassMethod> $candidates */
+        $candidates = (new NodeFinder)->findInstanceOf($ast, ClassMethod::class);
+
+        $named = array_values(array_filter(
+            $candidates,
+            static fn (ClassMethod $candidate): bool => $candidate->name->toLowerString() === strtolower($method),
+        ));
+
+        if ($named === []) {
+            return null;
+        }
+
+        // One file usually declares one class-like, so the name is enough.
+        // Where it does not, the declaration line reflection reports picks the
+        // right one out of the several that share a method name.
+        $line = $reflection->getStartLine();
+
+        foreach ($named as $candidate) {
+            if ($line !== false && abs($candidate->getStartLine() - $line) <= 1) {
+                return $candidate;
+            }
+        }
+
+        return count($named) === 1 ? $named[0] : null;
     }
 
     /**
